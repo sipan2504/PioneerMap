@@ -2,6 +2,17 @@ import { useCallback, useState } from "react";
 import { axiosClient } from "../lib/axiosClient";
 import type { AuthResult, PaymentDTO, User } from "../types/pi";
 
+declare global {
+  interface Window {
+    Pi: {
+      authenticate: (
+        scopes: string[],
+        onIncompletePaymentFound?: (payment: PaymentDTO) => Promise<void>
+      ) => Promise<AuthResult>;
+    };
+  }
+}
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [showSignIn, setShowSignIn] = useState(false);
@@ -21,18 +32,35 @@ export const useAuth = () => {
       setUser(authResult.user);
       setShowSignIn(false);
     } catch (err) {
-      console.error("Error signing in:", err);
+      console.error("Error signing in to backend:", err);
+      throw err;
     }
   }, []);
 
   const signIn = useCallback(async () => {
+    if (!window.Pi) {
+      console.error("Pi SDK is not available.");
+      return;
+    }
+
     setIsLoading(true);
+
     try {
-      const scopes = ["username", "payments", "roles", "in_app_notifications"];
-      const authResult = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
+      const scopes = [
+        "username",
+        "payments",
+        "roles",
+        "in_app_notifications",
+      ];
+
+      const authResult = await window.Pi.authenticate(
+        scopes,
+        onIncompletePaymentFound
+      );
+
       await signInUser(authResult);
     } catch (err) {
-      console.error("Error authenticating:", err);
+      console.error("Pi authentication failed:", err);
     } finally {
       setIsLoading(false);
     }
@@ -40,6 +68,7 @@ export const useAuth = () => {
 
   const signOut = useCallback(async () => {
     setIsLoading(true);
+
     try {
       await axiosClient.get("/user/signout");
       setUser(null);
@@ -54,6 +83,10 @@ export const useAuth = () => {
     setShowSignIn(false);
   }, []);
 
+  const requireAuth = useCallback(() => {
+    setShowSignIn(true);
+  }, []);
+
   return {
     user,
     isAuthenticated: Boolean(user),
@@ -61,7 +94,7 @@ export const useAuth = () => {
     signIn,
     signOut,
     closeSignIn,
-    requireAuth: () => setShowSignIn(true),
+    requireAuth,
     isLoading,
   };
 };
