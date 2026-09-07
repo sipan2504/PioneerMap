@@ -18,7 +18,7 @@ import "./types/session";
 import mountNotificationEndpoints from "./handlers/notifications";
 
 const dbName = env.mongo_db_name;
-const mongoUri = `mongodb://${env.mongo_host}/${dbName}`;
+const mongoUri = `mongodb+srv://${encodeURIComponent(env.mongo_user)}:${encodeURIComponent(env.mongo_password)}@${env.mongo_host}/${dbName}?retryWrites=true&w=majority`;
 const mongoClientOptions = {
   authSource: "admin",
   auth: {
