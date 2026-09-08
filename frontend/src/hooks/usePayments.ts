@@ -55,13 +55,15 @@ export const usePayments = ({ isAuthenticated, onRequireAuth }: UsePaymentsArgs)
 
       setIsLoading(true);
       try {
-        await window.Pi.createPayment(
-          {
-            amount,
-            memo,
-            metadata,
-            ...(tokenCanonical ? { tokenCanonical } : {}),
-          },
+        const paymentData = {
+  amount,
+  memo,
+  metadata,
+  ...(tokenCanonical ? { tokenCanonical } : {}),
+} as any;
+
+await window.Pi.createPayment(
+  paymentData,
           {
             onReadyForServerApproval,
             onReadyForServerCompletion,
