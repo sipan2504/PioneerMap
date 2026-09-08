@@ -58,6 +58,8 @@ app.use(
 app.use(cookieParser());
 
 // Use sessions:
+app.set("trust proxy", 1);
+
 app.use(
   session({
     secret: env.session_secret,
@@ -69,6 +71,11 @@ app.use(
       dbName: dbName,
       collectionName: "user_sessions",
     }),
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    },
   }) as unknown as express.RequestHandler,
 );
 
