@@ -4,15 +4,9 @@ import type { AuthResult, PaymentDTO, User } from "../types/pi";
 
 declare global {
   interface Window {
-    Pi: {
-      authenticate: (
-        scopes: string[],
-        onIncompletePaymentFound?: (payment: PaymentDTO) => Promise<void>
-      ) => Promise<AuthResult>;
-    };
+    Pi: any;
   }
 }
-
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [showSignIn, setShowSignIn] = useState(false);
