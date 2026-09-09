@@ -16,6 +16,8 @@ type Place = {
   lat: number;
   lng: number;
   description: string;
+  username?: string;
+  user_id?: string | null;
 };
 
 const initialPlaces: Place[] = [
@@ -107,6 +109,8 @@ function PioneerMapPage() {
 
   const [status, setStatus] = useState("");
   const [signedIn, setSignedIn] = useState(false);
+  const [username, setUsername] = useState("");
+
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
@@ -150,6 +154,8 @@ function PioneerMapPage() {
       );
 
       setSignedIn(true);
+      setUsername(auth.user.username);
+
       setStatus(
         `Hoş geldin @${auth.user.username}`
       );
@@ -299,6 +305,22 @@ function PioneerMapPage() {
               ${place.description}
             </span>
 
+            ${
+              place.username
+                ? `
+                  <br />
+                  <span style="
+                    display:inline-block;
+                    margin-top:6px;
+                    color:#7b1fa2;
+                    font-weight:bold;
+                  ">
+                    👤 @${place.username}
+                  </span>
+                `
+                : ""
+            }
+
             <br />
 
             <span style="
@@ -349,6 +371,7 @@ function PioneerMapPage() {
       description:
         placeDescription.trim() ||
         "Pi Economy place",
+      username: username || undefined,
     };
 
     try {
@@ -390,6 +413,11 @@ function PioneerMapPage() {
         description:
           data.description ||
           newPlace.description,
+        username:
+          data.username ||
+          newPlace.username,
+        user_id:
+          data.user_id || null,
       };
 
       setPlaces((current) => [
@@ -499,6 +527,8 @@ function PioneerMapPage() {
             }}
           >
             ✅ Pi Connected
+            {username &&
+              ` — @${username}`}
           </div>
         )}
 
