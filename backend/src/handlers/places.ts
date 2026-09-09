@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 export default function mountPlaceEndpoints(router: Router) {
-  // Get all places
   router.get("/places", async (req, res) => {
     try {
       const placeCollection = req.app.locals.placeCollection;
@@ -29,7 +28,6 @@ export default function mountPlaceEndpoints(router: Router) {
     }
   });
 
-  // Add a new place
   router.post("/places", async (req, res) => {
     try {
       const placeCollection = req.app.locals.placeCollection;
@@ -61,6 +59,8 @@ export default function mountPlaceEndpoints(router: Router) {
         });
       }
 
+      const user = req.session.currentUser;
+
       const place = {
         name: String(name).trim(),
         category,
@@ -69,11 +69,12 @@ export default function mountPlaceEndpoints(router: Router) {
         description: description
           ? String(description).trim()
           : "Pi Economy place",
+        username: user?.username || "anonymous",
+        user_id: user?.uid || null,
         created_at: new Date(),
       };
 
-      const result =
-        await placeCollection.insertOne(place);
+      const result = await placeCollection.insertOne(place);
 
       return res.status(201).json({
         ...place,
