@@ -18,7 +18,7 @@ type Place = {
   description: string;
 };
 
-const places: Place[] = [
+const initialPlaces: Place[] = [
   {
     name: "Pi Stay Ankara",
     category: "Stays",
@@ -60,26 +60,11 @@ const categoryIcons: Record<
   Exclude<Category, "All">,
   { icon: string; color: string }
 > = {
-  Stays: {
-    icon: "🏠",
-    color: "#1976D2",
-  },
-  Shops: {
-    icon: "🛍️",
-    color: "#E91E63",
-  },
-  Food: {
-    icon: "🍴",
-    color: "#FF9800",
-  },
-  Services: {
-    icon: "🔧",
-    color: "#00A6A6",
-  },
-  Jobs: {
-    icon: "💼",
-    color: "#673AB7",
-  },
+  Stays: { icon: "🏠", color: "#1976D2" },
+  Shops: { icon: "🛍️", color: "#E91E63" },
+  Food: { icon: "🍴", color: "#FF9800" },
+  Services: { icon: "🔧", color: "#00A6A6" },
+  Jobs: { icon: "💼", color: "#673AB7" },
 };
 
 function createCategoryIcon(
@@ -91,21 +76,21 @@ function createCategoryIcon(
     className: "pioneer-map-marker",
     html: `
       <div style="
-        width: 48px;
-        height: 48px;
-        background: ${color};
-        border: 4px solid white;
-        border-radius: 50% 50% 50% 0;
-        transform: rotate(-45deg);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.30);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width:48px;
+        height:48px;
+        background:${color};
+        border:4px solid white;
+        border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);
+        box-shadow:0 4px 10px rgba(0,0,0,0.30);
+        display:flex;
+        align-items:center;
+        justify-content:center;
       ">
         <span style="
-          transform: rotate(45deg);
-          font-size: 23px;
-          line-height: 1;
+          transform:rotate(45deg);
+          font-size:23px;
+          line-height:1;
         ">${icon}</span>
       </div>
     `,
@@ -120,6 +105,19 @@ function PioneerMapPage() {
   const [signedIn, setSignedIn] = useState(false);
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
+
+  const [places, setPlaces] =
+    useState<Place[]>(initialPlaces);
+
+  const [showForm, setShowForm] = useState(false);
+  const [selectedLocation, setSelectedLocation] =
+    useState<{ lat: number; lng: number } | null>(null);
+
+  const [placeName, setPlaceName] = useState("");
+  const [placeDescription, setPlaceDescription] =
+    useState("");
+  const [placeCategory, setPlaceCategory] =
+    useState<Exclude<Category, "All">>("Stays");
 
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<L.Map | null>(null);
@@ -166,6 +164,16 @@ function PioneerMapPage() {
       }
     ).addTo(map);
 
+    map.on("click", (event) => {
+      setSelectedLocation({
+        lat: event.latlng.lat,
+        lng: event.latlng.lng,
+      });
+
+      setShowForm(true);
+      setStatus("Konum seçildi. Yer bilgilerini gir.");
+    });
+
     mapInstance.current = map;
 
     setTimeout(() => {
@@ -183,9 +191,9 @@ function PioneerMapPage() {
 
     if (!map) return;
 
-    markersRef.current.forEach((marker) => {
-      marker.remove();
-    });
+    markersRef.current.forEach((marker) =>
+      marker.remove()
+    );
 
     markersRef.current = [];
 
@@ -210,14 +218,19 @@ function PioneerMapPage() {
             <div style="font-size:28px;margin-bottom:5px;">
               ${categoryIcons[place.category].icon}
             </div>
+
             <strong style="font-size:16px;">
               ${place.name}
             </strong>
+
             <br />
+
             <span style="color:#666;">
               ${place.description}
             </span>
+
             <br />
+
             <span style="
               display:inline-block;
               margin-top:8px;
@@ -234,7 +247,44 @@ function PioneerMapPage() {
 
       markersRef.current.push(marker);
     });
-  }, [activeCategory]);
+  }, [places, activeCategory]);
+
+  const addPlace = () => {
+    if (!selectedLocation) {
+      setStatus("Önce haritadan bir konum seç.");
+      return;
+    }
+
+    if (!placeName.trim()) {
+      setStatus("Yer adını yaz.");
+      return;
+    }
+
+    const newPlace: Place = {
+      name: placeName.trim(),
+      category: placeCategory,
+      lat: selectedLocation.lat,
+      lng: selectedLocation.lng,
+      description:
+        placeDescription.trim() ||
+        "Pi Economy place",
+    };
+
+    setPlaces((current) => [
+      ...current,
+      newPlace,
+    ]);
+
+    setPlaceName("");
+    setPlaceDescription("");
+    setPlaceCategory("Stays");
+    setSelectedLocation(null);
+    setShowForm(false);
+
+    setStatus(
+      `✅ ${newPlace.name} haritaya eklendi.`
+    );
+  };
 
   const categories = [
     { name: "All" as Category, icon: "🌍" },
@@ -335,10 +385,157 @@ function PioneerMapPage() {
             {category.icon} {category.name}
           </button>
         ))}
+
+        <button
+          onClick={() => setShowForm(true)}
+          style={{
+            padding: "10px 18px",
+            borderRadius: "20px",
+            border: "none",
+            background: "#222",
+            color: "#fff",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          📍 Add Place
+        </button>
       </div>
+
+      {showForm && (
+        <div
+          style={{
+            margin: "15px",
+            padding: "20px",
+            background: "#ffffff",
+            borderRadius: "12px",
+            boxShadow:
+              "0 2px 10px rgba(0,0,0,0.12)",
+          }}
+        >
+          <h2>📍 Add Place</h2>
+
+          <p>
+            Haritada bir noktaya tıklayarak konum seç.
+          </p>
+
+          {selectedLocation && (
+            <p
+              style={{
+                color: "#2e7d32",
+                fontWeight: "bold",
+              }}
+            >
+              ✅ Konum seçildi
+            </p>
+          )}
+
+          <input
+            value={placeName}
+            onChange={(event) =>
+              setPlaceName(event.target.value)
+            }
+            placeholder="Yer adı"
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "12px",
+              marginBottom: "10px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+            }}
+          />
+
+          <select
+            value={placeCategory}
+            onChange={(event) =>
+              setPlaceCategory(
+                event.target.value as Exclude<
+                  Category,
+                  "All"
+                >
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom: "10px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+            }}
+          >
+            <option value="Stays">
+              🏠 Stays
+            </option>
+            <option value="Shops">
+              🛍️ Shops
+            </option>
+            <option value="Food">
+              🍔 Food
+            </option>
+            <option value="Services">
+              🔧 Services
+            </option>
+            <option value="Jobs">
+              💼 Jobs
+            </option>
+          </select>
+
+          <textarea
+            value={placeDescription}
+            onChange={(event) =>
+              setPlaceDescription(
+                event.target.value
+              )
+            }
+            placeholder="Açıklama"
+            rows={3}
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "12px",
+              marginBottom: "10px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+            }}
+          />
+
+          <button
+            onClick={addPlace}
+            style={{
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#f1c40f",
+              cursor: "pointer",
+              fontWeight: "bold",
+              marginRight: "8px",
+            }}
+          >
+            ➕ Yer Ekle
+          </button>
+
+          <button
+            onClick={() => {
+              setShowForm(false);
+              setSelectedLocation(null);
+            }}
+            style={{
+              padding: "12px 20px",
+              borderRadius: "8px",
+              border: "1px solid #ccc",
+              background: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            İptal
+          </button>
+        </div>
+      )}
 
       <main style={{ padding: "15px" }}>
         <div
+          ref={mapRef}
           style={{
             width: "100%",
             height: "500px",
@@ -346,7 +543,6 @@ function PioneerMapPage() {
             borderRadius: "12px",
             overflow: "hidden",
           }}
-          ref={mapRef}
         />
 
         <p
@@ -369,4 +565,4 @@ function PioneerMapPage() {
   );
 }
 
-export default PioneerMapPage;
+export default PioneerMapPage;    
