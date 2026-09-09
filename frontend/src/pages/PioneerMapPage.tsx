@@ -2,13 +2,63 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+type Category = "All" | "Stays" | "Shops" | "Food" | "Services" | "Jobs";
+
+type Place = {
+  name: string;
+  category: Exclude<Category, "All">;
+  lat: number;
+  lng: number;
+  description: string;
+};
+
+const places: Place[] = [
+  {
+    name: "Pi Stay Ankara",
+    category: "Stays",
+    lat: 39.9334,
+    lng: 32.8597,
+    description: "Pi-powered accommodation",
+  },
+  {
+    name: "Pi Market",
+    category: "Shops",
+    lat: 39.925,
+    lng: 32.85,
+    description: "Pi-powered shop",
+  },
+  {
+    name: "Pi Food",
+    category: "Food",
+    lat: 39.94,
+    lng: 32.87,
+    description: "Pi-powered food business",
+  },
+  {
+    name: "Pi Services",
+    category: "Services",
+    lat: 39.92,
+    lng: 32.88,
+    description: "Pi-powered service",
+  },
+  {
+    name: "Pi Jobs",
+    category: "Jobs",
+    lat: 39.95,
+    lng: 32.84,
+    description: "Pi Economy job listing",
+  },
+];
+
 function PioneerMapPage() {
   const [status, setStatus] = useState("");
   const [signedIn, setSignedIn] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] =
+    useState<Category>("All");
 
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
 
   const loginWithPi = async () => {
     try {
@@ -36,52 +86,77 @@ function PioneerMapPage() {
   };
 
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || mapInstance.current) return;
 
-    try {
-      const map = L.map(mapRef.current).setView(
-        [39.9334, 32.8597],
-        6
-      );
+    const map = L.map(mapRef.current).setView(
+      [39.9334, 32.8597],
+      6
+    );
 
-      L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          attribution: "© OpenStreetMap contributors",
-        }
-      ).addTo(map);
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution: "© OpenStreetMap contributors",
+      }
+    ).addTo(map);
 
-      L.marker([39.9334, 32.8597])
-        .addTo(map)
-        .bindPopup(
-          "<b>PioneerMap</b><br/>Pi Economy Map"
-        );
+    mapInstance.current = map;
 
-      mapInstance.current = map;
-
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 300);
-    } catch (error) {
-      console.error("Map error:", error);
-      setStatus("Harita yüklenemedi.");
-    }
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
 
     return () => {
-      if (mapInstance.current) {
-        mapInstance.current.remove();
-        mapInstance.current = null;
-      }
+      map.remove();
+      mapInstance.current = null;
     };
   }, []);
 
+  useEffect(() => {
+    const map = mapInstance.current;
+
+    if (!map) return;
+
+    markersRef.current.forEach((marker) => {
+      marker.remove();
+    });
+
+    markersRef.current = [];
+
+    const filteredPlaces =
+      activeCategory === "All"
+        ? places
+        : places.filter(
+            (place) => place.category === activeCategory
+          );
+
+    filteredPlaces.forEach((place) => {
+      const marker = L.marker([
+        place.lat,
+        place.lng,
+      ])
+        .addTo(map)
+        .bindPopup(`
+          <div>
+            <strong>${place.name}</strong>
+            <br />
+            ${place.description}
+            <br />
+            <b>Category:</b> ${place.category}
+          </div>
+        `);
+
+      markersRef.current.push(marker);
+    });
+  }, [activeCategory]);
+
   const categories = [
-    { name: "All", icon: "🌍" },
-    { name: "Stays", icon: "🏠" },
-    { name: "Shops", icon: "🛍️" },
-    { name: "Food", icon: "🍔" },
-    { name: "Services", icon: "🔧" },
-    { name: "Jobs", icon: "💼" },
+    { name: "All" as Category, icon: "🌍" },
+    { name: "Stays" as Category, icon: "🏠" },
+    { name: "Shops" as Category, icon: "🛍️" },
+    { name: "Food" as Category, icon: "🍔" },
+    { name: "Services" as Category, icon: "🔧" },
+    { name: "Jobs" as Category, icon: "💼" },
   ];
 
   return (
@@ -195,10 +270,12 @@ function PioneerMapPage() {
           }}
         >
           {activeCategory === "All"
-            ? "🌍 Explore the Pi Economy"
-            : `${categories.find(
-                (c) => c.name === activeCategory
-              )?.icon} ${activeCategory}`}
+            ? "🌍 Pi Economy Places"
+            : `${
+                categories.find(
+                  (c) => c.name === activeCategory
+                )?.icon
+              } ${activeCategory}`}
         </p>
       </main>
     </div>
