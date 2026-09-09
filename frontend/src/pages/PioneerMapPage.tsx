@@ -101,6 +101,10 @@ function createCategoryIcon(
 }
 
 function PioneerMapPage() {
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://pioneermap-2.onrender.com";
+
   const [status, setStatus] = useState("");
   const [signedIn, setSignedIn] = useState(false);
   const [activeCategory, setActiveCategory] =
@@ -151,12 +155,45 @@ function PioneerMapPage() {
       );
     } catch (error) {
       console.error(error);
-      setStatus(
-        "Pi Sign-In başarısız oldu."
-      );
+      setStatus("Pi Sign-In başarısız oldu.");
     }
   };
 
+  // MongoDB'deki yerleri getir
+  useEffect(() => {
+    const loadPlaces = async () => {
+      try {
+        const response = await fetch(
+          `${backendUrl}/api/places`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Places request failed: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          setPlaces(data);
+        }
+      } catch (error) {
+        console.error(
+          "Places yüklenemedi:",
+          error
+        );
+      }
+    };
+
+    loadPlaces();
+  }, [backendUrl]);
+
+  // Haritayı oluştur
   useEffect(() => {
     if (!mapRef.current || mapInstance.current) {
       return;
@@ -200,6 +237,7 @@ function PioneerMapPage() {
     };
   }, []);
 
+  // Markerları göster
   useEffect(() => {
     const map = mapInstance.current;
 
@@ -218,8 +256,7 @@ function PioneerMapPage() {
         ? places
         : places.filter(
             (place) =>
-              place.category ===
-              activeCategory
+              place.category === activeCategory
           );
 
     filteredPlaces.forEach((place) => {
@@ -241,9 +278,11 @@ function PioneerMapPage() {
               font-size:28px;
               margin-bottom:5px;
             ">
-              ${categoryIcons[
-                place.category
-              ].icon}
+              ${
+                categoryIcons[
+                  place.category
+                ].icon
+              }
             </div>
 
             <strong style="
@@ -284,7 +323,8 @@ function PioneerMapPage() {
     });
   }, [places, activeCategory]);
 
-  const addPlace = () => {
+  // Yeni yeri MongoDB'ye kaydet
+  const addPlace = async () => {
     if (!placeName.trim()) {
       setStatus("Yer adını yaz.");
       return;
@@ -311,27 +351,78 @@ function PioneerMapPage() {
         "Pi Economy place",
     };
 
-    setPlaces((current) => [
-      ...current,
-      newPlace,
-    ]);
+    try {
+      setStatus("⏳ Yer kaydediliyor...");
 
-    if (map) {
-      map.setView(
-        [newPlace.lat, newPlace.lng],
-        Math.max(map.getZoom(), 10)
+      const response = await fetch(
+        `${backendUrl}/api/places`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(newPlace),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            "Yer kaydedilemedi."
+        );
+      }
+
+      const savedPlace: Place = {
+        name: data.name || newPlace.name,
+        category:
+          data.category || newPlace.category,
+        lat:
+          typeof data.lat === "number"
+            ? data.lat
+            : newPlace.lat,
+        lng:
+          typeof data.lng === "number"
+            ? data.lng
+            : newPlace.lng,
+        description:
+          data.description ||
+          newPlace.description,
+      };
+
+      setPlaces((current) => [
+        ...current,
+        savedPlace,
+      ]);
+
+      if (map) {
+        map.setView(
+          [savedPlace.lat, savedPlace.lng],
+          Math.max(map.getZoom(), 10)
+        );
+      }
+
+      setPlaceName("");
+      setPlaceDescription("");
+      setPlaceCategory("Stays");
+      setSelectedLocation(null);
+      setShowForm(false);
+
+      setStatus(
+        `✅ ${savedPlace.name} MongoDB'ye kaydedildi.`
+      );
+    } catch (error) {
+      console.error(
+        "Yer kaydetme hatası:",
+        error
+      );
+
+      setStatus(
+        "❌ Yer kaydedilemedi. Backend bağlantısını kontrol et."
       );
     }
-
-    setPlaceName("");
-    setPlaceDescription("");
-    setPlaceCategory("Stays");
-    setSelectedLocation(null);
-    setShowForm(false);
-
-    setStatus(
-      `✅ ${newPlace.name} başarıyla haritaya eklendi.`
-    );
   };
 
   const categories = [
@@ -412,9 +503,11 @@ function PioneerMapPage() {
         )}
 
         {status && (
-          <p style={{
-            fontWeight: "bold"
-          }}>
+          <p
+            style={{
+              fontWeight: "bold",
+            }}
+          >
             {status}
           </p>
         )}
@@ -441,8 +534,7 @@ function PioneerMapPage() {
             style={{
               padding: "10px 15px",
               borderRadius: "20px",
-              border:
-                "1px solid #ddd",
+              border: "1px solid #ddd",
               cursor: "pointer",
               background:
                 activeCategory ===
@@ -523,8 +615,7 @@ function PioneerMapPage() {
               padding: "12px",
               marginBottom: "10px",
               borderRadius: "8px",
-              border:
-                "1px solid #ccc",
+              border: "1px solid #ccc",
             }}
           />
 
@@ -543,8 +634,7 @@ function PioneerMapPage() {
               padding: "12px",
               marginBottom: "10px",
               borderRadius: "8px",
-              border:
-                "1px solid #ccc",
+              border: "1px solid #ccc",
             }}
           >
             <option value="Stays">
@@ -583,8 +673,7 @@ function PioneerMapPage() {
               padding: "12px",
               marginBottom: "10px",
               borderRadius: "8px",
-              border:
-                "1px solid #ccc",
+              border: "1px solid #ccc",
             }}
           />
 
@@ -606,15 +695,12 @@ function PioneerMapPage() {
           <button
             onClick={() => {
               setShowForm(false);
-              setSelectedLocation(
-                null
-              );
+              setSelectedLocation(null);
             }}
             style={{
               padding: "12px 20px",
               borderRadius: "8px",
-              border:
-                "1px solid #ccc",
+              border: "1px solid #ccc",
               background: "#fff",
               cursor: "pointer",
             }}
@@ -624,9 +710,11 @@ function PioneerMapPage() {
         </div>
       )}
 
-      <main style={{
-        padding: "15px"
-      }}>
+      <main
+        style={{
+          padding: "15px",
+        }}
+      >
         <div
           ref={mapRef}
           style={{
