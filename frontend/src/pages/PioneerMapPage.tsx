@@ -36,32 +36,42 @@ function PioneerMapPage() {
   };
 
   useEffect(() => {
-    if (!mapRef.current || mapInstance.current) return;
+    if (!mapRef.current) return;
 
-    const map = L.map(mapRef.current).setView(
-      [39.9334, 32.8597],
-      6
-    );
-
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
-      }
-    ).addTo(map);
-
-    L.marker([39.9334, 32.8597])
-      .addTo(map)
-      .bindPopup(
-        "<b>🗺️ PioneerMap</b><br />Pi Economy Map"
+    try {
+      const map = L.map(mapRef.current).setView(
+        [39.9334, 32.8597],
+        6
       );
 
-    mapInstance.current = map;
+      L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          attribution: "© OpenStreetMap contributors",
+        }
+      ).addTo(map);
+
+      L.marker([39.9334, 32.8597])
+        .addTo(map)
+        .bindPopup(
+          "<b>PioneerMap</b><br/>Pi Economy Map"
+        );
+
+      mapInstance.current = map;
+
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 300);
+    } catch (error) {
+      console.error("Map error:", error);
+      setStatus("Harita yüklenemedi.");
+    }
 
     return () => {
-      map.remove();
-      mapInstance.current = null;
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
     };
   }, []);
 
@@ -79,7 +89,6 @@ function PioneerMapPage() {
       style={{
         minHeight: "100vh",
         background: "#f5f7fa",
-        boxSizing: "border-box",
       }}
     >
       <header
@@ -87,14 +96,11 @@ function PioneerMapPage() {
           padding: "20px",
           textAlign: "center",
           background: "#ffffff",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
         }}
       >
-        <h1 style={{ margin: "0 0 8px" }}>
-          🗺️ PioneerMap
-        </h1>
+        <h1>🗺️ PioneerMap</h1>
 
-        <p style={{ margin: "0 0 18px" }}>
+        <p>
           Discover Pi-powered stores, products, services,
           and businesses near you.
         </p>
@@ -105,9 +111,9 @@ function PioneerMapPage() {
             style={{
               padding: "12px 24px",
               fontSize: "16px",
-              cursor: "pointer",
               borderRadius: "8px",
               border: "none",
+              cursor: "pointer",
             }}
           >
             🔐 Sign in with Pi
@@ -117,7 +123,6 @@ function PioneerMapPage() {
             style={{
               display: "inline-block",
               padding: "12px 24px",
-              fontSize: "16px",
               borderRadius: "8px",
               background: "#e8f5e9",
               color: "#2e7d32",
@@ -129,13 +134,7 @@ function PioneerMapPage() {
         )}
 
         {status && (
-          <p
-            style={{
-              marginTop: "12px",
-              marginBottom: "0",
-              fontWeight: "bold",
-            }}
-          >
+          <p style={{ fontWeight: "bold" }}>
             {status}
           </p>
         )}
@@ -177,46 +176,31 @@ function PioneerMapPage() {
         ))}
       </div>
 
-      <div
-        style={{
-          padding: "15px",
-        }}
-      >
+      <main style={{ padding: "15px" }}>
         <div
           style={{
-            background: "#ffffff",
+            width: "100%",
+            height: "500px",
+            background: "#ddd",
             borderRadius: "12px",
             overflow: "hidden",
-            boxShadow:
-              "0 2px 10px rgba(0,0,0,0.1)",
           }}
-        >
-          <div
-            ref={mapRef}
-            style={{
-              width: "100%",
-              height: "500px",
-            }}
-          />
-        </div>
+          ref={mapRef}
+        />
 
         <p
           style={{
             textAlign: "center",
-            marginTop: "12px",
             fontWeight: "bold",
           }}
         >
           {activeCategory === "All"
             ? "🌍 Explore the Pi Economy"
-            : `${
-                categories.find(
-                  (category) =>
-                    category.name === activeCategory
-                )?.icon
-              } ${activeCategory}`}
+            : `${categories.find(
+                (c) => c.name === activeCategory
+              )?.icon} ${activeCategory}`}
         </p>
-      </div>
+      </main>
     </div>
   );
 }
