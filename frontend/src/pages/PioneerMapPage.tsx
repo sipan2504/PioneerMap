@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-type Category = "All" | "Stays" | "Shops" | "Food" | "Services" | "Jobs";
+type Category =
+  | "All"
+  | "Stays"
+  | "Shops"
+  | "Food"
+  | "Services"
+  | "Jobs";
 
 type Place = {
   name: string;
@@ -50,6 +56,65 @@ const places: Place[] = [
   },
 ];
 
+const categoryIcons: Record<
+  Exclude<Category, "All">,
+  { icon: string; color: string }
+> = {
+  Stays: {
+    icon: "🏠",
+    color: "#1976D2",
+  },
+  Shops: {
+    icon: "🛍️",
+    color: "#E91E63",
+  },
+  Food: {
+    icon: "🍴",
+    color: "#FF9800",
+  },
+  Services: {
+    icon: "🔧",
+    color: "#00A6A6",
+  },
+  Jobs: {
+    icon: "💼",
+    color: "#673AB7",
+  },
+};
+
+function createCategoryIcon(
+  category: Exclude<Category, "All">
+) {
+  const { icon, color } = categoryIcons[category];
+
+  return L.divIcon({
+    className: "pioneer-map-marker",
+    html: `
+      <div style="
+        width: 48px;
+        height: 48px;
+        background: ${color};
+        border: 4px solid white;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.30);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        <span style="
+          transform: rotate(45deg);
+          font-size: 23px;
+          line-height: 1;
+        ">${icon}</span>
+      </div>
+    `,
+    iconSize: [56, 56],
+    iconAnchor: [28, 56],
+    popupAnchor: [0, -55],
+  });
+}
+
 function PioneerMapPage() {
   const [status, setStatus] = useState("");
   const [signedIn, setSignedIn] = useState(false);
@@ -96,7 +161,8 @@ function PioneerMapPage() {
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
-        attribution: "© OpenStreetMap contributors",
+        attribution:
+          "© OpenStreetMap contributors",
       }
     ).addTo(map);
 
@@ -127,22 +193,42 @@ function PioneerMapPage() {
       activeCategory === "All"
         ? places
         : places.filter(
-            (place) => place.category === activeCategory
+            (place) =>
+              place.category === activeCategory
           );
 
     filteredPlaces.forEach((place) => {
-      const marker = L.marker([
-        place.lat,
-        place.lng,
-      ])
+      const marker = L.marker(
+        [place.lat, place.lng],
+        {
+          icon: createCategoryIcon(place.category),
+        }
+      )
         .addTo(map)
         .bindPopup(`
-          <div>
-            <strong>${place.name}</strong>
+          <div style="min-width:180px;text-align:center;">
+            <div style="font-size:28px;margin-bottom:5px;">
+              ${categoryIcons[place.category].icon}
+            </div>
+            <strong style="font-size:16px;">
+              ${place.name}
+            </strong>
             <br />
-            ${place.description}
+            <span style="color:#666;">
+              ${place.description}
+            </span>
             <br />
-            <b>Category:</b> ${place.category}
+            <span style="
+              display:inline-block;
+              margin-top:8px;
+              padding:4px 10px;
+              border-radius:12px;
+              background:${categoryIcons[place.category].color};
+              color:white;
+              font-size:12px;
+            ">
+              ${place.category}
+            </span>
           </div>
         `);
 
@@ -176,8 +262,8 @@ function PioneerMapPage() {
         <h1>🗺️ PioneerMap</h1>
 
         <p>
-          Discover Pi-powered stores, products, services,
-          and businesses near you.
+          Discover Pi-powered stores, products,
+          services, and businesses near you.
         </p>
 
         {!signedIn ? (
@@ -273,7 +359,8 @@ function PioneerMapPage() {
             ? "🌍 Pi Economy Places"
             : `${
                 categories.find(
-                  (c) => c.name === activeCategory
+                  (c) =>
+                    c.name === activeCategory
                 )?.icon
               } ${activeCategory}`}
         </p>
