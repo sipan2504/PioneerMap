@@ -3,6 +3,7 @@ import Shop from "./pages/Shop";
 import EngagementTasksPage from "./pages/EngagementTasksPage.tsx";
 import PioneerMapPage from "./pages/PioneerMapPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
   {
     path: "/privacy-policy",
     element: <PrivacyPolicy />,
+  },
+  {
+    path: "/terms-of-service",
+    element: <TermsOfService />,
   },
 ]);
 
