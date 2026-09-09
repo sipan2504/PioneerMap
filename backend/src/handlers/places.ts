@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 export default function mountPlaceEndpoints(router: Router) {
+  // Get all places
   router.get("/places", async (req, res) => {
     try {
       const placeCollection = req.app.locals.placeCollection;
@@ -28,6 +29,7 @@ export default function mountPlaceEndpoints(router: Router) {
     }
   });
 
+  // Add a new place
   router.post("/places", async (req, res) => {
     try {
       const placeCollection = req.app.locals.placeCollection;
@@ -55,7 +57,8 @@ export default function mountPlaceEndpoints(router: Router) {
       ) {
         return res.status(400).json({
           error: "invalid_data",
-          message: "Name, category, latitude and longitude are required",
+          message:
+            "Name, category, latitude and longitude are required",
         });
       }
 
@@ -74,7 +77,8 @@ export default function mountPlaceEndpoints(router: Router) {
         created_at: new Date(),
       };
 
-      const result = await placeCollection.insertOne(place);
+      const result =
+        await placeCollection.insertOne(place);
 
       return res.status(201).json({
         ...place,
@@ -86,6 +90,71 @@ export default function mountPlaceEndpoints(router: Router) {
       return res.status(500).json({
         error: "internal_error",
         message: "Failed to add place",
+      });
+    }
+  });
+
+  // Delete a place
+  router.delete("/places/:id", async (req, res) => {
+    try {
+      const placeCollection = req.app.locals.placeCollection;
+
+      if (!placeCollection) {
+        return res.status(503).json({
+          error: "service_unavailable",
+          message: "Database not ready",
+        });
+      }
+
+      const { ObjectId } = await import("mongodb");
+
+      if (!ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          error: "invalid_id",
+          message: "Invalid place ID",
+        });
+      }
+
+      const user = req.session.currentUser;
+
+      if (!user) {
+        return res.status(401).json({
+          error: "unauthorized",
+          message: "User needs to sign in first",
+        });
+      }
+
+      const place = await placeCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+
+      if (!place) {
+        return res.status(404).json({
+          error: "not_found",
+          message: "Place not found",
+        });
+      }
+
+      if (place.user_id !== user.uid) {
+        return res.status(403).json({
+          error: "forbidden",
+          message: "You can only delete your own places",
+        });
+      }
+
+      await placeCollection.deleteOne({
+        _id: new ObjectId(req.params.id),
+      });
+
+      return res.status(200).json({
+        message: "Place deleted successfully",
+      });
+    } catch (err) {
+      console.error("Error deleting place:", err);
+
+      return res.status(500).json({
+        error: "internal_error",
+        message: "Failed to delete place",
       });
     }
   });
