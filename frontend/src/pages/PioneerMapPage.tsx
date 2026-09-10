@@ -19,33 +19,49 @@ type Place = {
   description: string;
   username?: string;
   user_id?: string | null;
+  language?: string;
+  country?: string;
 };
 
 const categoryIcons: Record<
   Exclude<Category, "All">,
   { icon: string; color: string }
 > = {
-  Stays: {
-    icon: "🏠",
-    color: "#1976D2",
-  },
-  Shops: {
-    icon: "🛍️",
-    color: "#E91E63",
-  },
-  Food: {
-    icon: "🍔",
-    color: "#FF9800",
-  },
-  Services: {
-    icon: "🔧",
-    color: "#009688",
-  },
-  Jobs: {
-    icon: "💼",
-    color: "#673AB7",
-  },
+  Stays: { icon: "🏠", color: "#1976D2" },
+  Shops: { icon: "🛍️", color: "#E91E63" },
+  Food: { icon: "🍔", color: "#FF9800" },
+  Services: { icon: "🔧", color: "#009688" },
+  Jobs: { icon: "💼", color: "#673AB7" },
 };
+
+const languages = [
+  { value: "Turkish", label: "🇹🇷 Türkçe" },
+  { value: "English", label: "🇬🇧 English" },
+  { value: "Arabic", label: "🇸🇦 العربية" },
+  { value: "German", label: "🇩🇪 Deutsch" },
+  { value: "French", label: "🇫🇷 Français" },
+  { value: "Spanish", label: "🇪🇸 Español" },
+  { value: "Russian", label: "🇷🇺 Русский" },
+  { value: "Chinese", label: "🇨🇳 中文" },
+  { value: "Japanese", label: "🇯🇵 日本語" },
+  { value: "Korean", label: "🇰🇷 한국어" },
+];
+
+const countries = [
+  { value: "Türkiye", label: "🇹🇷 Türkiye" },
+  { value: "United States", label: "🇺🇸 ABD" },
+  { value: "United Kingdom", label: "🇬🇧 İngiltere" },
+  { value: "Germany", label: "🇩🇪 Almanya" },
+  { value: "France", label: "🇫🇷 Fransa" },
+  { value: "Spain", label: "🇪🇸 İspanya" },
+  { value: "Italy", label: "🇮🇹 İtalya" },
+  { value: "Saudi Arabia", label: "🇸🇦 Suudi Arabistan" },
+  { value: "United Arab Emirates", label: "🇦🇪 BAE" },
+  { value: "China", label: "🇨🇳 Çin" },
+  { value: "Japan", label: "🇯🇵 Japonya" },
+  { value: "South Korea", label: "🇰🇷 Güney Kore" },
+  { value: "Russia", label: "🇷🇺 Rusya" },
+];
 
 const initialPlaces: Place[] = [
   {
@@ -54,6 +70,8 @@ const initialPlaces: Place[] = [
     lat: 39.9334,
     lng: 32.8597,
     description: "Pi-powered accommodation",
+    language: "Turkish",
+    country: "Türkiye",
   },
   {
     name: "Pi Market",
@@ -61,6 +79,8 @@ const initialPlaces: Place[] = [
     lat: 39.925,
     lng: 32.85,
     description: "Pi-powered shop",
+    language: "Turkish",
+    country: "Türkiye",
   },
   {
     name: "Pi Food",
@@ -68,6 +88,8 @@ const initialPlaces: Place[] = [
     lat: 39.94,
     lng: 32.87,
     description: "Pi-powered food business",
+    language: "Turkish",
+    country: "Türkiye",
   },
   {
     name: "Pi Services",
@@ -75,6 +97,8 @@ const initialPlaces: Place[] = [
     lat: 39.92,
     lng: 32.88,
     description: "Pi-powered service",
+    language: "Turkish",
+    country: "Türkiye",
   },
   {
     name: "Pi Jobs",
@@ -82,6 +106,8 @@ const initialPlaces: Place[] = [
     lat: 39.95,
     lng: 32.84,
     description: "Pi Economy job listing",
+    language: "Turkish",
+    country: "Türkiye",
   },
 ];
 
@@ -93,27 +119,19 @@ function distanceInKm(
 ): number {
   const R = 6371;
 
-  const dLat =
-    ((lat2 - lat1) * Math.PI) / 180;
-
-  const dLng =
-    ((lng2 - lng1) * Math.PI) / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
 
   const a =
-    Math.sin(dLat / 2) *
-      Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
+      Math.sin(dLng / 2) ** 2;
 
   return (
     R *
     2 *
-    Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1 - a)
-    )
+    Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   );
 }
 
@@ -176,14 +194,9 @@ function PioneerMapPage() {
     import.meta.env.VITE_BACKEND_URL ||
     "https://pioneermap-2.onrender.com";
 
-  const [status, setStatus] =
-    useState("");
-
-  const [signedIn, setSignedIn] =
-    useState(false);
-
-  const [username, setUsername] =
-    useState("");
+  const [status, setStatus] = useState("");
+  const [signedIn, setSignedIn] = useState(false);
+  const [username, setUsername] = useState("");
 
   const [places, setPlaces] =
     useState<Place[]>(initialPlaces);
@@ -193,6 +206,12 @@ function PioneerMapPage() {
 
   const [searchText, setSearchText] =
     useState("");
+
+  const [activeLanguage, setActiveLanguage] =
+    useState("All");
+
+  const [activeCountry, setActiveCountry] =
+    useState("All");
 
   const [nearbyOnly, setNearbyOnly] =
     useState(false);
@@ -224,6 +243,12 @@ function PioneerMapPage() {
   const [placeCategory, setPlaceCategory] =
     useState<Exclude<Category, "All">>("Stays");
 
+  const [placeLanguage, setPlaceLanguage] =
+    useState("Turkish");
+
+  const [placeCountry, setPlaceCountry] =
+    useState("Türkiye");
+
   const mapRef =
     useRef<HTMLDivElement | null>(null);
 
@@ -236,20 +261,6 @@ function PioneerMapPage() {
   const userMarkerRef =
     useRef<L.Marker | null>(null);
 
-  /*
-   * PI LOGIN
-   *
-   * ÖNEMLİ:
-   * Pi authenticate sonucunu backend /user/signin
-   * endpoint'ine gönderiyoruz.
-   *
-   * Böylece backend:
-   * req.session.currentUser
-   * bilgisini oluşturuyor.
-   *
-   * Yeni yer eklenince artık anonymous yerine
-   * gerçek Pi kullanıcı adı kullanılacak.
-   */
   const loginWithPi = async () => {
     try {
       const pi = (window as any).Pi;
@@ -278,10 +289,6 @@ function PioneerMapPage() {
         );
       }
 
-      /*
-       * Pi kullanıcı bilgisini PioneerMap backend
-       * session'ına kaydet.
-       */
       const signinResponse =
         await fetch(
           `${backendUrl}/user/signin`,
@@ -315,10 +322,7 @@ function PioneerMapPage() {
       }
 
       setSignedIn(true);
-
-      setUsername(
-        auth.user.username
-      );
+      setUsername(auth.user.username);
 
       setStatus(
         `Hoş geldin @${auth.user.username}`
@@ -340,9 +344,6 @@ function PioneerMapPage() {
     }
   };
 
-  /*
-   * LOAD PLACES
-   */
   useEffect(() => {
     const loadPlaces = async () => {
       try {
@@ -382,9 +383,6 @@ function PioneerMapPage() {
     loadPlaces();
   }, [backendUrl]);
 
-  /*
-   * CREATE MAP
-   */
   useEffect(() => {
     if (
       !mapRef.current ||
@@ -432,9 +430,6 @@ function PioneerMapPage() {
     };
   }, []);
 
-  /*
-   * NEARBY PLACES
-   */
   const findNearbyPlaces = () => {
     if (!navigator.geolocation) {
       setStatus(
@@ -443,17 +438,13 @@ function PioneerMapPage() {
       return;
     }
 
-    setStatus(
-      "📍 Konumun alınıyor..."
-    );
+    setStatus("📍 Konumun alınıyor...");
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location = {
-          lat:
-            position.coords.latitude,
-          lng:
-            position.coords.longitude,
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
         };
 
         setUserLocation(location);
@@ -517,9 +508,6 @@ function PioneerMapPage() {
     );
   };
 
-  /*
-   * SHOW ALL
-   */
   const showAllPlaces = () => {
     setNearbyOnly(false);
     setUserLocation(null);
@@ -535,9 +523,6 @@ function PioneerMapPage() {
     );
   };
 
-  /*
-   * DELETE PLACE
-   */
   const deletePlace = async (
     place: Place
   ) => {
@@ -614,9 +599,6 @@ function PioneerMapPage() {
     }
   };
 
-  /*
-   * FILTER + MARKERS
-   */
   useEffect(() => {
     const map =
       mapInstance.current;
@@ -644,11 +626,23 @@ function PioneerMapPage() {
           place.category ===
             activeCategory;
 
+        const languageMatch =
+          activeLanguage === "All" ||
+          (place.language || "") ===
+            activeLanguage;
+
+        const countryMatch =
+          activeCountry === "All" ||
+          (place.country || "") ===
+            activeCountry;
+
         const text = [
           place.name,
           place.description,
           place.username || "",
           place.category,
+          place.language || "",
+          place.country || "",
         ]
           .join(" ")
           .toLowerCase();
@@ -677,6 +671,8 @@ function PioneerMapPage() {
 
         return (
           categoryMatch &&
+          languageMatch &&
+          countryMatch &&
           searchMatch &&
           nearbyMatch
         );
@@ -745,83 +741,97 @@ function PioneerMapPage() {
           `${place.name}-${place.lat}-${place.lng}`;
 
         marker.bindPopup(`
-          <div
-            style="
-              min-width:220px;
-              text-align:center;
-              font-family:Arial,sans-serif;
-            "
-          >
-            <div
-              style="
-                font-size:34px;
-                margin-bottom:6px;
-              "
-            >
+          <div style="
+            min-width:220px;
+            text-align:center;
+            font-family:Arial,sans-serif;
+          ">
+            <div style="
+              font-size:34px;
+              margin-bottom:6px;
+            ">
               ${category.icon}
             </div>
 
-            <div
-              style="
-                font-size:19px;
-                font-weight:700;
-                margin-bottom:5px;
-              "
-            >
+            <div style="
+              font-size:19px;
+              font-weight:700;
+              margin-bottom:5px;
+            ">
               ${place.name}
             </div>
 
-            <div
-              style="
-                color:#666;
-                font-size:14px;
-                line-height:1.4;
-              "
-            >
+            <div style="
+              color:#666;
+              font-size:14px;
+              line-height:1.4;
+            ">
               ${place.description}
             </div>
 
             ${
               place.username
                 ? `
-                  <div
-                    style="
-                      margin-top:8px;
-                      color:#7b1fa2;
-                      font-weight:700;
-                    "
-                  >
+                  <div style="
+                    margin-top:8px;
+                    color:#7b1fa2;
+                    font-weight:700;
+                  ">
                     👤 @${place.username}
                   </div>
                 `
                 : ""
             }
 
-            <div
-              style="
-                display:inline-block;
-                margin-top:8px;
-                padding:5px 12px;
-                border-radius:20px;
-                background:${category.color};
-                color:white;
-                font-weight:700;
-                font-size:12px;
-              "
-            >
+            ${
+              place.language
+                ? `
+                  <div style="
+                    margin-top:7px;
+                    color:#555;
+                    font-size:13px;
+                  ">
+                    🌐 ${place.language}
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              place.country
+                ? `
+                  <div style="
+                    margin-top:4px;
+                    color:#555;
+                    font-size:13px;
+                  ">
+                    🌍 ${place.country}
+                  </div>
+                `
+                : ""
+            }
+
+            <div style="
+              display:inline-block;
+              margin-top:8px;
+              padding:5px 12px;
+              border-radius:20px;
+              background:${category.color};
+              color:white;
+              font-weight:700;
+              font-size:12px;
+            ">
               ${place.category}
             </div>
 
             ${
               distance !== null
                 ? `
-                  <div
-                    style="
-                      margin-top:8px;
-                      color:#1976D2;
-                      font-weight:700;
-                    "
-                  >
+                  <div style="
+                    margin-top:8px;
+                    color:#1976D2;
+                    font-weight:700;
+                  ">
                     📍 ${distance.toFixed(
                       1
                     )} km
@@ -903,14 +913,13 @@ function PioneerMapPage() {
   }, [
     places,
     activeCategory,
+    activeLanguage,
+    activeCountry,
     searchText,
     nearbyOnly,
     userLocation,
   ]);
 
-  /*
-   * ADD PLACE
-   */
   const addPlace = async () => {
     if (!signedIn) {
       setStatus(
@@ -946,16 +955,10 @@ function PioneerMapPage() {
       description:
         placeDescription.trim() ||
         "Pi Economy place",
-
-      /*
-       * Frontend tarafında da gerçek
-       * Pi kullanıcı adını gönderiyoruz.
-       *
-       * Asıl sahiplik backend session
-       * tarafından belirleniyor.
-       */
       username:
         username || undefined,
+      language: placeLanguage,
+      country: placeCountry,
     };
 
     try {
@@ -1016,11 +1019,6 @@ function PioneerMapPage() {
           data.description ||
           newPlace.description,
 
-        /*
-         * Backend username döndürürse onu,
-         * döndürmezse giriş yapan Pi
-         * kullanıcısını kullan.
-         */
         username:
           data.username ||
           newPlace.username,
@@ -1028,6 +1026,14 @@ function PioneerMapPage() {
         user_id:
           data.user_id ||
           null,
+
+        language:
+          data.language ||
+          newPlace.language,
+
+        country:
+          data.country ||
+          newPlace.country,
       };
 
       setPlaces(
@@ -1057,6 +1063,8 @@ function PioneerMapPage() {
       setPlaceName("");
       setPlaceDescription("");
       setPlaceCategory("Stays");
+      setPlaceLanguage("Turkish");
+      setPlaceCountry("Türkiye");
       setSelectedLocation(null);
       setShowForm(false);
 
@@ -1081,30 +1089,12 @@ function PioneerMapPage() {
     name: Category;
     icon: string;
   }> = [
-    {
-      name: "All",
-      icon: "🌍",
-    },
-    {
-      name: "Stays",
-      icon: "🏠",
-    },
-    {
-      name: "Shops",
-      icon: "🛍️",
-    },
-    {
-      name: "Food",
-      icon: "🍔",
-    },
-    {
-      name: "Services",
-      icon: "🔧",
-    },
-    {
-      name: "Jobs",
-      icon: "💼",
-    },
+    { name: "All", icon: "🌍" },
+    { name: "Stays", icon: "🏠" },
+    { name: "Shops", icon: "🛍️" },
+    { name: "Food", icon: "🍔" },
+    { name: "Services", icon: "🔧" },
+    { name: "Jobs", icon: "💼" },
   ];
 
   const selectedDistance =
@@ -1434,6 +1424,94 @@ function PioneerMapPage() {
           )
         )}
 
+        <select
+          value={
+            activeLanguage
+          }
+          onChange={(event) =>
+            setActiveLanguage(
+              event.target.value
+            )
+          }
+          style={{
+            padding:
+              "10px 14px",
+            borderRadius:
+              "22px",
+            border:
+              "1px solid #ddd",
+            background:
+              "#fff",
+            fontSize:
+              "15px",
+            cursor:
+              "pointer",
+          }}
+        >
+          <option value="All">
+            🌐 Dil
+          </option>
+
+          {languages.map(
+            (language) => (
+              <option
+                key={
+                  language.value
+                }
+                value={
+                  language.value
+                }
+              >
+                {language.label}
+              </option>
+            )
+          )}
+        </select>
+
+        <select
+          value={
+            activeCountry
+          }
+          onChange={(event) =>
+            setActiveCountry(
+              event.target.value
+            )
+          }
+          style={{
+            padding:
+              "10px 14px",
+            borderRadius:
+              "22px",
+            border:
+              "1px solid #ddd",
+            background:
+              "#fff",
+            fontSize:
+              "15px",
+            cursor:
+              "pointer",
+          }}
+        >
+          <option value="All">
+            🌍 Ülke
+          </option>
+
+          {countries.map(
+            (country) => (
+              <option
+                key={
+                  country.value
+                }
+                value={
+                  country.value
+                }
+              >
+                {country.label}
+              </option>
+            )
+          )}
+        </select>
+
         <button
           onClick={() =>
             setShowForm(true)
@@ -1499,7 +1577,9 @@ function PioneerMapPage() {
           )}
 
           <input
-            value={placeName}
+            value={
+              placeName
+            }
             onChange={(event) =>
               setPlaceName(
                 event.target.value
@@ -1565,6 +1645,82 @@ function PioneerMapPage() {
             </option>
           </select>
 
+          <select
+            value={
+              placeLanguage
+            }
+            onChange={(event) =>
+              setPlaceLanguage(
+                event.target.value
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+              fontSize:
+                "15px",
+            }}
+          >
+            {languages.map(
+              (language) => (
+                <option
+                  key={
+                    language.value
+                  }
+                  value={
+                    language.value
+                  }
+                >
+                  {language.label}
+                </option>
+              )
+            )}
+          </select>
+
+          <select
+            value={
+              placeCountry
+            }
+            onChange={(event) =>
+              setPlaceCountry(
+                event.target.value
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+              fontSize:
+                "15px",
+            }}
+          >
+            {countries.map(
+              (country) => (
+                <option
+                  key={
+                    country.value
+                  }
+                  value={
+                    country.value
+                  }
+                >
+                  {country.label}
+                </option>
+              )
+            )}
+          </select>
+
           <textarea
             value={
               placeDescription
@@ -1624,14 +1780,12 @@ function PioneerMapPage() {
             style={{
               padding:
                 "12px 20px",
-              border:
-                "none",
+              border: "none",
               borderRadius:
                 "9px",
               background:
                 "#777",
-              color:
-                "#fff",
+              color: "#fff",
               fontWeight:
                 "700",
               cursor:
@@ -1760,7 +1914,8 @@ function PioneerMapPage() {
                         "38px",
                       borderRadius:
                         "50%",
-                      border: "none",
+                      border:
+                        "none",
                       background:
                         "#eeeeee",
                       fontSize:
@@ -1796,6 +1951,66 @@ function PioneerMapPage() {
                   {
                     selectedPlace.category
                   }
+                </div>
+
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    gap: "8px",
+                    flexWrap:
+                      "wrap",
+                    marginTop:
+                      "12px",
+                  }}
+                >
+                  {selectedPlace.language && (
+                    <div
+                      style={{
+                        padding:
+                          "8px 12px",
+                        borderRadius:
+                          "20px",
+                        background:
+                          "#e3f2fd",
+                        color:
+                          "#1565c0",
+                        fontWeight:
+                          "700",
+                        fontSize:
+                          "13px",
+                      }}
+                    >
+                      🌐{" "}
+                      {
+                        selectedPlace.language
+                      }
+                    </div>
+                  )}
+
+                  {selectedPlace.country && (
+                    <div
+                      style={{
+                        padding:
+                          "8px 12px",
+                        borderRadius:
+                          "20px",
+                        background:
+                          "#e8f5e9",
+                        color:
+                          "#2e7d32",
+                        fontWeight:
+                          "700",
+                        fontSize:
+                          "13px",
+                      }}
+                    >
+                      🌍{" "}
+                      {
+                        selectedPlace.country
+                      }
+                    </div>
+                  )}
                 </div>
 
                 <div
@@ -1963,12 +2178,14 @@ function PioneerMapPage() {
                       }
                     }}
                     style={{
-                      flex: "1",
+                      flex:
+                        "1",
                       minWidth:
                         "160px",
                       padding:
                         "13px",
-                      border: "none",
+                      border:
+                        "none",
                       borderRadius:
                         "10px",
                       background:
@@ -2038,6 +2255,12 @@ function PioneerMapPage() {
             ? "📍 50 km içindeki yerler — en yakından uzağa"
             : searchText.trim()
             ? `🔎 "${searchText}" sonuçları`
+            : activeLanguage !==
+                "All"
+            ? `🌐 ${activeLanguage}`
+            : activeCountry !==
+                "All"
+            ? `🌍 ${activeCountry}`
             : activeCategory ===
               "All"
             ? "🌍 Pi Economy Places"
