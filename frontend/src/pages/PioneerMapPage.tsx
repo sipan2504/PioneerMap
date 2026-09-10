@@ -240,20 +240,24 @@ function PioneerMapPage() {
    * PI LOGIN
    *
    * ÖNEMLİ:
-   * Pi authenticate sonucunu backend'e gönderiyoruz.
-   * Backend /user/signin üzerinden accessToken'ı doğruluyor
-   * ve req.session.currentUser oluşturuyor.
+   * Pi authenticate sonucunu backend /user/signin
+   * endpoint'ine gönderiyoruz.
+   *
+   * Böylece backend:
+   * req.session.currentUser
+   * bilgisini oluşturuyor.
+   *
+   * Yeni yer eklenince artık anonymous yerine
+   * gerçek Pi kullanıcı adı kullanılacak.
    */
   const loginWithPi = async () => {
     try {
       const pi = (window as any).Pi;
 
       if (!pi) {
-        setStatus("❌ Pi SDK yüklenemedi.");
+        setStatus("Pi SDK yüklenemedi.");
         return;
       }
-
-      setStatus("⏳ Pi bağlantısı kuruluyor...");
 
       await pi.init({
         version: "2.0",
@@ -265,50 +269,59 @@ function PioneerMapPage() {
         () => true
       );
 
-      if (!auth?.user?.username) {
+      if (
+        !auth?.user?.username ||
+        !auth?.accessToken
+      ) {
         throw new Error(
-          "Pi kullanıcı bilgisi alınamadı."
-        );
-      }
-
-      if (!auth?.accessToken) {
-        throw new Error(
-          "Pi accessToken alınamadı."
+          "Pi kullanıcı bilgisi veya erişim anahtarı alınamadı."
         );
       }
 
       /*
-       * Pi kullanıcısını backend session'a bağla.
+       * Pi kullanıcı bilgisini PioneerMap backend
+       * session'ına kaydet.
        */
-      const response = await fetch(
-        `${backendUrl}/user/signin`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            authResult: auth,
-          }),
-        }
-      );
+      const signinResponse =
+        await fetch(
+          `${backendUrl}/user/signin`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              authResult: auth,
+            }),
+          }
+        );
 
-      const data =
-        await response.json().catch(() => ({}));
+      let signinData: any = {};
 
-      if (!response.ok) {
+      try {
+        signinData =
+          await signinResponse.json();
+      } catch {
+        signinData = {};
+      }
+
+      if (!signinResponse.ok) {
         throw new Error(
-          data?.message ||
-            "Backend Pi giriş işlemi başarısız oldu."
+          signinData?.message ||
+            "PioneerMap backend giriş işlemi başarısız oldu."
         );
       }
 
       setSignedIn(true);
-      setUsername(auth.user.username);
+
+      setUsername(
+        auth.user.username
+      );
 
       setStatus(
-        `✅ Pi Connected — @${auth.user.username}`
+        `Hoş geldin @${auth.user.username}`
       );
     } catch (error) {
       console.error(
@@ -317,6 +330,7 @@ function PioneerMapPage() {
       );
 
       setSignedIn(false);
+      setUsername("");
 
       setStatus(
         error instanceof Error
@@ -332,13 +346,14 @@ function PioneerMapPage() {
   useEffect(() => {
     const loadPlaces = async () => {
       try {
-        const response = await fetch(
-          `${backendUrl}/api/places`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const response =
+          await fetch(
+            `${backendUrl}/api/places`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
 
         if (!response.ok) {
           throw new Error(
@@ -428,13 +443,17 @@ function PioneerMapPage() {
       return;
     }
 
-    setStatus("📍 Konumun alınıyor...");
+    setStatus(
+      "📍 Konumun alınıyor..."
+    );
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
+          lat:
+            position.coords.latitude,
+          lng:
+            position.coords.longitude,
         };
 
         setUserLocation(location);
@@ -471,7 +490,9 @@ function PioneerMapPage() {
               }
             )
               .addTo(map)
-              .bindPopup("📍 Konumunuz");
+              .bindPopup(
+                "📍 Konumunuz"
+              );
         }
 
         setStatus(
@@ -529,7 +550,7 @@ function PioneerMapPage() {
 
     if (!signedIn) {
       setStatus(
-        "🔐 Silmek için önce Pi ile giriş yapmalısın."
+        "π Silmek için önce Pi ile giriş yapmalısın."
       );
       return;
     }
@@ -548,13 +569,14 @@ function PioneerMapPage() {
         "⏳ Yer siliniyor..."
       );
 
-      const response = await fetch(
-        `${backendUrl}/api/places/${place._id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const response =
+        await fetch(
+          `${backendUrl}/api/places/${place._id}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
 
       const data =
         await response.json();
@@ -596,14 +618,16 @@ function PioneerMapPage() {
    * FILTER + MARKERS
    */
   useEffect(() => {
-    const map = mapInstance.current;
+    const map =
+      mapInstance.current;
 
     if (!map) {
       return;
     }
 
     markersRef.current.forEach(
-      (marker) => marker.remove()
+      (marker) =>
+        marker.remove()
     );
 
     markersRef.current = [];
@@ -620,15 +644,14 @@ function PioneerMapPage() {
           place.category ===
             activeCategory;
 
-        const text =
-          [
-            place.name,
-            place.description,
-            place.username || "",
-            place.category,
-          ]
-            .join(" ")
-            .toLowerCase();
+        const text = [
+          place.name,
+          place.description,
+          place.username || "",
+          place.category,
+        ]
+          .join(" ")
+          .toLowerCase();
 
         const searchMatch =
           query === "" ||
@@ -718,14 +741,8 @@ function PioneerMapPage() {
           ).addTo(map);
 
         const safeId =
-          `details-${(
-            place._id ||
-            `${place.name}-${place.lat}-${place.lng}`
-          )
-            .replace(
-              /[^a-zA-Z0-9_-]/g,
-              "-"
-            )}`;
+          place._id ||
+          `${place.name}-${place.lat}-${place.lng}`;
 
         marker.bindPopup(`
           <div
@@ -805,14 +822,16 @@ function PioneerMapPage() {
                       font-weight:700;
                     "
                   >
-                    📍 ${distance.toFixed(1)} km
+                    📍 ${distance.toFixed(
+                      1
+                    )} km
                   </div>
                 `
                 : ""
             }
 
             <button
-              id="${safeId}"
+              id="details-${safeId}"
               style="
                 width:100%;
                 margin-top:12px;
@@ -844,7 +863,7 @@ function PioneerMapPage() {
             setTimeout(() => {
               const button =
                 document.getElementById(
-                  safeId
+                  `details-${safeId}`
                 );
 
               if (button) {
@@ -895,7 +914,7 @@ function PioneerMapPage() {
   const addPlace = async () => {
     if (!signedIn) {
       setStatus(
-        "🔐 Önce Pi ile giriş yapmalısın."
+        "π Önce Pi ile giriş yapmalısın."
       );
       return;
     }
@@ -927,6 +946,14 @@ function PioneerMapPage() {
       description:
         placeDescription.trim() ||
         "Pi Economy place",
+
+      /*
+       * Frontend tarafında da gerçek
+       * Pi kullanıcı adını gönderiyoruz.
+       *
+       * Asıl sahiplik backend session
+       * tarafından belirleniyor.
+       */
       username:
         username || undefined,
     };
@@ -964,28 +991,40 @@ function PioneerMapPage() {
 
       const savedPlace: Place = {
         _id: data._id,
+
         name:
           data.name ||
           newPlace.name,
+
         category:
           data.category ||
           newPlace.category,
+
         lat:
           typeof data.lat ===
           "number"
             ? data.lat
             : newPlace.lat,
+
         lng:
           typeof data.lng ===
           "number"
             ? data.lng
             : newPlace.lng,
+
         description:
           data.description ||
           newPlace.description,
+
+        /*
+         * Backend username döndürürse onu,
+         * döndürmezse giriş yapan Pi
+         * kullanıcısını kullan.
+         */
         username:
           data.username ||
           newPlace.username,
+
         user_id:
           data.user_id ||
           null,
@@ -1022,7 +1061,7 @@ function PioneerMapPage() {
       setShowForm(false);
 
       setStatus(
-        `✅ ${savedPlace.name} MongoDB'ye kaydedildi.`
+        `✅ ${savedPlace.name} kaydedildi. @${savedPlace.username || username}`
       );
     } catch (error) {
       console.error(
@@ -1033,7 +1072,7 @@ function PioneerMapPage() {
       setStatus(
         error instanceof Error
           ? `❌ ${error.message}`
-          : "❌ Yer kaydedilemedi."
+          : "❌ Yer kaydedilemedi. Backend bağlantısını kontrol et."
       );
     }
   };
@@ -1092,8 +1131,6 @@ function PioneerMapPage() {
         minHeight: "100vh",
         background: "#f5f7fa",
         color: "#222",
-        fontFamily:
-          "Arial, sans-serif",
       }}
     >
       <header
@@ -1107,8 +1144,7 @@ function PioneerMapPage() {
       >
         <h1
           style={{
-            margin:
-              "0 0 12px",
+            margin: "0 0 12px",
             fontSize: "34px",
           }}
         >
@@ -1120,104 +1156,191 @@ function PioneerMapPage() {
             margin:
               "0 auto 18px",
             maxWidth: "650px",
-            color: "#666",
+            fontSize: "17px",
+            lineHeight: "1.45",
           }}
         >
-          Discover places,
-          businesses and services
-          in the Pi Economy.
+          Discover Pi-powered
+          stores, products,
+          services, and
+          businesses near you.
         </p>
 
-        <button
-          onClick={loginWithPi}
-          style={{
-            padding:
-              "11px 18px",
-            border: "none",
-            borderRadius: "10px",
-            background:
-              signedIn
-                ? "#2e7d32"
-                : "#1976D2",
-            color: "white",
-            fontWeight: 700,
-            cursor: "pointer",
-          }}
-        >
-          {signedIn
-            ? `🟢 Pi Connected — @${username}`
-            : "🔐 Sign in with Pi"}
-        </button>
-
-        {status && (
+        {!signedIn ? (
+          <button
+            onClick={
+              loginWithPi
+            }
+            style={{
+              padding:
+                "13px 25px",
+              border: "none",
+              borderRadius: "10px",
+              background:
+                "#1976D2",
+              color: "#ffffff",
+              fontSize: "16px",
+              fontWeight: "700",
+              cursor: "pointer",
+              boxShadow:
+                "0 3px 10px rgba(25,118,210,.25)",
+            }}
+          >
+            <span
+              style={{
+                display:
+                  "inline-flex",
+                alignItems:
+                  "center",
+                justifyContent:
+                  "center",
+                width: "25px",
+                height: "25px",
+                marginRight: "7px",
+                borderRadius:
+                  "50%",
+                background:
+                  "#ffffff",
+                color: "#1976D2",
+                fontSize: "18px",
+                fontWeight: "800",
+              }}
+            >
+              π
+            </span>
+            Sign in with Pi
+          </button>
+        ) : (
           <div
             style={{
+              display:
+                "inline-block",
+              padding:
+                "12px 20px",
+              borderRadius:
+                "10px",
+              background:
+                "#e8f5e9",
+              color:
+                "#2e7d32",
+              fontWeight:
+                "700",
+            }}
+          >
+            ✅ Pi Connected
+            {username &&
+              ` — @${username}`}
+          </div>
+        )}
+
+        {status && (
+          <p
+            style={{
               margin:
-                "15px auto 0",
-              maxWidth: "700px",
-              padding: "11px 14px",
-              borderRadius: "10px",
-              background: "#eef5ff",
-              color: "#174a7c",
-              fontWeight: 600,
+                "14px 0 0",
+              fontWeight: "700",
             }}
           >
             {status}
-          </div>
+          </p>
         )}
       </header>
 
-      <main
+      <section
         style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "16px",
+          background:
+            "#ffffff",
+          padding: "15px",
         }}
       >
         <div
           style={{
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-            marginBottom: "14px",
+            maxWidth:
+              "700px",
+            margin: "0 auto",
           }}
         >
-          <input
-            value={searchText}
-            onChange={(e) =>
-              setSearchText(
-                e.target.value
-              )
-            }
-            placeholder="🔎 Yer, işletme veya kullanıcı ara..."
+          <div
             style={{
-              flex: "1 1 260px",
-              minWidth: "220px",
-              padding: "13px",
-              border:
-                "1px solid #ddd",
-              borderRadius: "10px",
-              fontSize: "15px",
+              position:
+                "relative",
             }}
-          />
+          >
+            <input
+              value={
+                searchText
+              }
+              onChange={(event) =>
+                setSearchText(
+                  event.target.value
+                )
+              }
+              placeholder="🔎 Yer, işletme veya kullanıcı ara..."
+              style={{
+                width: "100%",
+                boxSizing:
+                  "border-box",
+                padding:
+                  "15px 45px 15px 18px",
+                borderRadius:
+                  "30px",
+                border:
+                  "2px solid #ddd",
+                fontSize: "16px",
+                outline: "none",
+              }}
+            />
+
+            {searchText && (
+              <button
+                onClick={() =>
+                  setSearchText("")
+                }
+                style={{
+                  position:
+                    "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform:
+                    "translateY(-50%)",
+                  width: "32px",
+                  height: "32px",
+                  borderRadius:
+                    "50%",
+                  border: "none",
+                  background:
+                    "#eee",
+                  fontSize: "20px",
+                  cursor:
+                    "pointer",
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           <button
-            onClick={
+            onClick={() =>
               nearbyOnly
-                ? showAllPlaces
-                : findNearbyPlaces
+                ? showAllPlaces()
+                : findNearbyPlaces()
             }
             style={{
-              padding:
-                "12px 16px",
+              width: "100%",
+              marginTop: "10px",
+              padding: "14px",
               border: "none",
-              borderRadius: "10px",
+              borderRadius:
+                "28px",
               background:
                 nearbyOnly
-                  ? "#455a64"
+                  ? "#d32f2f"
                   : "#1976D2",
-              color: "white",
-              fontWeight: 700,
+              color:
+                "#ffffff",
+              fontSize: "16px",
+              fontWeight: "700",
               cursor: "pointer",
             }}
           >
@@ -1226,482 +1349,706 @@ function PioneerMapPage() {
               : "📍 Yakınımdaki Yerler"}
           </button>
 
-          <button
-            onClick={() =>
-              setShowForm(
-                !showForm
-              )
-            }
+          {nearbyOnly &&
+            userLocation && (
+              <div
+                style={{
+                  marginTop:
+                    "10px",
+                  padding: "11px",
+                  borderRadius:
+                    "12px",
+                  background:
+                    "#e3f2fd",
+                  color:
+                    "#1565c0",
+                  textAlign:
+                    "center",
+                  fontWeight:
+                    "700",
+                }}
+              >
+                📍 Konumun bulundu
+                <br />
+                📏 En yakın yerler
+                önce gösteriliyor
+              </div>
+            )}
+        </div>
+      </section>
+
+      <section
+        style={{
+          background:
+            "#ffffff",
+          padding:
+            "0 15px 15px",
+          display: "flex",
+          gap: "8px",
+          justifyContent:
+            "center",
+          flexWrap: "wrap",
+        }}
+      >
+        {categories.map(
+          (category) => (
+            <button
+              key={
+                category.name
+              }
+              onClick={() =>
+                setActiveCategory(
+                  category.name
+                )
+              }
+              style={{
+                padding:
+                  "10px 16px",
+                borderRadius:
+                  "22px",
+                border:
+                  "1px solid #ddd",
+                background:
+                  activeCategory ===
+                  category.name
+                    ? "#f1c40f"
+                    : "#ffffff",
+                fontWeight:
+                  activeCategory ===
+                  category.name
+                    ? "700"
+                    : "400",
+                fontSize:
+                  "15px",
+                cursor:
+                  "pointer",
+              }}
+            >
+              {
+                category.icon
+              }{" "}
+              {
+                category.name
+              }
+            </button>
+          )
+        )}
+
+        <button
+          onClick={() =>
+            setShowForm(true)
+          }
+          style={{
+            padding:
+              "10px 18px",
+            borderRadius:
+              "22px",
+            border: "none",
+            background:
+              "#222",
+            color: "#fff",
+            fontWeight:
+              "700",
+            fontSize:
+              "15px",
+            cursor:
+              "pointer",
+          }}
+        >
+          📍 Add Place
+        </button>
+      </section>
+
+      {showForm && (
+        <section
+          style={{
+            margin: "15px",
+            padding: "20px",
+            background:
+              "#ffffff",
+            borderRadius:
+              "14px",
+            boxShadow:
+              "0 3px 14px rgba(0,0,0,.12)",
+          }}
+        >
+          <h2
             style={{
-              padding:
-                "12px 16px",
-              border: "none",
-              borderRadius: "10px",
-              background: "#2e7d32",
-              color: "white",
-              fontWeight: 700,
-              cursor: "pointer",
+              marginTop: 0,
             }}
           >
             📍 Add Place
-          </button>
-        </div>
+          </h2>
 
-        {nearbyOnly && (
-          <div
-            style={{
-              marginBottom: "14px",
-              padding: "12px",
-              background: "#e8f5e9",
-              borderRadius: "10px",
-              color: "#256029",
-              fontWeight: 700,
-            }}
-          >
-            📍 Yakınındaki yerler
-            gösteriliyor.
-            <br />
-            📏 En yakın yerler önce
-            sıralanıyor.
-          </div>
-        )}
+          <p>
+            Haritaya dokunarak
+            konum seçebilirsin.
+          </p>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginBottom: "14px",
-          }}
-        >
-          {categories.map(
-            (category) => (
-              <button
-                key={
-                  category.name
-                }
-                onClick={() =>
-                  setActiveCategory(
-                    category.name
-                  )
-                }
-                style={{
-                  padding:
-                    "10px 13px",
-                  border:
-                    activeCategory ===
-                    category.name
-                      ? "2px solid #1976D2"
-                      : "1px solid #ddd",
-                  borderRadius: "10px",
-                  background:
-                    activeCategory ===
-                    category.name
-                      ? "#eaf3ff"
-                      : "white",
-                  color: "#222",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                {category.icon}{" "}
-                {category.name}
-              </button>
-            )
-          )}
-        </div>
-
-        {showForm && (
-          <div
-            style={{
-              background: "white",
-              padding: "16px",
-              borderRadius: "14px",
-              boxShadow:
-                "0 4px 18px rgba(0,0,0,.08)",
-              marginBottom: "16px",
-            }}
-          >
-            <h2
-              style={{
-                marginTop: 0,
-              }}
-            >
-              📍 Yeni Yer Ekle
-            </h2>
-
+          {selectedLocation && (
             <p
               style={{
-                color: "#666",
-                fontSize: "14px",
+                color:
+                  "#2e7d32",
+                fontWeight:
+                  "700",
               }}
             >
-              Haritada bir noktaya
-              tıklayarak konum
-              seçebilirsin.
+              ✅ Konum seçildi
             </p>
+          )}
 
-            <input
-              value={placeName}
-              onChange={(e) =>
-                setPlaceName(
-                  e.target.value
-                )
-              }
-              placeholder="Yer / işletme adı"
-              style={{
-                width: "100%",
-                boxSizing:
-                  "border-box",
-                padding: "12px",
-                marginBottom: "10px",
-                border:
-                  "1px solid #ddd",
-                borderRadius: "9px",
-              }}
-            />
+          <input
+            value={placeName}
+            onChange={(event) =>
+              setPlaceName(
+                event.target.value
+              )
+            }
+            placeholder="Yer adı"
+            style={{
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+              fontSize:
+                "15px",
+            }}
+          />
 
-            <select
-              value={placeCategory}
-              onChange={(e) =>
-                setPlaceCategory(
-                  e.target
-                    .value as Exclude<
-                    Category,
-                    "All"
-                  >
-                )
-              }
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginBottom: "10px",
-                border:
-                  "1px solid #ddd",
-                borderRadius: "9px",
-                background: "white",
-              }}
-            >
-              <option value="Stays">
-                🏠 Stays
-              </option>
-              <option value="Shops">
-                🛍️ Shops
-              </option>
-              <option value="Food">
-                🍔 Food
-              </option>
-              <option value="Services">
-                🔧 Services
-              </option>
-              <option value="Jobs">
-                💼 Jobs
-              </option>
-            </select>
+          <select
+            value={
+              placeCategory
+            }
+            onChange={(event) =>
+              setPlaceCategory(
+                event.target
+                  .value as Exclude<
+                  Category,
+                  "All"
+                >
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+              fontSize:
+                "15px",
+            }}
+          >
+            <option value="Stays">
+              🏠 Stays
+            </option>
+            <option value="Shops">
+              🛍️ Shops
+            </option>
+            <option value="Food">
+              🍔 Food
+            </option>
+            <option value="Services">
+              🔧 Services
+            </option>
+            <option value="Jobs">
+              💼 Jobs
+            </option>
+          </select>
 
-            <textarea
-              value={placeDescription}
-              onChange={(e) =>
-                setPlaceDescription(
-                  e.target.value
-                )
-              }
-              placeholder="Açıklama"
-              rows={4}
-              style={{
-                width: "100%",
-                boxSizing:
-                  "border-box",
-                padding: "12px",
-                marginBottom: "10px",
-                border:
-                  "1px solid #ddd",
-                borderRadius: "9px",
-                resize: "vertical",
-              }}
-            />
+          <textarea
+            value={
+              placeDescription
+            }
+            onChange={(event) =>
+              setPlaceDescription(
+                event.target.value
+              )
+            }
+            placeholder="Açıklama"
+            rows={4}
+            style={{
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+              fontSize:
+                "15px",
+            }}
+          />
 
+          <button
+            onClick={addPlace}
+            style={{
+              padding:
+                "12px 20px",
+              border: "none",
+              borderRadius:
+                "9px",
+              background:
+                "#2e7d32",
+              color: "#fff",
+              fontWeight:
+                "700",
+              cursor:
+                "pointer",
+              marginRight:
+                "8px",
+            }}
+          >
+            💾 Kaydet
+          </button>
+
+          <button
+            onClick={() => {
+              setShowForm(false);
+              setSelectedLocation(
+                null
+              );
+            }}
+            style={{
+              padding:
+                "12px 20px",
+              border:
+                "none",
+              borderRadius:
+                "9px",
+              background:
+                "#777",
+              color:
+                "#fff",
+              fontWeight:
+                "700",
+              cursor:
+                "pointer",
+            }}
+          >
+            İptal
+          </button>
+
+          {selectedLocation && (
             <div
               style={{
-                display: "flex",
-                gap: "8px",
-                flexWrap: "wrap",
+                marginTop:
+                  "15px",
+                padding:
+                  "12px",
+                borderRadius:
+                  "10px",
+                background:
+                  "#f5f5f5",
               }}
             >
-              <button
-                onClick={addPlace}
-                style={{
-                  padding:
-                    "12px 18px",
-                  border: "none",
-                  borderRadius: "9px",
-                  background:
-                    "#2e7d32",
-                  color: "white",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                💾 Kaydet
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowForm(false);
-                  setSelectedLocation(
-                    null
-                  );
-                }}
-                style={{
-                  padding:
-                    "12px 18px",
-                  border: "none",
-                  borderRadius: "9px",
-                  background:
-                    "#757575",
-                  color: "white",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                İptal
-              </button>
+              📍 Seçilen konum:{" "}
+              {selectedLocation.lat.toFixed(
+                5
+              )}
+              ,{" "}
+              {selectedLocation.lng.toFixed(
+                5
+              )}
             </div>
+          )}
+        </section>
+      )}
 
-            {selectedLocation && (
-              <div
-                style={{
-                  marginTop: "10px",
-                  padding: "9px",
-                  background: "#f5f5f5",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                }}
-              >
-                📍 Seçilen konum:{" "}
-                {selectedLocation.lat.toFixed(
-                  5
-                )}
-                ,{" "}
-                {selectedLocation.lng.toFixed(
-                  5
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
+      <main
+        style={{
+          padding: "15px",
+        }}
+      >
         <div
           ref={mapRef}
           style={{
             width: "100%",
-            height: "520px",
-            borderRadius: "14px",
-            overflow: "hidden",
-            boxShadow:
-              "0 4px 18px rgba(0,0,0,.12)",
-            background: "#ddd",
+            height: "500px",
+            borderRadius:
+              "14px",
+            overflow:
+              "hidden",
+            background:
+              "#ddd",
           }}
         />
 
-        {selectedPlace && (
-          <div
-            id="pioneer-detail-card"
-            style={{
-              marginTop: "16px",
-              background: "white",
-              borderRadius: "16px",
-              padding: "20px",
-              boxShadow:
-                "0 5px 20px rgba(0,0,0,.10)",
-            }}
-          >
-            <div
+        {selectedPlace &&
+          selectedCategory && (
+            <section
+              id="pioneer-detail-card"
               style={{
-                display: "flex",
-                justifyContent:
-                  "space-between",
-                alignItems: "flex-start",
-                gap: "12px",
+                marginTop:
+                  "16px",
+                background:
+                  "#ffffff",
+                borderRadius:
+                  "18px",
+                overflow:
+                  "hidden",
+                boxShadow:
+                  "0 4px 18px rgba(0,0,0,.16)",
+                borderTop:
+                  `7px solid ${selectedCategory.color}`,
               }}
             >
-              <div>
+              <div
+                style={{
+                  padding:
+                    "20px",
+                }}
+              >
                 <div
                   style={{
-                    fontSize: "42px",
+                    display:
+                      "flex",
+                    justifyContent:
+                      "space-between",
+                    alignItems:
+                      "flex-start",
+                    gap: "12px",
                   }}
                 >
-                  {selectedCategory?.icon}
-                </div>
+                  <div>
+                    <div
+                      style={{
+                        fontSize:
+                          "42px",
+                      }}
+                    >
+                      {
+                        selectedCategory.icon
+                      }
+                    </div>
 
-                <h2
-                  style={{
-                    margin:
-                      "5px 0",
-                  }}
-                >
-                  {selectedPlace.name}
-                </h2>
+                    <h2
+                      style={{
+                        margin:
+                          "6px 0 0",
+                        fontSize:
+                          "25px",
+                      }}
+                    >
+                      {
+                        selectedPlace.name
+                      }
+                    </h2>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      setSelectedPlace(
+                        null
+                      )
+                    }
+                    style={{
+                      width: "38px",
+                      height:
+                        "38px",
+                      borderRadius:
+                        "50%",
+                      border: "none",
+                      background:
+                        "#eeeeee",
+                      fontSize:
+                        "22px",
+                      cursor:
+                        "pointer",
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
 
                 <div
                   style={{
                     display:
                       "inline-block",
+                    marginTop:
+                      "10px",
                     padding:
-                      "5px 10px",
+                      "7px 14px",
                     borderRadius:
                       "20px",
                     background:
-                      selectedCategory?.color ||
-                      "#1976D2",
-                    color: "white",
-                    fontWeight: 700,
-                    fontSize: "13px",
+                      selectedCategory.color,
+                    color:
+                      "#ffffff",
+                    fontWeight:
+                      "700",
+                    fontSize:
+                      "13px",
                   }}
                 >
-                  {selectedPlace.category}
+                  {
+                    selectedPlace.category
+                  }
                 </div>
-              </div>
 
-              <button
-                onClick={() =>
-                  setSelectedPlace(
-                    null
-                  )
-                }
-                style={{
-                  border: "none",
-                  background:
-                    "#eeeeee",
-                  borderRadius: "8px",
-                  padding:
-                    "8px 11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <p
-              style={{
-                marginTop: "18px",
-                lineHeight: 1.6,
-                color: "#444",
-              }}
-            >
-              {selectedPlace.description}
-            </p>
-
-            <div
-              style={{
-                display: "grid",
-                gap: "8px",
-                marginTop: "14px",
-              }}
-            >
-              <div>
-                👤{" "}
-                <strong>
-                  @
-                  {selectedPlace.username ||
-                    "anonymous"}
-                </strong>
-              </div>
-
-              {selectedDistance !==
-                null && (
                 <div
                   style={{
-                    color:
-                      "#1976D2",
-                    fontWeight: 700,
-                  }}
-                >
-                  📍{" "}
-                  {selectedDistance.toFixed(
-                    1
-                  )}{" "}
-                  km uzakta
-                </div>
-              )}
-
-              <div
-                style={{
-                  color: "#666",
-                  fontSize: "13px",
-                }}
-              >
-                🌐{" "}
-                {selectedPlace.lat.toFixed(
-                  5
-                )}
-                ,{" "}
-                {selectedPlace.lng.toFixed(
-                  5
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                const map =
-                  mapInstance.current;
-
-                if (map) {
-                  map.setView(
-                    [
-                      selectedPlace.lat,
-                      selectedPlace.lng,
-                    ],
-                    15
-                  );
-                }
-              }}
-              style={{
-                width: "100%",
-                marginTop: "16px",
-                padding: "12px",
-                border: "none",
-                borderRadius: "10px",
-                background:
-                  "#1976D2",
-                color: "white",
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              🗺️ Haritada Göster
-            </button>
-
-            {signedIn &&
-              selectedPlace.username ===
-                username && (
-                <button
-                  onClick={() =>
-                    deletePlace(
-                      selectedPlace
-                    )
-                  }
-                  style={{
-                    width: "100%",
-                    marginTop: "9px",
-                    padding: "12px",
-                    border: "none",
+                    marginTop:
+                      "16px",
+                    padding:
+                      "15px",
                     borderRadius:
-                      "10px",
+                      "12px",
                     background:
-                      "#d32f2f",
-                    color: "white",
-                    fontWeight: 700,
-                    cursor: "pointer",
+                      "#f7f7f7",
                   }}
                 >
-                  🗑️ Yeri Sil
-                </button>
-              )}
-          </div>
-        )}
+                  <div
+                    style={{
+                      fontSize:
+                        "13px",
+                      color:
+                        "#777",
+                      fontWeight:
+                        "700",
+                      marginBottom:
+                        "5px",
+                    }}
+                  >
+                    AÇIKLAMA
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize:
+                        "16px",
+                      lineHeight:
+                        "1.5",
+                    }}
+                  >
+                    {
+                      selectedPlace.description
+                    }
+                  </div>
+                </div>
+
+                {selectedPlace.username && (
+                  <div
+                    style={{
+                      marginTop:
+                        "10px",
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#f3e5f5",
+                      color:
+                        "#7b1fa2",
+                      fontWeight:
+                        "700",
+                    }}
+                  >
+                    👤 @
+                    {
+                      selectedPlace.username
+                    }
+                  </div>
+                )}
+
+                {selectedDistance !==
+                  null && (
+                  <div
+                    style={{
+                      marginTop:
+                        "10px",
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#e3f2fd",
+                      color:
+                        "#1565c0",
+                      fontWeight:
+                        "700",
+                    }}
+                  >
+                    📍{" "}
+                    {selectedDistance.toFixed(
+                      1
+                    )}{" "}
+                    km uzaklıkta
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    marginTop:
+                      "10px",
+                    padding:
+                      "13px",
+                    borderRadius:
+                      "12px",
+                    background:
+                      "#fafafa",
+                    color:
+                      "#555",
+                    fontSize:
+                      "13px",
+                  }}
+                >
+                  🗺️ Konum:{" "}
+                  {selectedPlace.lat.toFixed(
+                    5
+                  )}
+                  ,{" "}
+                  {selectedPlace.lng.toFixed(
+                    5
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    gap: "9px",
+                    flexWrap:
+                      "wrap",
+                    marginTop:
+                      "15px",
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      const map =
+                        mapInstance.current;
+
+                      if (map) {
+                        map.setView(
+                          [
+                            selectedPlace.lat,
+                            selectedPlace.lng,
+                          ],
+                          15
+                        );
+
+                        setTimeout(
+                          () => {
+                            const card =
+                              document.getElementById(
+                                "pioneer-detail-card"
+                              );
+
+                            if (card) {
+                              card.scrollIntoView(
+                                {
+                                  behavior:
+                                    "smooth",
+                                  block:
+                                    "start",
+                                }
+                              );
+                            }
+                          },
+                          100
+                        );
+                      }
+                    }}
+                    style={{
+                      flex: "1",
+                      minWidth:
+                        "160px",
+                      padding:
+                        "13px",
+                      border: "none",
+                      borderRadius:
+                        "10px",
+                      background:
+                        "#1976D2",
+                      color:
+                        "#ffffff",
+                      fontWeight:
+                        "700",
+                      cursor:
+                        "pointer",
+                    }}
+                  >
+                    🗺️ Haritada Göster
+                  </button>
+
+                  {signedIn &&
+                    username &&
+                    selectedPlace.username ===
+                      username && (
+                      <button
+                        onClick={() =>
+                          deletePlace(
+                            selectedPlace
+                          )
+                        }
+                        style={{
+                          flex:
+                            "1",
+                          minWidth:
+                            "160px",
+                          padding:
+                            "13px",
+                          border:
+                            "none",
+                          borderRadius:
+                            "10px",
+                          background:
+                            "#d32f2f",
+                          color:
+                            "#ffffff",
+                          fontWeight:
+                            "700",
+                          cursor:
+                            "pointer",
+                        }}
+                      >
+                        🗑️ Yeri Sil
+                      </button>
+                    )}
+                </div>
+              </div>
+            </section>
+          )}
+
+        <div
+          style={{
+            textAlign:
+              "center",
+            fontWeight:
+              "700",
+            padding:
+              "15px 5px",
+          }}
+        >
+          {nearbyOnly &&
+          userLocation
+            ? "📍 50 km içindeki yerler — en yakından uzağa"
+            : searchText.trim()
+            ? `🔎 "${searchText}" sonuçları`
+            : activeCategory ===
+              "All"
+            ? "🌍 Pi Economy Places"
+            : `${
+                categories.find(
+                  (item) =>
+                    item.name ===
+                    activeCategory
+                )?.icon
+              } ${activeCategory}`}
+        </div>
       </main>
     </div>
   );
