@@ -38,29 +38,141 @@ const languages = [
   { value: "Turkish", label: "🇹🇷 Türkçe" },
   { value: "English", label: "🇬🇧 English" },
   { value: "Arabic", label: "🇸🇦 العربية" },
-  { value: "German", label: "🇩🇪 Deutsch" },
-  { value: "French", label: "🇫🇷 Français" },
-  { value: "Spanish", label: "🇪🇸 Español" },
-  { value: "Russian", label: "🇷🇺 Русский" },
   { value: "Chinese", label: "🇨🇳 中文" },
+  { value: "Hindi", label: "🇮🇳 हिन्दी" },
+  { value: "Spanish", label: "🇪🇸 Español" },
+  { value: "French", label: "🇫🇷 Français" },
+  { value: "Portuguese", label: "🇵🇹 Português" },
+  { value: "Russian", label: "🇷🇺 Русский" },
+  { value: "Bengali", label: "🇧🇩 বাংলা" },
+  { value: "German", label: "🇩🇪 Deutsch" },
   { value: "Japanese", label: "🇯🇵 日本語" },
   { value: "Korean", label: "🇰🇷 한국어" },
+  { value: "Persian", label: "🇮🇷 فارسی" },
+  { value: "Italian", label: "🇮🇹 Italiano" },
+  { value: "Urdu", label: "🇵🇰 اردو" },
+  { value: "Vietnamese", label: "🇻🇳 Tiếng Việt" },
+  { value: "Telugu", label: "🇮🇳 తెలుగు" },
+  { value: "Marathi", label: "🇮🇳 मराठी" },
+  { value: "Tamil", label: "🇮🇳 தமிழ்" },
+  { value: "Yue Chinese", label: "🇭🇰 粵語" },
+  { value: "Wu Chinese", label: "🇨🇳 吴语" },
+  { value: "Gujarati", label: "🇮🇳 ગુજરાતી" },
+  { value: "Kannada", label: "🇮🇳 ಕನ್ನಡ" },
+  { value: "Polish", label: "🇵🇱 Polski" },
+  { value: "Ukrainian", label: "🇺🇦 Українська" },
+  { value: "Malay", label: "🇲🇾 Bahasa Melayu" },
+  { value: "Malayalam", label: "🇮🇳 മലയാളം" },
+  { value: "Odia", label: "🇮🇳 ଓଡ଼ିଆ" },
+  { value: "Punjabi", label: "🇮🇳 ਪੰਜਾਬੀ" },
+  { value: "Romanian", label: "🇷🇴 Română" },
+  { value: "Dutch", label: "🇳🇱 Nederlands" },
+  { value: "Greek", label: "🇬🇷 Ελληνικά" },
+  { value: "Czech", label: "🇨🇿 Čeština" },
+  { value: "Swedish", label: "🇸🇪 Svenska" },
+  { value: "Hungarian", label: "🇭🇺 Magyar" },
+  { value: "Hebrew", label: "🇮🇱 עברית" },
+  { value: "Finnish", label: "🇫🇮 Suomi" },
+  { value: "Norwegian", label: "🇳🇴 Norsk" },
+  { value: "Danish", label: "🇩🇰 Dansk" },
+  { value: "Bulgarian", label: "🇧🇬 Български" },
+  { value: "Serbian", label: "🇷🇸 Српски" },
+  { value: "Croatian", label: "🇭🇷 Hrvatski" },
+  { value: "Slovak", label: "🇸🇰 Slovenčina" },
+  { value: "Lithuanian", label: "🇱🇹 Lietuvių" },
+  { value: "Slovenian", label: "🇸🇮 Slovenščina" },
+  { value: "Latvian", label: "🇱🇻 Latviešu" },
+  { value: "Estonian", label: "🇪🇪 Eesti" },
+  { value: "Thai", label: "🇹🇭 ไทย" },
+  { value: "Indonesian", label: "🇮🇩 Bahasa Indonesia" },
 ];
 
 const countries = [
   { value: "Türkiye", label: "🇹🇷 Türkiye" },
   { value: "United States", label: "🇺🇸 ABD" },
+  { value: "Canada", label: "🇨🇦 Kanada" },
+  { value: "Mexico", label: "🇲🇽 Meksika" },
+  { value: "Brazil", label: "🇧🇷 Brezilya" },
+  { value: "Argentina", label: "🇦🇷 Arjantin" },
+  { value: "Chile", label: "🇨🇱 Şili" },
+  { value: "Colombia", label: "🇨🇴 Kolombiya" },
+  { value: "Peru", label: "🇵🇪 Peru" },
   { value: "United Kingdom", label: "🇬🇧 İngiltere" },
-  { value: "Germany", label: "🇩🇪 Almanya" },
+  { value: "Ireland", label: "🇮🇪 İrlanda" },
   { value: "France", label: "🇫🇷 Fransa" },
-  { value: "Spain", label: "🇪🇸 İspanya" },
+  { value: "Germany", label: "🇩🇪 Almanya" },
   { value: "Italy", label: "🇮🇹 İtalya" },
-  { value: "Saudi Arabia", label: "🇸🇦 Suudi Arabistan" },
-  { value: "United Arab Emirates", label: "🇦🇪 BAE" },
+  { value: "Spain", label: "🇪🇸 İspanya" },
+  { value: "Portugal", label: "🇵🇹 Portekiz" },
+  { value: "Netherlands", label: "🇳🇱 Hollanda" },
+  { value: "Belgium", label: "🇧🇪 Belçika" },
+  { value: "Switzerland", label: "🇨🇭 İsviçre" },
+  { value: "Austria", label: "🇦🇹 Avusturya" },
+  { value: "Sweden", label: "🇸🇪 İsveç" },
+  { value: "Norway", label: "🇳🇴 Norveç" },
+  { value: "Denmark", label: "🇩🇰 Danimarka" },
+  { value: "Finland", label: "🇫🇮 Finlandiya" },
+  { value: "Iceland", label: "🇮🇸 İzlanda" },
+  { value: "Poland", label: "🇵🇱 Polonya" },
+  { value: "Czechia", label: "🇨🇿 Çekya" },
+  { value: "Slovakia", label: "🇸🇰 Slovakya" },
+  { value: "Hungary", label: "🇭🇺 Macaristan" },
+  { value: "Romania", label: "🇷🇴 Romanya" },
+  { value: "Bulgaria", label: "🇧🇬 Bulgaristan" },
+  { value: "Greece", label: "🇬🇷 Yunanistan" },
+  { value: "Ukraine", label: "🇺🇦 Ukrayna" },
+  { value: "Serbia", label: "🇷🇸 Sırbistan" },
+  { value: "Croatia", label: "🇭🇷 Hırvatistan" },
+  { value: "Slovenia", label: "🇸🇮 Slovenya" },
+  { value: "Bosnia and Herzegovina", label: "🇧🇦 Bosna-Hersek" },
+  { value: "Albania", label: "🇦🇱 Arnavutluk" },
+  { value: "Lithuania", label: "🇱🇹 Litvanya" },
+  { value: "Latvia", label: "🇱🇻 Letonya" },
+  { value: "Estonia", label: "🇪🇪 Estonya" },
+  { value: "Russia", label: "🇷🇺 Rusya" },
+  { value: "Georgia", label: "🇬🇪 Gürcistan" },
+  { value: "Armenia", label: "🇦🇲 Ermenistan" },
+  { value: "Azerbaijan", label: "🇦🇿 Azerbaycan" },
+  { value: "Kazakhstan", label: "🇰🇿 Kazakistan" },
+  { value: "Uzbekistan", label: "🇺🇿 Özbekistan" },
   { value: "China", label: "🇨🇳 Çin" },
   { value: "Japan", label: "🇯🇵 Japonya" },
   { value: "South Korea", label: "🇰🇷 Güney Kore" },
-  { value: "Russia", label: "🇷🇺 Rusya" },
+  { value: "India", label: "🇮🇳 Hindistan" },
+  { value: "Pakistan", label: "🇵🇰 Pakistan" },
+  { value: "Bangladesh", label: "🇧🇩 Bangladeş" },
+  { value: "Nepal", label: "🇳🇵 Nepal" },
+  { value: "Sri Lanka", label: "🇱🇰 Sri Lanka" },
+  { value: "Thailand", label: "🇹🇭 Tayland" },
+  { value: "Vietnam", label: "🇻🇳 Vietnam" },
+  { value: "Malaysia", label: "🇲🇾 Malezya" },
+  { value: "Singapore", label: "🇸🇬 Singapur" },
+  { value: "Indonesia", label: "🇮🇩 Endonezya" },
+  { value: "Philippines", label: "🇵🇭 Filipinler" },
+  { value: "Australia", label: "🇦🇺 Avustralya" },
+  { value: "New Zealand", label: "🇳🇿 Yeni Zelanda" },
+  { value: "Saudi Arabia", label: "🇸🇦 Suudi Arabistan" },
+  { value: "United Arab Emirates", label: "🇦🇪 BAE" },
+  { value: "Qatar", label: "🇶🇦 Katar" },
+  { value: "Kuwait", label: "🇰🇼 Kuveyt" },
+  { value: "Bahrain", label: "🇧🇭 Bahreyn" },
+  { value: "Oman", label: "🇴🇲 Umman" },
+  { value: "Jordan", label: "🇯🇴 Ürdün" },
+  { value: "Lebanon", label: "🇱🇧 Lübnan" },
+  { value: "Israel", label: "🇮🇱 İsrail" },
+  { value: "Iraq", label: "🇮🇶 Irak" },
+  { value: "Iran", label: "🇮🇷 İran" },
+  { value: "Egypt", label: "🇪🇬 Mısır" },
+  { value: "Morocco", label: "🇲🇦 Fas" },
+  { value: "Algeria", label: "🇩🇿 Cezayir" },
+  { value: "Tunisia", label: "🇹🇳 Tunus" },
+  { value: "Libya", label: "🇱🇾 Libya" },
+  { value: "South Africa", label: "🇿🇦 Güney Afrika" },
+  { value: "Nigeria", label: "🇳🇬 Nijerya" },
+  { value: "Ghana", label: "🇬🇭 Gana" },
+  { value: "Kenya", label: "🇰🇪 Kenya" },
+  { value: "Ethiopia", label: "🇪🇹 Etiyopya" },
+  { value: "Tanzania", label: "🇹🇿 Tanzanya" },
 ];
 
 const initialPlaces: Place[] = [
@@ -91,24 +203,6 @@ const initialPlaces: Place[] = [
     language: "Turkish",
     country: "Türkiye",
   },
-  {
-    name: "Pi Services",
-    category: "Services",
-    lat: 39.92,
-    lng: 32.88,
-    description: "Pi-powered service",
-    language: "Turkish",
-    country: "Türkiye",
-  },
-  {
-    name: "Pi Jobs",
-    category: "Jobs",
-    lat: 39.95,
-    lng: 32.84,
-    description: "Pi Economy job listing",
-    language: "Turkish",
-    country: "Türkiye",
-  },
 ];
 
 function distanceInKm(
@@ -116,9 +210,8 @@ function distanceInKm(
   lng1: number,
   lat2: number,
   lng2: number
-): number {
+) {
   const R = 6371;
-
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
 
@@ -204,23 +297,20 @@ function PioneerMapPage() {
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
-  const [searchText, setSearchText] =
-    useState("");
-
   const [activeLanguage, setActiveLanguage] =
     useState("All");
 
   const [activeCountry, setActiveCountry] =
     useState("All");
 
+  const [searchText, setSearchText] =
+    useState("");
+
   const [nearbyOnly, setNearbyOnly] =
     useState(false);
 
   const [userLocation, setUserLocation] =
-    useState<{
-      lat: number;
-      lng: number;
-    } | null>(null);
+    useState<{ lat: number; lng: number } | null>(null);
 
   const [selectedPlace, setSelectedPlace] =
     useState<Place | null>(null);
@@ -229,10 +319,7 @@ function PioneerMapPage() {
     useState(false);
 
   const [selectedLocation, setSelectedLocation] =
-    useState<{
-      lat: number;
-      lng: number;
-    } | null>(null);
+    useState<{ lat: number; lng: number } | null>(null);
 
   const [placeName, setPlaceName] =
     useState("");
@@ -266,7 +353,7 @@ function PioneerMapPage() {
       const pi = (window as any).Pi;
 
       if (!pi) {
-        setStatus("Pi SDK yüklenemedi.");
+        setStatus("❌ Pi SDK yüklenemedi.");
         return;
       }
 
@@ -285,47 +372,40 @@ function PioneerMapPage() {
         !auth?.accessToken
       ) {
         throw new Error(
-          "Pi kullanıcı bilgisi veya erişim anahtarı alınamadı."
+          "Pi kullanıcı bilgisi alınamadı."
         );
       }
 
-      const signinResponse =
-        await fetch(
-          `${backendUrl}/user/signin`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              authResult: auth,
-            }),
-          }
-        );
+      const response = await fetch(
+        `${backendUrl}/user/signin`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            authResult: auth,
+          }),
+        }
+      );
 
-      let signinData: any = {};
+      const data = await response
+        .json()
+        .catch(() => ({}));
 
-      try {
-        signinData =
-          await signinResponse.json();
-      } catch {
-        signinData = {};
-      }
-
-      if (!signinResponse.ok) {
+      if (!response.ok) {
         throw new Error(
-          signinData?.message ||
-            "PioneerMap backend giriş işlemi başarısız oldu."
+          data?.message ||
+            "Backend giriş işlemi başarısız."
         );
       }
 
       setSignedIn(true);
       setUsername(auth.user.username);
-
       setStatus(
-        `Hoş geldin @${auth.user.username}`
+        `✅ Hoş geldin @${auth.user.username}`
       );
     } catch (error) {
       console.error(
@@ -339,7 +419,7 @@ function PioneerMapPage() {
       setStatus(
         error instanceof Error
           ? `❌ ${error.message}`
-          : "❌ Pi Sign-In başarısız oldu."
+          : "❌ Pi Sign-In başarısız."
       );
     }
   };
@@ -347,14 +427,12 @@ function PioneerMapPage() {
   useEffect(() => {
     const loadPlaces = async () => {
       try {
-        const response =
-          await fetch(
-            `${backendUrl}/api/places`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          );
+        const response = await fetch(
+          `${backendUrl}/api/places`,
+          {
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           throw new Error(
@@ -391,11 +469,12 @@ function PioneerMapPage() {
       return;
     }
 
-    const map =
-      L.map(mapRef.current).setView(
-        [39.9334, 32.8597],
-        6
-      );
+    const map = L.map(
+      mapRef.current
+    ).setView(
+      [39.9334, 32.8597],
+      6
+    );
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -412,7 +491,6 @@ function PioneerMapPage() {
       });
 
       setShowForm(true);
-
       setStatus(
         "📍 Konum seçildi. Yer bilgilerini gir."
       );
@@ -433,7 +511,7 @@ function PioneerMapPage() {
   const findNearbyPlaces = () => {
     if (!navigator.geolocation) {
       setStatus(
-        "❌ Bu cihaz konum özelliğini desteklemiyor."
+        "❌ Konum özelliği desteklenmiyor."
       );
       return;
     }
@@ -465,7 +543,6 @@ function PioneerMapPage() {
 
         if (userMarkerRef.current) {
           userMarkerRef.current.remove();
-          userMarkerRef.current = null;
         }
 
         if (map) {
@@ -490,14 +567,9 @@ function PioneerMapPage() {
           "📍 Yakınındaki yerler gösteriliyor."
         );
       },
-      (error) => {
-        console.error(
-          "Location error:",
-          error
-        );
-
+      () => {
         setStatus(
-          "❌ Konum izni verilmedi. Konum iznini açıp tekrar dene."
+          "❌ Konum izni verilmedi."
         );
       },
       {
@@ -528,14 +600,14 @@ function PioneerMapPage() {
   ) => {
     if (!place._id) {
       setStatus(
-        "❌ Bu yer silinemiyor: ID bulunamadı."
+        "❌ Yer ID bulunamadı."
       );
       return;
     }
 
     if (!signedIn) {
       setStatus(
-        "π Silmek için önce Pi ile giriş yapmalısın."
+        "❌ Silmek için Pi ile giriş yapmalısın."
       );
       return;
     }
@@ -545,9 +617,7 @@ function PioneerMapPage() {
         `"${place.name}" yerini silmek istediğine emin misin?`
       );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       setStatus(
@@ -586,11 +656,6 @@ function PioneerMapPage() {
         `✅ ${place.name} silindi.`
       );
     } catch (error) {
-      console.error(
-        "Delete error:",
-        error
-      );
-
       setStatus(
         error instanceof Error
           ? `❌ ${error.message}`
@@ -603,13 +668,10 @@ function PioneerMapPage() {
     const map =
       mapInstance.current;
 
-    if (!map) {
-      return;
-    }
+    if (!map) return;
 
     markersRef.current.forEach(
-      (marker) =>
-        marker.remove()
+      (marker) => marker.remove()
     );
 
     markersRef.current = [];
@@ -657,16 +719,13 @@ function PioneerMapPage() {
           nearbyOnly &&
           userLocation
         ) {
-          const distance =
+          nearbyMatch =
             distanceInKm(
               userLocation.lat,
               userLocation.lng,
               place.lat,
               place.lng
-            );
-
-          nearbyMatch =
-            distance <= 50;
+            ) <= 50;
         }
 
         return (
@@ -681,27 +740,19 @@ function PioneerMapPage() {
     if (userLocation) {
       filteredPlaces =
         [...filteredPlaces].sort(
-          (a, b) => {
-            const distanceA =
-              distanceInKm(
-                userLocation.lat,
-                userLocation.lng,
-                a.lat,
-                a.lng
-              );
-
-            const distanceB =
-              distanceInKm(
-                userLocation.lat,
-                userLocation.lng,
-                b.lat,
-                b.lng
-              );
-
-            return (
-              distanceA - distanceB
-            );
-          }
+          (a, b) =>
+            distanceInKm(
+              userLocation.lat,
+              userLocation.lng,
+              a.lat,
+              a.lng
+            ) -
+            distanceInKm(
+              userLocation.lat,
+              userLocation.lng,
+              b.lat,
+              b.lng
+            )
         );
     }
 
@@ -736,27 +787,20 @@ function PioneerMapPage() {
             }
           ).addTo(map);
 
-        const safeId =
-          place._id ||
-          `${place.name}-${place.lat}-${place.lng}`;
-
         marker.bindPopup(`
           <div style="
-            min-width:220px;
+            min-width:230px;
             text-align:center;
             font-family:Arial,sans-serif;
           ">
-            <div style="
-              font-size:34px;
-              margin-bottom:6px;
-            ">
+            <div style="font-size:34px">
               ${category.icon}
             </div>
 
             <div style="
               font-size:19px;
               font-weight:700;
-              margin-bottom:5px;
+              margin:6px 0;
             ">
               ${place.name}
             </div>
@@ -771,43 +815,13 @@ function PioneerMapPage() {
 
             ${
               place.username
-                ? `
-                  <div style="
+                ? `<div style="
                     margin-top:8px;
                     color:#7b1fa2;
                     font-weight:700;
                   ">
                     👤 @${place.username}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              place.language
-                ? `
-                  <div style="
-                    margin-top:7px;
-                    color:#555;
-                    font-size:13px;
-                  ">
-                    🌐 ${place.language}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              place.country
-                ? `
-                  <div style="
-                    margin-top:4px;
-                    color:#555;
-                    font-size:13px;
-                  ">
-                    🌍 ${place.country}
-                  </div>
-                `
+                  </div>`
                 : ""
             }
 
@@ -825,23 +839,41 @@ function PioneerMapPage() {
             </div>
 
             ${
+              place.language
+                ? `<div style="
+                    margin-top:7px;
+                    font-size:13px;
+                  ">
+                    🗣️ ${place.language}
+                  </div>`
+                : ""
+            }
+
+            ${
+              place.country
+                ? `<div style="
+                    margin-top:5px;
+                    font-size:13px;
+                  ">
+                    🌍 ${place.country}
+                  </div>`
+                : ""
+            }
+
+            ${
               distance !== null
-                ? `
-                  <div style="
+                ? `<div style="
                     margin-top:8px;
                     color:#1976D2;
                     font-weight:700;
                   ">
-                    📍 ${distance.toFixed(
-                      1
-                    )} km
-                  </div>
-                `
+                    📍 ${distance.toFixed(1)} km
+                  </div>`
                 : ""
             }
 
             <button
-              id="details-${safeId}"
+              id="details-${place._id || place.name}"
               style="
                 width:100%;
                 margin-top:12px;
@@ -852,7 +884,6 @@ function PioneerMapPage() {
                 color:white;
                 font-size:14px;
                 font-weight:700;
-                cursor:pointer;
               "
             >
               📋 Detayları Gör
@@ -860,12 +891,9 @@ function PioneerMapPage() {
           </div>
         `);
 
-        marker.on(
-          "click",
-          () => {
-            setSelectedPlace(place);
-          }
-        );
+        marker.on("click", () => {
+          setSelectedPlace(place);
+        });
 
         marker.on(
           "popupopen",
@@ -873,7 +901,7 @@ function PioneerMapPage() {
             setTimeout(() => {
               const button =
                 document.getElementById(
-                  `details-${safeId}`
+                  `details-${place._id || place.name}`
                 );
 
               if (button) {
@@ -881,24 +909,7 @@ function PioneerMapPage() {
                   setSelectedPlace(
                     place
                   );
-
                   map.closePopup();
-
-                  setTimeout(() => {
-                    const card =
-                      document.getElementById(
-                        "pioneer-detail-card"
-                      );
-
-                    if (card) {
-                      card.scrollIntoView({
-                        behavior:
-                          "smooth",
-                        block:
-                          "start",
-                      });
-                    }
-                  }, 100);
                 };
               }
             }, 50);
@@ -923,7 +934,7 @@ function PioneerMapPage() {
   const addPlace = async () => {
     if (!signedIn) {
       setStatus(
-        "π Önce Pi ile giriş yapmalısın."
+        "❌ Önce Pi ile giriş yapmalısın."
       );
       return;
     }
@@ -947,7 +958,7 @@ function PioneerMapPage() {
             lng: 32.8597,
           });
 
-    const newPlace: Place = {
+    const newPlace = {
       name: placeName.trim(),
       category: placeCategory,
       lat: location.lat,
@@ -955,10 +966,10 @@ function PioneerMapPage() {
       description:
         placeDescription.trim() ||
         "Pi Economy place",
-      username:
-        username || undefined,
       language: placeLanguage,
       country: placeCountry,
+      username:
+        username || undefined,
     };
 
     try {
@@ -994,71 +1005,44 @@ function PioneerMapPage() {
 
       const savedPlace: Place = {
         _id: data._id,
-
         name:
           data.name ||
           newPlace.name,
-
         category:
           data.category ||
           newPlace.category,
-
         lat:
-          typeof data.lat ===
-          "number"
+          typeof data.lat === "number"
             ? data.lat
             : newPlace.lat,
-
         lng:
-          typeof data.lng ===
-          "number"
+          typeof data.lng === "number"
             ? data.lng
             : newPlace.lng,
-
         description:
           data.description ||
           newPlace.description,
-
         username:
           data.username ||
           newPlace.username,
-
         user_id:
-          data.user_id ||
-          null,
-
+          data.user_id || null,
         language:
           data.language ||
           newPlace.language,
-
         country:
           data.country ||
           newPlace.country,
       };
 
-      setPlaces(
-        (current) => [
-          ...current,
-          savedPlace,
-        ]
-      );
+      setPlaces((current) => [
+        ...current,
+        savedPlace,
+      ]);
 
       setSelectedPlace(
         savedPlace
       );
-
-      if (map) {
-        map.setView(
-          [
-            savedPlace.lat,
-            savedPlace.lng,
-          ],
-          Math.max(
-            map.getZoom(),
-            12
-          )
-        );
-      }
 
       setPlaceName("");
       setPlaceDescription("");
@@ -1069,7 +1053,7 @@ function PioneerMapPage() {
       setShowForm(false);
 
       setStatus(
-        `✅ ${savedPlace.name} kaydedildi. @${savedPlace.username || username}`
+        `✅ ${savedPlace.name} kaydedildi.`
       );
     } catch (error) {
       console.error(
@@ -1080,7 +1064,7 @@ function PioneerMapPage() {
       setStatus(
         error instanceof Error
           ? `❌ ${error.message}`
-          : "❌ Yer kaydedilemedi. Backend bağlantısını kontrol et."
+          : "❌ Yer kaydedilemedi."
       );
     }
   };
@@ -1125,7 +1109,7 @@ function PioneerMapPage() {
     >
       <header
         style={{
-          background: "#ffffff",
+          background: "#fff",
           padding: "22px 16px",
           textAlign: "center",
           borderBottom:
@@ -1134,7 +1118,7 @@ function PioneerMapPage() {
       >
         <h1
           style={{
-            margin: "0 0 12px",
+            margin: "0 0 10px",
             fontSize: "34px",
           }}
         >
@@ -1158,9 +1142,7 @@ function PioneerMapPage() {
 
         {!signedIn ? (
           <button
-            onClick={
-              loginWithPi
-            }
+            onClick={loginWithPi}
             style={{
               padding:
                 "13px 25px",
@@ -1168,37 +1150,12 @@ function PioneerMapPage() {
               borderRadius: "10px",
               background:
                 "#1976D2",
-              color: "#ffffff",
+              color: "#fff",
               fontSize: "16px",
               fontWeight: "700",
-              cursor: "pointer",
-              boxShadow:
-                "0 3px 10px rgba(25,118,210,.25)",
             }}
           >
-            <span
-              style={{
-                display:
-                  "inline-flex",
-                alignItems:
-                  "center",
-                justifyContent:
-                  "center",
-                width: "25px",
-                height: "25px",
-                marginRight: "7px",
-                borderRadius:
-                  "50%",
-                background:
-                  "#ffffff",
-                color: "#1976D2",
-                fontSize: "18px",
-                fontWeight: "800",
-              }}
-            >
-              π
-            </span>
-            Sign in with Pi
+            π Sign in with Pi
           </button>
         ) : (
           <div
@@ -1217,9 +1174,8 @@ function PioneerMapPage() {
                 "700",
             }}
           >
-            ✅ Pi Connected
-            {username &&
-              ` — @${username}`}
+            ✅ Pi Connected —
+            @{username}
           </div>
         )}
 
@@ -1238,77 +1194,36 @@ function PioneerMapPage() {
 
       <section
         style={{
-          background:
-            "#ffffff",
+          background: "#fff",
           padding: "15px",
         }}
       >
         <div
           style={{
-            maxWidth:
-              "700px",
+            maxWidth: "700px",
             margin: "0 auto",
           }}
         >
-          <div
+          <input
+            value={searchText}
+            onChange={(e) =>
+              setSearchText(
+                e.target.value
+              )
+            }
+            placeholder="🔎 Yer, işletme veya kullanıcı ara..."
             style={{
-              position:
-                "relative",
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "15px",
+              borderRadius:
+                "30px",
+              border:
+                "2px solid #ddd",
+              fontSize: "16px",
             }}
-          >
-            <input
-              value={
-                searchText
-              }
-              onChange={(event) =>
-                setSearchText(
-                  event.target.value
-                )
-              }
-              placeholder="🔎 Yer, işletme veya kullanıcı ara..."
-              style={{
-                width: "100%",
-                boxSizing:
-                  "border-box",
-                padding:
-                  "15px 45px 15px 18px",
-                borderRadius:
-                  "30px",
-                border:
-                  "2px solid #ddd",
-                fontSize: "16px",
-                outline: "none",
-              }}
-            />
-
-            {searchText && (
-              <button
-                onClick={() =>
-                  setSearchText("")
-                }
-                style={{
-                  position:
-                    "absolute",
-                  right: "10px",
-                  top: "50%",
-                  transform:
-                    "translateY(-50%)",
-                  width: "32px",
-                  height: "32px",
-                  borderRadius:
-                    "50%",
-                  border: "none",
-                  background:
-                    "#eee",
-                  fontSize: "20px",
-                  cursor:
-                    "pointer",
-                }}
-              >
-                ×
-              </button>
-            )}
-          </div>
+          />
 
           <button
             onClick={() =>
@@ -1327,11 +1242,9 @@ function PioneerMapPage() {
                 nearbyOnly
                   ? "#d32f2f"
                   : "#1976D2",
-              color:
-                "#ffffff",
+              color: "#fff",
               fontSize: "16px",
               fontWeight: "700",
-              cursor: "pointer",
             }}
           >
             {nearbyOnly
@@ -1369,8 +1282,7 @@ function PioneerMapPage() {
 
       <section
         style={{
-          background:
-            "#ffffff",
+          background: "#fff",
           padding:
             "0 15px 15px",
           display: "flex",
@@ -1402,54 +1314,72 @@ function PioneerMapPage() {
                   activeCategory ===
                   category.name
                     ? "#f1c40f"
-                    : "#ffffff",
+                    : "#fff",
                 fontWeight:
                   activeCategory ===
                   category.name
                     ? "700"
                     : "400",
-                fontSize:
-                  "15px",
-                cursor:
-                  "pointer",
               }}
             >
-              {
-                category.icon
-              }{" "}
-              {
-                category.name
-              }
+              {category.icon}{" "}
+              {category.name}
             </button>
           )
         )}
 
-        <select
-          value={
-            activeLanguage
-          }
-          onChange={(event) =>
-            setActiveLanguage(
-              event.target.value
-            )
+        <button
+          onClick={() =>
+            setShowForm(true)
           }
           style={{
             padding:
-              "10px 14px",
+              "10px 18px",
             borderRadius:
               "22px",
+            border: "none",
+            background: "#222",
+            color: "#fff",
+            fontWeight: "700",
+          }}
+        >
+          📍 Add Place
+        </button>
+      </section>
+
+      {/* DİL VE ÜLKE FİLTRELERİ */}
+      <section
+        style={{
+          background: "#fff",
+          padding:
+            "0 15px 15px",
+          display: "grid",
+          gridTemplateColumns:
+            "1fr 1fr",
+          gap: "10px",
+          maxWidth: "700px",
+          margin: "0 auto",
+        }}
+      >
+        <select
+          value={activeLanguage}
+          onChange={(e) =>
+            setActiveLanguage(
+              e.target.value
+            )
+          }
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius:
+              "10px",
             border:
-              "1px solid #ddd",
-            background:
-              "#fff",
-            fontSize:
-              "15px",
-            cursor:
-              "pointer",
+              "1px solid #ccc",
+            fontSize: "15px",
           }}
         >
           <option value="All">
-            🌐 Dil
+            🗣️ Tüm Diller
           </option>
 
           {languages.map(
@@ -1469,31 +1399,24 @@ function PioneerMapPage() {
         </select>
 
         <select
-          value={
-            activeCountry
-          }
-          onChange={(event) =>
+          value={activeCountry}
+          onChange={(e) =>
             setActiveCountry(
-              event.target.value
+              e.target.value
             )
           }
           style={{
-            padding:
-              "10px 14px",
+            width: "100%",
+            padding: "12px",
             borderRadius:
-              "22px",
+              "10px",
             border:
-              "1px solid #ddd",
-            background:
-              "#fff",
-            fontSize:
-              "15px",
-            cursor:
-              "pointer",
+              "1px solid #ccc",
+            fontSize: "15px",
           }}
         >
           <option value="All">
-            🌍 Ülke
+            🌍 Tüm Ülkeler
           </option>
 
           {countries.map(
@@ -1511,30 +1434,6 @@ function PioneerMapPage() {
             )
           )}
         </select>
-
-        <button
-          onClick={() =>
-            setShowForm(true)
-          }
-          style={{
-            padding:
-              "10px 18px",
-            borderRadius:
-              "22px",
-            border: "none",
-            background:
-              "#222",
-            color: "#fff",
-            fontWeight:
-              "700",
-            fontSize:
-              "15px",
-            cursor:
-              "pointer",
-          }}
-        >
-          📍 Add Place
-        </button>
       </section>
 
       {showForm && (
@@ -1542,19 +1441,14 @@ function PioneerMapPage() {
           style={{
             margin: "15px",
             padding: "20px",
-            background:
-              "#ffffff",
+            background: "#fff",
             borderRadius:
               "14px",
             boxShadow:
               "0 3px 14px rgba(0,0,0,.12)",
           }}
         >
-          <h2
-            style={{
-              marginTop: 0,
-            }}
-          >
+          <h2>
             📍 Add Place
           </h2>
 
@@ -1577,12 +1471,10 @@ function PioneerMapPage() {
           )}
 
           <input
-            value={
-              placeName
-            }
-            onChange={(event) =>
+            value={placeName}
+            onChange={(e) =>
               setPlaceName(
-                event.target.value
+                e.target.value
               )
             }
             placeholder="Yer adı"
@@ -1597,19 +1489,14 @@ function PioneerMapPage() {
                 "8px",
               border:
                 "1px solid #ccc",
-              fontSize:
-                "15px",
             }}
           />
 
           <select
-            value={
-              placeCategory
-            }
-            onChange={(event) =>
+            value={placeCategory}
+            onChange={(e) =>
               setPlaceCategory(
-                event.target
-                  .value as Exclude<
+                e.target.value as Exclude<
                   Category,
                   "All"
                 >
@@ -1624,8 +1511,6 @@ function PioneerMapPage() {
                 "8px",
               border:
                 "1px solid #ccc",
-              fontSize:
-                "15px",
             }}
           >
             <option value="Stays">
@@ -1646,12 +1531,10 @@ function PioneerMapPage() {
           </select>
 
           <select
-            value={
-              placeLanguage
-            }
-            onChange={(event) =>
+            value={placeLanguage}
+            onChange={(e) =>
               setPlaceLanguage(
-                event.target.value
+                e.target.value
               )
             }
             style={{
@@ -1663,8 +1546,6 @@ function PioneerMapPage() {
                 "8px",
               border:
                 "1px solid #ccc",
-              fontSize:
-                "15px",
             }}
           >
             {languages.map(
@@ -1684,12 +1565,10 @@ function PioneerMapPage() {
           </select>
 
           <select
-            value={
-              placeCountry
-            }
-            onChange={(event) =>
+            value={placeCountry}
+            onChange={(e) =>
               setPlaceCountry(
-                event.target.value
+                e.target.value
               )
             }
             style={{
@@ -1701,8 +1580,6 @@ function PioneerMapPage() {
                 "8px",
               border:
                 "1px solid #ccc",
-              fontSize:
-                "15px",
             }}
           >
             {countries.map(
@@ -1725,9 +1602,9 @@ function PioneerMapPage() {
             value={
               placeDescription
             }
-            onChange={(event) =>
+            onChange={(e) =>
               setPlaceDescription(
-                event.target.value
+                e.target.value
               )
             }
             placeholder="Açıklama"
@@ -1743,8 +1620,6 @@ function PioneerMapPage() {
                 "8px",
               border:
                 "1px solid #ccc",
-              fontSize:
-                "15px",
             }}
           />
 
@@ -1761,8 +1636,6 @@ function PioneerMapPage() {
               color: "#fff",
               fontWeight:
                 "700",
-              cursor:
-                "pointer",
               marginRight:
                 "8px",
             }}
@@ -1788,8 +1661,6 @@ function PioneerMapPage() {
               color: "#fff",
               fontWeight:
                 "700",
-              cursor:
-                "pointer",
             }}
           >
             İptal
@@ -1800,8 +1671,7 @@ function PioneerMapPage() {
               style={{
                 marginTop:
                   "15px",
-                padding:
-                  "12px",
+                padding: "12px",
                 borderRadius:
                   "10px",
                 background:
@@ -1833,10 +1703,8 @@ function PioneerMapPage() {
             height: "500px",
             borderRadius:
               "14px",
-            overflow:
-              "hidden",
-            background:
-              "#ddd",
+            overflow: "hidden",
+            background: "#ddd",
           }}
         />
 
@@ -1848,7 +1716,7 @@ function PioneerMapPage() {
                 marginTop:
                   "16px",
                 background:
-                  "#ffffff",
+                  "#fff",
                 borderRadius:
                   "18px",
                 overflow:
@@ -1861,8 +1729,7 @@ function PioneerMapPage() {
             >
               <div
                 style={{
-                  padding:
-                    "20px",
+                  padding: "20px",
                 }}
               >
                 <div
@@ -1873,7 +1740,6 @@ function PioneerMapPage() {
                       "space-between",
                     alignItems:
                       "flex-start",
-                    gap: "12px",
                   }}
                 >
                   <div>
@@ -1892,8 +1758,6 @@ function PioneerMapPage() {
                       style={{
                         margin:
                           "6px 0 0",
-                        fontSize:
-                          "25px",
                       }}
                     >
                       {
@@ -1909,7 +1773,8 @@ function PioneerMapPage() {
                       )
                     }
                     style={{
-                      width: "38px",
+                      width:
+                        "38px",
                       height:
                         "38px",
                       borderRadius:
@@ -1917,11 +1782,9 @@ function PioneerMapPage() {
                       border:
                         "none",
                       background:
-                        "#eeeeee",
+                        "#eee",
                       fontSize:
                         "22px",
-                      cursor:
-                        "pointer",
                     }}
                   >
                     ×
@@ -1941,11 +1804,9 @@ function PioneerMapPage() {
                     background:
                       selectedCategory.color,
                     color:
-                      "#ffffff",
+                      "#fff",
                     fontWeight:
                       "700",
-                    fontSize:
-                      "13px",
                   }}
                 >
                   {
@@ -1955,68 +1816,8 @@ function PioneerMapPage() {
 
                 <div
                   style={{
-                    display:
-                      "flex",
-                    gap: "8px",
-                    flexWrap:
-                      "wrap",
                     marginTop:
-                      "12px",
-                  }}
-                >
-                  {selectedPlace.language && (
-                    <div
-                      style={{
-                        padding:
-                          "8px 12px",
-                        borderRadius:
-                          "20px",
-                        background:
-                          "#e3f2fd",
-                        color:
-                          "#1565c0",
-                        fontWeight:
-                          "700",
-                        fontSize:
-                          "13px",
-                      }}
-                    >
-                      🌐{" "}
-                      {
-                        selectedPlace.language
-                      }
-                    </div>
-                  )}
-
-                  {selectedPlace.country && (
-                    <div
-                      style={{
-                        padding:
-                          "8px 12px",
-                        borderRadius:
-                          "20px",
-                        background:
-                          "#e8f5e9",
-                        color:
-                          "#2e7d32",
-                        fontWeight:
-                          "700",
-                        fontSize:
-                          "13px",
-                      }}
-                    >
-                      🌍{" "}
-                      {
-                        selectedPlace.country
-                      }
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  style={{
-                    marginTop:
-                      "16px",
+                      "15px",
                     padding:
                       "15px",
                     borderRadius:
@@ -2025,31 +1826,74 @@ function PioneerMapPage() {
                       "#f7f7f7",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize:
-                        "13px",
-                      color:
-                        "#777",
-                      fontWeight:
-                        "700",
-                      marginBottom:
-                        "5px",
-                    }}
-                  >
+                  <strong>
                     AÇIKLAMA
-                  </div>
+                  </strong>
 
                   <div
                     style={{
-                      fontSize:
-                        "16px",
+                      marginTop:
+                        "6px",
                       lineHeight:
                         "1.5",
                     }}
                   >
                     {
                       selectedPlace.description
+                    }
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display:
+                      "grid",
+                    gridTemplateColumns:
+                      "1fr 1fr",
+                    gap: "10px",
+                    marginTop:
+                      "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#eef7ff",
+                    }}
+                  >
+                    🗣️{" "}
+                    <strong>
+                      Dil
+                    </strong>
+                    <br />
+                    {
+                      selectedPlace.language ||
+                      "Turkish"
+                    }
+                  </div>
+
+                  <div
+                    style={{
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#f5f0ff",
+                    }}
+                  >
+                    🌍{" "}
+                    <strong>
+                      Ülke
+                    </strong>
+                    <br />
+                    {
+                      selectedPlace.country ||
+                      "Türkiye"
                     }
                   </div>
                 </div>
@@ -2106,32 +1950,6 @@ function PioneerMapPage() {
 
                 <div
                   style={{
-                    marginTop:
-                      "10px",
-                    padding:
-                      "13px",
-                    borderRadius:
-                      "12px",
-                    background:
-                      "#fafafa",
-                    color:
-                      "#555",
-                    fontSize:
-                      "13px",
-                  }}
-                >
-                  🗺️ Konum:{" "}
-                  {selectedPlace.lat.toFixed(
-                    5
-                  )}
-                  ,{" "}
-                  {selectedPlace.lng.toFixed(
-                    5
-                  )}
-                </div>
-
-                <div
-                  style={{
                     display:
                       "flex",
                     gap: "9px",
@@ -2154,32 +1972,10 @@ function PioneerMapPage() {
                           ],
                           15
                         );
-
-                        setTimeout(
-                          () => {
-                            const card =
-                              document.getElementById(
-                                "pioneer-detail-card"
-                              );
-
-                            if (card) {
-                              card.scrollIntoView(
-                                {
-                                  behavior:
-                                    "smooth",
-                                  block:
-                                    "start",
-                                }
-                              );
-                            }
-                          },
-                          100
-                        );
                       }
                     }}
                     style={{
-                      flex:
-                        "1",
+                      flex: "1",
                       minWidth:
                         "160px",
                       padding:
@@ -2191,11 +1987,9 @@ function PioneerMapPage() {
                       background:
                         "#1976D2",
                       color:
-                        "#ffffff",
+                        "#fff",
                       fontWeight:
                         "700",
-                      cursor:
-                        "pointer",
                     }}
                   >
                     🗺️ Haritada Göster
@@ -2212,8 +2006,7 @@ function PioneerMapPage() {
                           )
                         }
                         style={{
-                          flex:
-                            "1",
+                          flex: "1",
                           minWidth:
                             "160px",
                           padding:
@@ -2225,11 +2018,9 @@ function PioneerMapPage() {
                           background:
                             "#d32f2f",
                           color:
-                            "#ffffff",
+                            "#fff",
                           fontWeight:
                             "700",
-                          cursor:
-                            "pointer",
                         }}
                       >
                         🗑️ Yeri Sil
@@ -2256,21 +2047,15 @@ function PioneerMapPage() {
             : searchText.trim()
             ? `🔎 "${searchText}" sonuçları`
             : activeLanguage !==
-                "All"
-            ? `🌐 ${activeLanguage}`
+              "All"
+            ? `🗣️ ${activeLanguage}`
             : activeCountry !==
-                "All"
+              "All"
             ? `🌍 ${activeCountry}`
             : activeCategory ===
               "All"
             ? "🌍 Pi Economy Places"
-            : `${
-                categories.find(
-                  (item) =>
-                    item.name ===
-                    activeCategory
-                )?.icon
-              } ${activeCategory}`}
+            : `${categoryIcons[activeCategory].icon} ${activeCategory}`}
         </div>
       </main>
     </div>
