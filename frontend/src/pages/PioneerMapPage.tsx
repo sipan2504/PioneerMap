@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
+import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
 import MapView from "../components/MapView";
 import PlaceCard from "../components/PlaceCard";
@@ -2226,18 +2227,11 @@ function PioneerMapPage() {
             @{username}
           </div>
         )}
-
-        {status && (
-          <p
-            style={{
-              margin:
-                "14px 0 0",
-              fontWeight: "700",
-            }}
-          >
-            {status}
-          </p>
-        )}
+<Toast
+  message={status}
+  onClose={() => setStatus("")}
+/>
+        
       </header>
 
       {/* SEARCH */}
