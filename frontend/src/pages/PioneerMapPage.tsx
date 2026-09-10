@@ -115,6 +115,9 @@ function PioneerMapPage() {
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
+  const [searchText, setSearchText] =
+    useState("");
+
   const [places, setPlaces] =
     useState<Place[]>(initialPlaces);
 
@@ -247,7 +250,9 @@ function PioneerMapPage() {
   // Yer silme
   const deletePlace = async (place: Place) => {
     if (!place._id) {
-      setStatus("❌ Bu yer silinemiyor: ID bulunamadı.");
+      setStatus(
+        "❌ Bu yer silinemiyor: ID bulunamadı."
+      );
       return;
     }
 
@@ -334,13 +339,35 @@ function PioneerMapPage() {
 
     markersRef.current = [];
 
+    const normalizedSearch =
+      searchText.trim().toLowerCase();
+
     const filteredPlaces =
-      activeCategory === "All"
-        ? places
-        : places.filter(
-            (place) =>
-              place.category === activeCategory
+      places.filter((place) => {
+        const matchesCategory =
+          activeCategory === "All" ||
+          place.category === activeCategory;
+
+        const searchableText = [
+          place.name,
+          place.description,
+          place.username || "",
+          place.category,
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const matchesSearch =
+          normalizedSearch === "" ||
+          searchableText.includes(
+            normalizedSearch
           );
+
+        return (
+          matchesCategory &&
+          matchesSearch
+        );
+      });
 
     filteredPlaces.forEach((place) => {
       const isMyPlace =
@@ -467,6 +494,7 @@ function PioneerMapPage() {
   }, [
     places,
     activeCategory,
+    searchText,
     signedIn,
     username,
   ]);
@@ -683,9 +711,66 @@ function PioneerMapPage() {
         )}
       </header>
 
+      {/* Arama */}
       <div
         style={{
           padding: "15px",
+          background: "#ffffff",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "700px",
+            margin: "0 auto",
+            position: "relative",
+          }}
+        >
+          <input
+            value={searchText}
+            onChange={(event) =>
+              setSearchText(
+                event.target.value
+              )
+            }
+            placeholder="🔎 Yer, işletme veya kullanıcı ara..."
+            style={{
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "15px 45px 15px 18px",
+              borderRadius: "30px",
+              border: "2px solid #ddd",
+              fontSize: "16px",
+              outline: "none",
+            }}
+          />
+
+          {searchText && (
+            <button
+              onClick={() => setSearchText("")}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "50%",
+                transform:
+                  "translateY(-50%)",
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                border: "none",
+                background: "#eee",
+                cursor: "pointer",
+                fontSize: "18px",
+              }}
+            >
+              ×
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: "0 15px 15px",
           display: "flex",
           gap: "8px",
           justifyContent: "center",
@@ -902,7 +987,9 @@ function PioneerMapPage() {
             fontWeight: "bold",
           }}
         >
-          {activeCategory === "All"
+          {searchText.trim()
+            ? `🔎 "${searchText}" sonuçları`
+            : activeCategory === "All"
             ? "🌍 Pi Economy Places"
             : `${
                 categories.find(
