@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
+import MapView from "../components/MapView";
+import PlaceCard from "../components/PlaceCard";
+import PlaceFilters from "../components/PlaceFilters";
+import AddPlaceForm from "../components/AddPlaceForm";
+import PlaceList from "../components/PlaceList";
+import BottomNav from "../components/BottomNav";
+import PlaceDetails from "../components/PlaceDetails";
 type Category =
   | "All"
   | "Stays"
