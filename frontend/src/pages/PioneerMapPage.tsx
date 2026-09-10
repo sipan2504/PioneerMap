@@ -47,8 +47,8 @@ const categoryIcons: Record<
 };
 
 /* =========================================================
-   FEATURE #4
-   PLACE LANGUAGE + COUNTRY DATA
+FEATURE #4
+PLACE LANGUAGE + COUNTRY DATA
 ========================================================= */
 
 const languages = [
@@ -151,7 +151,7 @@ const countries = [
   { value: "Armenia", label: "🇦🇲 Ermenistan" },
   { value: "Azerbaijan", label: "🇦🇿 Azerbaycan" },
   { value: "Kazakhstan", label: "🇰🇿 Kazakistan" },
-  { value: "Uzbekistan", label: "🇺🇿 Özbekistan" },
+  { value: "Uzbekistan", label: "🇺🇿 Kazakistan" },
   { value: "China", label: "🇨🇳 Çin" },
   { value: "Japan", label: "🇯🇵 Japonya" },
   { value: "South Korea", label: "🇰🇷 Güney Kore" },
@@ -193,8 +193,8 @@ const countries = [
 ];
 
 /* =========================================================
-   FEATURE #5
-   APP LANGUAGE / LOCALIZATION
+FEATURE #5
+APP LANGUAGE
 ========================================================= */
 
 const appLanguages: Array<{
@@ -253,12 +253,10 @@ const translations = {
     nearbyPlaces: "📍 50 km içindeki yerler — en yakından uzağa",
     results: "sonuçları",
     searchingLocation: "📍 Konumun alınıyor...",
-    locationNotSupported:
-      "❌ Konum özelliği desteklenmiyor.",
+    locationNotSupported: "❌ Konum özelliği desteklenmiyor.",
     locationDenied: "❌ Konum izni verilmedi.",
     signInFirst: "❌ Önce Pi ile giriş yapmalısın.",
-    deleteLogin:
-      "❌ Silmek için Pi ile giriş yapmalısın.",
+    deleteLogin: "❌ Silmek için Pi ile giriş yapmalısın.",
     saving: "⏳ Yer kaydediliyor...",
     deleting: "⏳ Yer siliniyor...",
     deleted: "silindi.",
@@ -266,14 +264,12 @@ const translations = {
     nameRequired: "❌ Yer adını yaz.",
     descriptionTitle: "AÇIKLAMA",
     languageSelector: "🌐 Uygulama Dili",
-    confirmDelete:
-      "yerini silmek istediğine emin misin?",
+    confirmDelete: "yerini silmek istediğine emin misin?",
     piSdkError: "❌ Pi SDK yüklenemedi.",
     piUserError: "Pi kullanıcı bilgisi alınamadı.",
     backendError: "Backend giriş işlemi başarısız.",
     loginFailed: "❌ Pi Sign-In başarısız.",
-    locationChosen:
-      "📍 Konum seçildi. Yer bilgilerini gir.",
+    locationChosen: "📍 Konum seçildi. Yer bilgilerini gir.",
     location: "📍 Konum",
     anonymous: "Kullanıcı",
   },
@@ -317,12 +313,10 @@ const translations = {
     nearbyPlaces: "📍 Places within 50 km — nearest first",
     results: "results",
     searchingLocation: "📍 Getting your location...",
-    locationNotSupported:
-      "❌ Location is not supported.",
+    locationNotSupported: "❌ Location is not supported.",
     locationDenied: "❌ Location permission denied.",
     signInFirst: "❌ Please sign in with Pi first.",
-    deleteLogin:
-      "❌ You must sign in with Pi to delete.",
+    deleteLogin: "❌ You must sign in with Pi to delete.",
     saving: "⏳ Saving place...",
     deleting: "⏳ Deleting place...",
     deleted: "deleted.",
@@ -380,12 +374,10 @@ const translations = {
     nearbyPlaces: "📍 الأماكن ضمن 50 كم — الأقرب أولاً",
     results: "النتائج",
     searchingLocation: "📍 جارٍ تحديد موقعك...",
-    locationNotSupported:
-      "❌ الموقع غير مدعوم.",
+    locationNotSupported: "❌ الموقع غير مدعوم.",
     locationDenied: "❌ تم رفض إذن الموقع.",
     signInFirst: "❌ يرجى تسجيل الدخول باستخدام Pi أولاً.",
-    deleteLogin:
-      "❌ يجب تسجيل الدخول باستخدام Pi للحذف.",
+    deleteLogin: "❌ يجب تسجيل الدخول باستخدام Pi للحذف.",
     saving: "⏳ جارٍ حفظ المكان...",
     deleting: "⏳ جارٍ حذف المكان...",
     deleted: "تم حذفه.",
@@ -398,8 +390,7 @@ const translations = {
     piUserError: "تعذر الحصول على معلومات مستخدم Pi.",
     backendError: "فشل تسجيل الدخول إلى الخادم.",
     loginFailed: "❌ فشل تسجيل الدخول باستخدام Pi.",
-    locationChosen:
-      "📍 تم اختيار الموقع. أدخل معلومات المكان.",
+    locationChosen: "📍 تم اختيار الموقع. أدخل معلومات المكان.",
     location: "📍 الموقع",
     anonymous: "مستخدم",
   },
@@ -446,8 +437,7 @@ const translations = {
     locationNotSupported: "❌ La ubicación no es compatible.",
     locationDenied: "❌ Permiso de ubicación denegado.",
     signInFirst: "❌ Inicia sesión con Pi primero.",
-    deleteLogin:
-      "❌ Debes iniciar sesión con Pi para eliminar.",
+    deleteLogin: "❌ Debes iniciar sesión con Pi para eliminar.",
     saving: "⏳ Guardando lugar...",
     deleting: "⏳ Eliminando lugar...",
     deleted: "eliminado.",
@@ -502,10 +492,12 @@ const translations = {
     close: "Fermer",
     distance: "km",
     places: "🌍 Lieux Pi Economy",
-    nearbyPlaces: "📍 Lieux dans un rayon de 50 km — plus proches en premier",
+    nearbyPlaces:
+      "📍 Lieux dans un rayon de 50 km — plus proches en premier",
     results: "résultats",
     searchingLocation: "📍 Obtention de votre position...",
-    locationNotSupported: "❌ La localisation n'est pas prise en charge.",
+    locationNotSupported:
+      "❌ La localisation n'est pas prise en charge.",
     locationDenied: "❌ Autorisation de localisation refusée.",
     signInFirst: "❌ Connectez-vous d'abord avec Pi.",
     deleteLogin:
@@ -519,7 +511,8 @@ const translations = {
     languageSelector: "🌐 Langue de l'application",
     confirmDelete: "Voulez-vous vraiment supprimer ce lieu ?",
     piSdkError: "❌ Pi SDK n'a pas pu être chargé.",
-    piUserError: "Impossible d'obtenir les informations utilisateur Pi.",
+    piUserError:
+      "Impossible d'obtenir les informations utilisateur Pi.",
     backendError: "Échec de la connexion au backend.",
     loginFailed: "❌ Échec de la connexion Pi.",
     locationChosen:
@@ -581,7 +574,8 @@ const translations = {
     languageSelector: "🌐 App-Sprache",
     confirmDelete: "Möchtest du diesen Ort wirklich löschen?",
     piSdkError: "❌ Pi SDK konnte nicht geladen werden.",
-    piUserError: "Pi-Benutzerinformationen konnten nicht abgerufen werden.",
+    piUserError:
+      "Pi-Benutzerinformationen konnten nicht abgerufen werden.",
     backendError: "Backend-Anmeldung fehlgeschlagen.",
     loginFailed: "❌ Pi-Anmeldung fehlgeschlagen.",
     locationChosen:
@@ -626,7 +620,8 @@ const translations = {
     close: "Fechar",
     distance: "km de distância",
     places: "🌍 Lugares Pi Economy",
-    nearbyPlaces: "📍 Lugares em até 50 km — mais próximos primeiro",
+    nearbyPlaces:
+      "📍 Lugares em até 50 km — mais próximos primeiro",
     results: "resultados",
     searchingLocation: "📍 Obtendo sua localização...",
     locationNotSupported: "❌ Localização não suportada.",
@@ -641,9 +636,11 @@ const translations = {
     nameRequired: "❌ Digite o nome do lugar.",
     descriptionTitle: "DESCRIÇÃO",
     languageSelector: "🌐 Idioma do aplicativo",
-    confirmDelete: "Tem certeza de que deseja excluir este lugar?",
+    confirmDelete:
+      "Tem certeza de que deseja excluir este lugar?",
     piSdkError: "❌ Não foi possível carregar o Pi SDK.",
-    piUserError: "Não foi possível obter os dados do usuário Pi.",
+    piUserError:
+      "Não foi possível obter os dados do usuário Pi.",
     backendError: "Falha no login do backend.",
     loginFailed: "❌ Falha no login com Pi.",
     locationChosen:
@@ -688,11 +685,13 @@ const translations = {
     close: "Закрыть",
     distance: "км",
     places: "🌍 Места Pi Economy",
-    nearbyPlaces: "📍 Места в пределах 50 км — ближайшие первыми",
+    nearbyPlaces:
+      "📍 Места в пределах 50 км — ближайшие первыми",
     results: "результаты",
     searchingLocation: "📍 Определяем местоположение...",
     locationNotSupported: "❌ Геолокация не поддерживается.",
-    locationDenied: "❌ Доступ к местоположению запрещён.",
+    locationDenied:
+      "❌ Доступ к местоположению запрещён.",
     signInFirst: "❌ Сначала войдите через Pi.",
     deleteLogin:
       "❌ Для удаления необходимо войти через Pi.",
@@ -703,9 +702,11 @@ const translations = {
     nameRequired: "❌ Введите название места.",
     descriptionTitle: "ОПИСАНИЕ",
     languageSelector: "🌐 Язык приложения",
-    confirmDelete: "Вы уверены, что хотите удалить это место?",
+    confirmDelete:
+      "Вы уверены, что хотите удалить это место?",
     piSdkError: "❌ Не удалось загрузить Pi SDK.",
-    piUserError: "Не удалось получить данные пользователя Pi.",
+    piUserError:
+      "Не удалось получить данные пользователя Pi.",
     backendError: "Ошибка входа через backend.",
     loginFailed: "❌ Ошибка входа через Pi.",
     locationChosen:
@@ -750,7 +751,8 @@ const translations = {
     close: "关闭",
     distance: "公里",
     places: "🌍 Pi Economy 地点",
-    nearbyPlaces: "📍 50 公里内的地点 — 最近的优先",
+    nearbyPlaces:
+      "📍 50 公里内的地点 — 最近的优先",
     results: "结果",
     searchingLocation: "📍 正在获取位置...",
     locationNotSupported: "❌ 不支持定位。",
@@ -811,11 +813,15 @@ const translations = {
     close: "बंद करें",
     distance: "किमी दूर",
     places: "🌍 Pi Economy स्थान",
-    nearbyPlaces: "📍 50 किमी के भीतर के स्थान — सबसे नज़दीकी पहले",
+    nearbyPlaces:
+      "📍 50 किमी के भीतर के स्थान — सबसे नज़दीकी पहले",
     results: "परिणाम",
-    searchingLocation: "📍 आपका स्थान प्राप्त किया जा रहा है...",
-    locationNotSupported: "❌ स्थान सुविधा समर्थित नहीं है।",
-    locationDenied: "❌ स्थान की अनुमति नहीं दी गई।",
+    searchingLocation:
+      "📍 आपका स्थान प्राप्त किया जा रहा है...",
+    locationNotSupported:
+      "❌ स्थान सुविधा समर्थित नहीं है।",
+    locationDenied:
+      "❌ स्थान की अनुमति नहीं दी गई।",
     signInFirst: "❌ पहले Pi से साइन इन करें।",
     deleteLogin:
       "❌ हटाने के लिए Pi से साइन इन करना आवश्यक है।",
@@ -826,9 +832,11 @@ const translations = {
     nameRequired: "❌ स्थान का नाम दर्ज करें।",
     descriptionTitle: "विवरण",
     languageSelector: "🌐 ऐप की भाषा",
-    confirmDelete: "क्या आप वाकई इस स्थान को हटाना चाहते हैं?",
+    confirmDelete:
+      "क्या आप वाकई इस स्थान को हटाना चाहते हैं?",
     piSdkError: "❌ Pi SDK लोड नहीं हो सका।",
-    piUserError: "Pi उपयोगकर्ता की जानकारी प्राप्त नहीं हो सकी।",
+    piUserError:
+      "Pi उपयोगकर्ता की जानकारी प्राप्त नहीं हो सकी।",
     backendError: "Backend साइन-इन विफल हुआ।",
     loginFailed: "❌ Pi साइन-इन विफल हुआ।",
     locationChosen:
@@ -848,20 +856,13 @@ function distanceInKm(
 ) {
   const R = 6371;
 
-  const dLat =
-    ((lat2 - lat1) * Math.PI) / 180;
-
-  const dLng =
-    ((lng2 - lng1) * Math.PI) / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(
-      (lat1 * Math.PI) / 180
-    ) *
-      Math.cos(
-        (lat2 * Math.PI) / 180
-      ) *
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLng / 2) ** 2;
 
   return (
@@ -880,9 +881,7 @@ function createCategoryIcon(
   const item = categoryIcons[category];
 
   return L.divIcon({
-    className:
-      "pioneer-place-marker",
-
+    className: "pioneer-place-marker",
     html: `
       <div style="
         width:48px;
@@ -912,9 +911,7 @@ function createCategoryIcon(
 
 function createUserIcon() {
   return L.divIcon({
-    className:
-      "pioneer-user-marker",
-
+    className: "pioneer-user-marker",
     html: `
       <div style="
         width:22px;
@@ -927,7 +924,6 @@ function createUserIcon() {
           0 3px 10px rgba(0,0,0,.35);
       "></div>
     `,
-
     iconSize: [30, 30],
     iconAnchor: [15, 15],
   });
@@ -939,8 +935,7 @@ const initialPlaces: Place[] = [
     category: "Stays",
     lat: 39.9334,
     lng: 32.8597,
-    description:
-      "Pi-powered accommodation",
+    description: "Pi-powered accommodation",
     language: "Turkish",
     country: "Türkiye",
   },
@@ -949,8 +944,7 @@ const initialPlaces: Place[] = [
     category: "Shops",
     lat: 39.925,
     lng: 32.85,
-    description:
-      "Pi-powered shop",
+    description: "Pi-powered shop",
     language: "Turkish",
     country: "Türkiye",
   },
@@ -959,8 +953,7 @@ const initialPlaces: Place[] = [
     category: "Food",
     lat: 39.94,
     lng: 32.87,
-    description:
-      "Pi-powered food business",
+    description: "Pi-powered food business",
     language: "Turkish",
     country: "Türkiye",
   },
@@ -972,7 +965,7 @@ function PioneerMapPage() {
     "https://pioneermap-2.onrender.com";
 
   /* =======================================================
-     APP LANGUAGE
+  APP LANGUAGE
   ======================================================= */
 
   const [appLanguage, setAppLanguage] =
@@ -1000,16 +993,12 @@ function PioneerMapPage() {
         ) {
           return saved as AppLanguage;
         }
-      } catch {
-        // Ignore localStorage errors.
-      }
+      } catch {}
 
       return "Turkish";
     });
 
-  const t = (
-    key: TranslationKey
-  ) =>
+  const t = (key: TranslationKey) =>
     translations[appLanguage][key];
 
   useEffect(() => {
@@ -1018,9 +1007,7 @@ function PioneerMapPage() {
         "pioneerMapAppLanguage",
         appLanguage
       );
-    } catch {
-      // Ignore localStorage errors.
-    }
+    } catch {}
 
     document.documentElement.lang =
       appLanguage === "Turkish"
@@ -1050,11 +1037,20 @@ function PioneerMapPage() {
   }, [appLanguage]);
 
   /* =======================================================
-     STATE
+  STATE
   ======================================================= */
 
   const [status, setStatus] =
     useState("");
+
+  const [activeNav, setActiveNav] =
+    useState<
+      "home" |
+      "nearby" |
+      "add" |
+      "favorites" |
+      "profile"
+    >("home");
 
   const [signedIn, setSignedIn] =
     useState(false);
@@ -1068,7 +1064,6 @@ function PioneerMapPage() {
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
-  /* FEATURE #4 */
   const [activeLanguage, setActiveLanguage] =
     useState("All");
 
@@ -1128,23 +1123,18 @@ function PioneerMapPage() {
     useRef<L.Marker[]>([]);
 
   const userMarkerRef =
-    useRef<L.Marker | null>(
-      null
-    );
+    useRef<L.Marker | null>(null);
 
   /* =======================================================
-     PI LOGIN
+  PI LOGIN
   ======================================================= */
 
   const loginWithPi = async () => {
     try {
-      const pi =
-        (window as any).Pi;
+      const pi = (window as any).Pi;
 
       if (!pi) {
-        setStatus(
-          t("piSdkError")
-        );
+        setStatus(t("piSdkError"));
         return;
       }
 
@@ -1173,14 +1163,11 @@ function PioneerMapPage() {
           `${backendUrl}/user/signin`,
           {
             method: "POST",
-
             headers: {
               "Content-Type":
                 "application/json",
             },
-
             credentials: "include",
-
             body: JSON.stringify({
               authResult: auth,
             }),
@@ -1200,33 +1187,33 @@ function PioneerMapPage() {
       }
 
       setSignedIn(true);
-
       setUsername(
         auth.user.username
       );
 
+      const welcome =
+        appLanguage === "Turkish"
+          ? "Hoş geldin"
+          : appLanguage === "English"
+          ? "Welcome"
+          : appLanguage === "Arabic"
+          ? "مرحباً"
+          : appLanguage === "Spanish"
+          ? "Bienvenido"
+          : appLanguage === "French"
+          ? "Bienvenue"
+          : appLanguage === "German"
+          ? "Willkommen"
+          : appLanguage === "Portuguese"
+          ? "Bem-vindo"
+          : appLanguage === "Russian"
+          ? "Добро пожаловать"
+          : appLanguage === "Chinese"
+          ? "欢迎"
+          : "स्वागत है";
+
       setStatus(
-        `✅ ${
-          appLanguage === "Turkish"
-            ? "Hoş geldin"
-            : appLanguage === "English"
-            ? "Welcome"
-            : appLanguage === "Arabic"
-            ? "مرحباً"
-            : appLanguage === "Spanish"
-            ? "Bienvenido"
-            : appLanguage === "French"
-            ? "Bienvenue"
-            : appLanguage === "German"
-            ? "Willkommen"
-            : appLanguage === "Portuguese"
-            ? "Bem-vindo"
-            : appLanguage === "Russian"
-            ? "Добро пожаловать"
-            : appLanguage === "Chinese"
-            ? "欢迎"
-            : "स्वागत है"
-        } @${auth.user.username}`
+        `✅ ${welcome} @${auth.user.username}`
       );
     } catch (error) {
       console.error(
@@ -1246,53 +1233,49 @@ function PioneerMapPage() {
   };
 
   /* =======================================================
-     LOAD PLACES
+  LOAD PLACES
   ======================================================= */
 
   useEffect(() => {
-    const loadPlaces =
-      async () => {
-        try {
-          const response =
-            await fetch(
-              `${backendUrl}/api/places`,
-              {
-                credentials:
-                  "include",
-              }
-            );
+    const loadPlaces = async () => {
+      try {
+        const response =
+          await fetch(
+            `${backendUrl}/api/places`,
+            {
+              credentials: "include",
+            }
+          );
 
-          if (!response.ok) {
-            throw new Error(
-              `HTTP ${response.status}`
-            );
-          }
-
-          const data =
-            await response.json();
-
-          if (
-            Array.isArray(data)
-          ) {
-            setPlaces(
-              data.length > 0
-                ? data
-                : initialPlaces
-            );
-          }
-        } catch (error) {
-          console.error(
-            "Places load error:",
-            error
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}`
           );
         }
-      };
+
+        const data =
+          await response.json();
+
+        if (Array.isArray(data)) {
+          setPlaces(
+            data.length > 0
+              ? data
+              : initialPlaces
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Places load error:",
+          error
+        );
+      }
+    };
 
     loadPlaces();
   }, [backendUrl]);
 
   /* =======================================================
-     MAP INITIALIZATION
+  MAP INITIALIZATION
   ======================================================= */
 
   useEffect(() => {
@@ -1304,9 +1287,7 @@ function PioneerMapPage() {
     }
 
     const map =
-      L.map(
-        mapRef.current
-      ).setView(
+      L.map(mapRef.current).setView(
         [39.9334, 32.8597],
         6
       );
@@ -1328,15 +1309,13 @@ function PioneerMapPage() {
         });
 
         setShowForm(true);
-
         setStatus(
           t("locationChosen")
         );
       }
     );
 
-    mapInstance.current =
-      map;
+    mapInstance.current = map;
 
     setTimeout(() => {
       map.invalidateSize();
@@ -1344,218 +1323,184 @@ function PioneerMapPage() {
 
     return () => {
       map.remove();
-      mapInstance.current =
-        null;
+      mapInstance.current = null;
     };
   }, []);
 
   /* =======================================================
-     NEARBY
+  NEARBY
   ======================================================= */
 
-  const findNearbyPlaces =
-    () => {
-      if (
-        !navigator.geolocation
-      ) {
-        setStatus(
-          t(
-            "locationNotSupported"
-          )
-        );
-        return;
-      }
-
+  const findNearbyPlaces = () => {
+    if (!navigator.geolocation) {
       setStatus(
-        t("searchingLocation")
+        t("locationNotSupported")
       );
+      return;
+    }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            lat:
-              position.coords
-                .latitude,
+    setStatus(
+      t("searchingLocation")
+    );
 
-            lng:
-              position.coords
-                .longitude,
-          };
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat:
+            position.coords.latitude,
+          lng:
+            position.coords.longitude,
+        };
 
-          setUserLocation(
-            location
+        setUserLocation(location);
+        setNearbyOnly(true);
+
+        const map =
+          mapInstance.current;
+
+        if (map) {
+          map.setView(
+            [
+              location.lat,
+              location.lng,
+            ],
+            12
           );
+        }
 
-          setNearbyOnly(true);
+        if (userMarkerRef.current) {
+          userMarkerRef.current.remove();
+        }
 
-          const map =
-            mapInstance.current;
-
-          if (map) {
-            map.setView(
+        if (map) {
+          userMarkerRef.current =
+            L.marker(
               [
                 location.lat,
                 location.lng,
               ],
-              12
-            );
-          }
-
-          if (
-            userMarkerRef.current
-          ) {
-            userMarkerRef.current.remove();
-          }
-
-          if (map) {
-            userMarkerRef.current =
-              L.marker(
-                [
-                  location.lat,
-                  location.lng,
-                ],
-                {
-                  icon:
-                    createUserIcon(),
-
-                  zIndexOffset: 1000,
-                }
-              )
-                .addTo(map)
-                .bindPopup(
-                  t("location")
-                );
-          }
-
-          setStatus(
-            t("nearestFirst")
-          );
-        },
-
-        () => {
-          setStatus(
-            t("locationDenied")
-          );
-        },
-
-        {
-          enableHighAccuracy:
-            true,
-          timeout: 10000,
-          maximumAge: 300000,
+              {
+                icon:
+                  createUserIcon(),
+                zIndexOffset: 1000,
+              }
+            )
+              .addTo(map)
+              .bindPopup(
+                t("location")
+              );
         }
+
+        setStatus(
+          t("nearestFirst")
+        );
+      },
+      () => {
+        setStatus(
+          t("locationDenied")
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      }
+    );
+  };
+
+  const showAllPlaces = () => {
+    setNearbyOnly(false);
+    setUserLocation(null);
+    setSelectedPlace(null);
+
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+
+    setStatus(t("allPlaces"));
+  };
+
+  /* =======================================================
+  DELETE PLACE
+  ======================================================= */
+
+  const deletePlace = async (
+    place: Place
+  ) => {
+    if (!place._id) {
+      setStatus(
+        "❌ Place ID not found."
       );
-    };
+      return;
+    }
 
-  const showAllPlaces =
-    () => {
-      setNearbyOnly(false);
+    if (!signedIn) {
+      setStatus(
+        t("deleteLogin")
+      );
+      return;
+    }
 
-      setUserLocation(null);
+    const confirmed =
+      window.confirm(
+        `"${place.name}" ${t(
+          "confirmDelete"
+        )}`
+      );
+
+    if (!confirmed) return;
+
+    try {
+      setStatus(
+        t("deleting")
+      );
+
+      const response =
+        await fetch(
+          `${backendUrl}/api/places/${place._id}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            "Place could not be deleted."
+        );
+      }
+
+      setPlaces(
+        (current) =>
+          current.filter(
+            (item) =>
+              item._id !== place._id
+          )
+      );
 
       setSelectedPlace(null);
 
-      if (
-        userMarkerRef.current
-      ) {
-        userMarkerRef.current.remove();
-
-        userMarkerRef.current =
-          null;
-      }
-
       setStatus(
-        t("allPlaces")
+        `✅ ${place.name} ${t(
+          "deleted"
+        )}`
       );
-    };
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? `❌ ${error.message}`
+          : "❌ Place could not be deleted."
+      );
+    }
+  };
 
   /* =======================================================
-     DELETE PLACE
-  ======================================================= */
-
-  const deletePlace =
-    async (
-      place: Place
-    ) => {
-      if (!place._id) {
-        setStatus(
-          "❌ Place ID not found."
-        );
-        return;
-      }
-
-      if (!signedIn) {
-        setStatus(
-          t("deleteLogin")
-        );
-        return;
-      }
-
-      const confirmed =
-        window.confirm(
-          `"${place.name}" ${t(
-            "confirmDelete"
-          )}`
-        );
-
-      if (!confirmed)
-        return;
-
-      try {
-        setStatus(
-          t("deleting")
-        );
-
-        const response =
-          await fetch(
-            `${backendUrl}/api/places/${place._id}`,
-            {
-              method: "DELETE",
-              credentials:
-                "include",
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message ||
-              "Place could not be deleted."
-          );
-        }
-
-        setPlaces(
-          (current) =>
-            current.filter(
-              (item) =>
-                item._id !==
-                place._id
-            )
-        );
-
-        setSelectedPlace(
-          null
-        );
-
-        setStatus(
-          `✅ ${place.name} ${t(
-            "deleted"
-          )}`
-        );
-      } catch (error) {
-        setStatus(
-          error instanceof Error
-            ? `❌ ${error.message}`
-            : "❌ Place could not be deleted."
-        );
-      }
-    };
-
-  /* =======================================================
-     MARKERS
-     DETAIL BUTTON FIXED
+  MARKERS
   ======================================================= */
 
   useEffect(() => {
@@ -1569,8 +1514,7 @@ function PioneerMapPage() {
         marker.remove()
     );
 
-    markersRef.current =
-      [];
+    markersRef.current = [];
 
     const query =
       searchText
@@ -1578,88 +1522,79 @@ function PioneerMapPage() {
         .toLowerCase();
 
     let filteredPlaces =
-      places.filter(
-        (place) => {
-          const categoryMatch =
-            activeCategory ===
-              "All" ||
-            place.category ===
-              activeCategory;
+      places.filter((place) => {
+        const categoryMatch =
+          activeCategory === "All" ||
+          place.category ===
+            activeCategory;
 
-          const languageMatch =
-            activeLanguage ===
-              "All" ||
-            (place.language ||
-              "") ===
-              activeLanguage;
+        const languageMatch =
+          activeLanguage === "All" ||
+          (place.language || "") ===
+            activeLanguage;
 
-          const countryMatch =
-            activeCountry ===
-              "All" ||
-            (place.country ||
-              "") ===
-              activeCountry;
+        const countryMatch =
+          activeCountry === "All" ||
+          (place.country || "") ===
+            activeCountry;
 
-          const text = [
-            place.name,
-            place.description,
-            place.username || "",
-            place.category,
-            place.language || "",
-            place.country || "",
-          ]
-            .join(" ")
-            .toLowerCase();
+        const text = [
+          place.name,
+          place.description,
+          place.username || "",
+          place.category,
+          place.language || "",
+          place.country || "",
+        ]
+          .join(" ")
+          .toLowerCase();
 
-          const searchMatch =
-            query === "" ||
-            text.includes(query);
+        const searchMatch =
+          query === "" ||
+          text.includes(query);
 
-          let nearbyMatch =
-            true;
+        let nearbyMatch = true;
 
-          if (
-            nearbyOnly &&
-            userLocation
-          ) {
-            nearbyMatch =
-              distanceInKm(
-                userLocation.lat,
-                userLocation.lng,
-                place.lat,
-                place.lng
-              ) <= 50;
-          }
-
-          return (
-            categoryMatch &&
-            languageMatch &&
-            countryMatch &&
-            searchMatch &&
-            nearbyMatch
-          );
+        if (
+          nearbyOnly &&
+          userLocation
+        ) {
+          nearbyMatch =
+            distanceInKm(
+              userLocation.lat,
+              userLocation.lng,
+              place.lat,
+              place.lng
+            ) <= 50;
         }
-      );
+
+        return (
+          categoryMatch &&
+          languageMatch &&
+          countryMatch &&
+          searchMatch &&
+          nearbyMatch
+        );
+      });
 
     if (userLocation) {
-      filteredPlaces =
-        [
-          ...filteredPlaces,
-        ].sort(
-          (a, b) =>
-            distanceInKm(
-              userLocation.lat,
-              userLocation.lng,
-              a.lat,
-              a.lng
-            ) -
-            distanceInKm(
-              userLocation.lat,
-              userLocation.lng,
-              b.lat,
-              b.lng
-            )
-        );
+      filteredPlaces = [
+        ...filteredPlaces,
+      ].sort(
+        (a, b) =>
+          distanceInKm(
+            userLocation.lat,
+            userLocation.lng,
+            a.lat,
+            a.lng
+          ) -
+          distanceInKm(
+            userLocation.lat,
+            userLocation.lng,
+            b.lat,
+            b.lng
+          )
+      );
     }
 
     filteredPlaces.forEach(
@@ -1699,7 +1634,6 @@ function PioneerMapPage() {
             text-align:center;
             font-family:Arial,sans-serif;
           ">
-
             <div style="
               font-size:34px;
             ">
@@ -1824,49 +1758,31 @@ function PioneerMapPage() {
             >
               ${t("details")}
             </button>
-
           </div>
         `);
 
         marker.on(
           "click",
           () => {
-            setSelectedPlace(
-              place
-            );
+            setSelectedPlace(place);
           }
         );
 
-        /*
-          IMPORTANT:
-          Eski document.getElementById()
-          yöntemi kaldırıldı.
-
-          Artık gerçek popup DOM'u
-          üzerinden buton bulunuyor.
-          Bu mobil Leaflet tıklama sorununu
-          daha güvenilir hale getirir.
-        */
         marker.on(
           "popupopen",
           (event) => {
             const popupElement =
               event.popup.getElement();
 
-            if (
-              !popupElement
-            ) {
+            if (!popupElement)
               return;
-            }
 
             const button =
               popupElement.querySelector(
                 ".pioneer-details-button"
               ) as HTMLButtonElement | null;
 
-            if (!button) {
-              return;
-            }
+            if (!button) return;
 
             L.DomEvent.off(
               button
@@ -1886,23 +1802,17 @@ function PioneerMapPage() {
 
                 map.closePopup();
 
-                setTimeout(
-                  () => {
-                    document
-                      .getElementById(
-                        "pioneer-detail-card"
-                      )
-                      ?.scrollIntoView(
-                        {
-                          behavior:
-                            "smooth",
-                          block:
-                            "start",
-                        }
-                      );
-                  },
-                  100
-                );
+                setTimeout(() => {
+                  document
+                    .getElementById(
+                      "pioneer-detail-card"
+                    )
+                    ?.scrollIntoView({
+                      behavior:
+                        "smooth",
+                      block: "start",
+                    });
+                }, 100);
               }
             );
           }
@@ -1925,200 +1835,163 @@ function PioneerMapPage() {
   ]);
 
   /* =======================================================
-     ADD PLACE
+  ADD PLACE
   ======================================================= */
 
-  const addPlace =
-    async () => {
-      if (!signedIn) {
-        setStatus(
-          t("signInFirst")
-        );
-        return;
-      }
+  const addPlace = async () => {
+    if (!signedIn) {
+      setStatus(
+        t("signInFirst")
+      );
+      return;
+    }
 
-      if (
-        !placeName.trim()
-      ) {
-        setStatus(
-          t("nameRequired")
-        );
-        return;
-      }
+    if (!placeName.trim()) {
+      setStatus(
+        t("nameRequired")
+      );
+      return;
+    }
 
-      const map =
-        mapInstance.current;
+    const map =
+      mapInstance.current;
 
-      const location =
-        selectedLocation ||
-        (map
-          ? map.getCenter()
-          : {
-              lat: 39.9334,
-              lng: 32.8597,
-            });
+    const location =
+      selectedLocation ||
+      (map
+        ? map.getCenter()
+        : {
+            lat: 39.9334,
+            lng: 32.8597,
+          });
 
-      const newPlace = {
-        name:
-          placeName.trim(),
-
-        category:
-          placeCategory,
-
-        lat:
-          location.lat,
-
-        lng:
-          location.lng,
-
-        description:
-          placeDescription.trim() ||
-          "Pi Economy place",
-
-        language:
-          placeLanguage,
-
-        country:
-          placeCountry,
-
-        username:
-          username ||
-          undefined,
-      };
-
-      try {
-        setStatus(
-          t("saving")
-        );
-
-        const response =
-          await fetch(
-            `${backendUrl}/api/places`,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-
-              credentials:
-                "include",
-
-              body: JSON.stringify(
-                newPlace
-              ),
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data?.message ||
-              "Place could not be saved."
-          );
-        }
-
-        const savedPlace: Place =
-          {
-            _id: data._id,
-
-            name:
-              data.name ||
-              newPlace.name,
-
-            category:
-              data.category ||
-              newPlace.category,
-
-            lat:
-              typeof data.lat ===
-              "number"
-                ? data.lat
-                : newPlace.lat,
-
-            lng:
-              typeof data.lng ===
-              "number"
-                ? data.lng
-                : newPlace.lng,
-
-            description:
-              data.description ||
-              newPlace.description,
-
-            username:
-              data.username ||
-              newPlace.username,
-
-            user_id:
-              data.user_id ||
-              null,
-
-            language:
-              data.language ||
-              newPlace.language,
-
-            country:
-              data.country ||
-              newPlace.country,
-          };
-
-        setPlaces(
-          (current) => [
-            ...current,
-            savedPlace,
-          ]
-        );
-
-        setSelectedPlace(
-          savedPlace
-        );
-
-        setPlaceName("");
-        setPlaceDescription("");
-
-        setPlaceCategory(
-          "Stays"
-        );
-
-        setPlaceLanguage(
-          "Turkish"
-        );
-
-        setPlaceCountry(
-          "Türkiye"
-        );
-
-        setSelectedLocation(
-          null
-        );
-
-        setShowForm(false);
-
-        setStatus(
-          `✅ ${savedPlace.name} ${t(
-            "saved"
-          )}`
-        );
-      } catch (error) {
-        console.error(
-          "Add place error:",
-          error
-        );
-
-        setStatus(
-          error instanceof Error
-            ? `❌ ${error.message}`
-            : "❌ Place could not be saved."
-        );
-      }
+    const newPlace = {
+      name: placeName.trim(),
+      category: placeCategory,
+      lat: location.lat,
+      lng: location.lng,
+      description:
+        placeDescription.trim() ||
+        "Pi Economy place",
+      language: placeLanguage,
+      country: placeCountry,
+      username:
+        username || undefined,
     };
 
+    try {
+      setStatus(
+        t("saving")
+      );
+
+      const response =
+        await fetch(
+          `${backendUrl}/api/places`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(
+              newPlace
+            ),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            "Place could not be saved."
+        );
+      }
+
+      const savedPlace: Place = {
+        _id: data._id,
+        name:
+          data.name ||
+          newPlace.name,
+        category:
+          data.category ||
+          newPlace.category,
+        lat:
+          typeof data.lat ===
+          "number"
+            ? data.lat
+            : newPlace.lat,
+        lng:
+          typeof data.lng ===
+          "number"
+            ? data.lng
+            : newPlace.lng,
+        description:
+          data.description ||
+          newPlace.description,
+        username:
+          data.username ||
+          newPlace.username,
+        user_id:
+          data.user_id || null,
+        language:
+          data.language ||
+          newPlace.language,
+        country:
+          data.country ||
+          newPlace.country,
+      };
+
+      setPlaces(
+        (current) => [
+          ...current,
+          savedPlace,
+        ]
+      );
+
+      setSelectedPlace(
+        savedPlace
+      );
+
+      setPlaceName("");
+      setPlaceDescription("");
+      setPlaceCategory(
+        "Stays"
+      );
+      setPlaceLanguage(
+        "Turkish"
+      );
+      setPlaceCountry(
+        "Türkiye"
+      );
+      setSelectedLocation(
+        null
+      );
+      setShowForm(false);
+
+      setStatus(
+        `✅ ${savedPlace.name} ${t(
+          "saved"
+        )}`
+      );
+    } catch (error) {
+      console.error(
+        "Add place error:",
+        error
+      );
+
+      setStatus(
+        error instanceof Error
+          ? `❌ ${error.message}`
+          : "❌ Place could not be saved."
+      );
+    }
+  };
+
   /* =======================================================
-     CATEGORIES
+  CATEGORIES
   ======================================================= */
 
   const categories: Array<{
@@ -2151,37 +2024,34 @@ function PioneerMapPage() {
     },
   ];
 
-  const categoryLabel =
-    (
-      category: Category
-    ) => {
-      if (
-        category === "All"
-      )
-        return t("all");
+  const categoryLabel = (
+    category: Category
+  ) => {
+    if (category === "All")
+      return t("all");
 
-      if (
-        category === "Stays"
-      )
-        return t("stays");
+    if (
+      category === "Stays"
+    )
+      return t("stays");
 
-      if (
-        category === "Shops"
-      )
-        return t("shops");
+    if (
+      category === "Shops"
+    )
+      return t("shops");
 
-      if (
-        category === "Food"
-      )
-        return t("food");
+    if (
+      category === "Food"
+    )
+      return t("food");
 
-      if (
-        category === "Services"
-      )
-        return t("services");
+    if (
+      category === "Services"
+    )
+      return t("services");
 
-      return t("jobs");
-    };
+    return t("jobs");
+  };
 
   const selectedDistance =
     selectedPlace &&
@@ -2202,36 +2072,24 @@ function PioneerMapPage() {
       : null;
 
   /* =======================================================
-     UI
+  UI
   ======================================================= */
 
   return (
     <div
       style={{
         minHeight: "100vh",
-
-        background:
-          "#f5f7fa",
-
-        color:
-          "#222",
+        background: "#f5f7fa",
+        color: "#222",
+        paddingBottom: "90px",
       }}
     >
-      {/* =================================================
-          HEADER
-      ================================================= */}
-
+      {/* HEADER */}
       <header
         style={{
-          background:
-            "#fff",
-
-          padding:
-            "22px 16px",
-
-          textAlign:
-            "center",
-
+          background: "#fff",
+          padding: "22px 16px",
+          textAlign: "center",
           borderBottom:
             "1px solid #eee",
         }}
@@ -2240,9 +2098,7 @@ function PioneerMapPage() {
           style={{
             margin:
               "0 0 10px",
-
-            fontSize:
-              "34px",
+            fontSize: "34px",
           }}
         >
           🗺️ PioneerMap
@@ -2252,15 +2108,9 @@ function PioneerMapPage() {
           style={{
             margin:
               "0 auto 18px",
-
-            maxWidth:
-              "650px",
-
-            fontSize:
-              "17px",
-
-            lineHeight:
-              "1.45",
+            maxWidth: "650px",
+            fontSize: "17px",
+            lineHeight: "1.45",
           }}
         >
           {t(
@@ -2269,32 +2119,20 @@ function PioneerMapPage() {
         </p>
 
         {/* APP LANGUAGE */}
-
         <div
           style={{
-            maxWidth:
-              "420px",
-
+            maxWidth: "420px",
             margin:
               "0 auto 15px",
-
-            textAlign:
-              "left",
+            textAlign: "left",
           }}
         >
           <label
             style={{
-              display:
-                "block",
-
-              marginBottom:
-                "7px",
-
-              fontWeight:
-                "700",
-
-              fontSize:
-                "14px",
+              display: "block",
+              marginBottom: "7px",
+              fontWeight: "700",
+              fontSize: "14px",
             }}
           >
             {t(
@@ -2312,29 +2150,16 @@ function PioneerMapPage() {
               )
             }
             style={{
-              width:
-                "100%",
-
+              width: "100%",
               boxSizing:
                 "border-box",
-
-              padding:
-                "12px",
-
-              borderRadius:
-                "10px",
-
+              padding: "12px",
+              borderRadius: "10px",
               border:
                 "1px solid #ccc",
-
-              background:
-                "#fff",
-
-              fontSize:
-                "15px",
-
-              fontWeight:
-                "600",
+              background: "#fff",
+              fontSize: "15px",
+              fontWeight: "600",
             }}
           >
             {appLanguages.map(
@@ -2347,9 +2172,7 @@ function PioneerMapPage() {
                     language.value
                   }
                 >
-                  {
-                    language.label
-                  }
+                  {language.label}
                 </option>
               )
             )}
@@ -2364,24 +2187,14 @@ function PioneerMapPage() {
             style={{
               padding:
                 "13px 25px",
-
-              border:
-                "none",
-
+              border: "none",
               borderRadius:
                 "10px",
-
               background:
                 "#1976D2",
-
-              color:
-                "#fff",
-
-              fontSize:
-                "16px",
-
-              fontWeight:
-                "700",
+              color: "#fff",
+              fontSize: "16px",
+              fontWeight: "700",
             }}
           >
             {t("signIn")}
@@ -2391,19 +2204,14 @@ function PioneerMapPage() {
             style={{
               display:
                 "inline-block",
-
               padding:
                 "12px 20px",
-
               borderRadius:
                 "10px",
-
               background:
                 "#e8f5e9",
-
               color:
                 "#2e7d32",
-
               fontWeight:
                 "700",
             }}
@@ -2418,9 +2226,7 @@ function PioneerMapPage() {
             style={{
               margin:
                 "14px 0 0",
-
-              fontWeight:
-                "700",
+              fontWeight: "700",
             }}
           >
             {status}
@@ -2428,26 +2234,17 @@ function PioneerMapPage() {
         )}
       </header>
 
-      {/* =================================================
-          SEARCH
-      ================================================= */}
-
+      {/* SEARCH */}
       <section
         style={{
-          background:
-            "#fff",
-
-          padding:
-            "15px",
+          background: "#fff",
+          padding: "15px",
         }}
       >
         <div
           style={{
-            maxWidth:
-              "700px",
-
-            margin:
-              "0 auto",
+            maxWidth: "700px",
+            margin: "0 auto",
           }}
         >
           <input
@@ -2459,27 +2256,19 @@ function PioneerMapPage() {
                 e.target.value
               )
             }
-            placeholder={
-              t("search")
-            }
+            placeholder={t(
+              "search"
+            )}
             style={{
-              width:
-                "100%",
-
+              width: "100%",
               boxSizing:
                 "border-box",
-
-              padding:
-                "15px",
-
+              padding: "15px",
               borderRadius:
                 "30px",
-
               border:
                 "2px solid #ddd",
-
-              fontSize:
-                "16px",
+              fontSize: "16px",
             }}
           />
 
@@ -2490,34 +2279,19 @@ function PioneerMapPage() {
                 : findNearbyPlaces()
             }
             style={{
-              width:
-                "100%",
-
-              marginTop:
-                "10px",
-
-              padding:
-                "14px",
-
-              border:
-                "none",
-
+              width: "100%",
+              marginTop: "10px",
+              padding: "14px",
+              border: "none",
               borderRadius:
                 "28px",
-
               background:
                 nearbyOnly
                   ? "#d32f2f"
                   : "#1976D2",
-
-              color:
-                "#fff",
-
-              fontSize:
-                "16px",
-
-              fontWeight:
-                "700",
+              color: "#fff",
+              fontSize: "16px",
+              fontWeight: "700",
             }}
           >
             {nearbyOnly
@@ -2531,22 +2305,15 @@ function PioneerMapPage() {
                 style={{
                   marginTop:
                     "10px",
-
-                  padding:
-                    "11px",
-
+                  padding: "11px",
                   borderRadius:
                     "12px",
-
                   background:
                     "#e3f2fd",
-
                   color:
                     "#1565c0",
-
                   textAlign:
                     "center",
-
                   fontWeight:
                     "700",
                 }}
@@ -2563,29 +2330,17 @@ function PioneerMapPage() {
         </div>
       </section>
 
-      {/* =================================================
-          CATEGORIES
-      ================================================= */}
-
+      {/* CATEGORIES */}
       <section
         style={{
-          background:
-            "#fff",
-
+          background: "#fff",
           padding:
             "0 15px 15px",
-
-          display:
-            "flex",
-
-          gap:
-            "8px",
-
+          display: "flex",
+          gap: "8px",
           justifyContent:
             "center",
-
-          flexWrap:
-            "wrap",
+          flexWrap: "wrap",
         }}
       >
         {categories.map(
@@ -2602,19 +2357,15 @@ function PioneerMapPage() {
               style={{
                 padding:
                   "10px 16px",
-
                 borderRadius:
                   "22px",
-
                 border:
                   "1px solid #ddd",
-
                 background:
                   activeCategory ===
                   category.name
                     ? "#f1c40f"
                     : "#fff",
-
                 fontWeight:
                   activeCategory ===
                   category.name
@@ -2622,9 +2373,7 @@ function PioneerMapPage() {
                     : "400",
               }}
             >
-              {
-                category.icon
-              }{" "}
+              {category.icon}{" "}
               {categoryLabel(
                 category.name
               )}
@@ -2634,26 +2383,17 @@ function PioneerMapPage() {
 
         <button
           onClick={() =>
-            setShowForm(
-              true
-            )
+            setShowForm(true)
           }
           style={{
             padding:
               "10px 18px",
-
+            border: "none",
             borderRadius:
               "22px",
-
-            border:
-              "none",
-
             background:
               "#222",
-
-            color:
-              "#fff",
-
+            color: "#fff",
             fontWeight:
               "700",
           }}
@@ -2662,33 +2402,19 @@ function PioneerMapPage() {
         </button>
       </section>
 
-      {/* =================================================
-          FEATURE #4
-          LANGUAGE + COUNTRY FILTERS
-      ================================================= */}
-
+      {/* LANGUAGE + COUNTRY */}
       <section
         style={{
-          background:
-            "#fff",
-
+          background: "#fff",
           padding:
             "0 15px 15px",
-
-          display:
-            "grid",
-
+          display: "grid",
           gridTemplateColumns:
             "1fr 1fr",
-
-          gap:
-            "10px",
-
+          gap: "10px",
           maxWidth:
             "700px",
-
-          margin:
-            "0 auto",
+          margin: "0 auto",
         }}
       >
         <select
@@ -2701,20 +2427,13 @@ function PioneerMapPage() {
             )
           }
           style={{
-            width:
-              "100%",
-
-            padding:
-              "12px",
-
+            width: "100%",
+            padding: "12px",
             borderRadius:
               "10px",
-
             border:
               "1px solid #ccc",
-
-            fontSize:
-              "15px",
+            fontSize: "15px",
           }}
         >
           <option value="All">
@@ -2733,9 +2452,7 @@ function PioneerMapPage() {
                   language.value
                 }
               >
-                {
-                  language.label
-                }
+                {language.label}
               </option>
             )
           )}
@@ -2751,20 +2468,13 @@ function PioneerMapPage() {
             )
           }
           style={{
-            width:
-              "100%",
-
-            padding:
-              "12px",
-
+            width: "100%",
+            padding: "12px",
             borderRadius:
               "10px",
-
             border:
               "1px solid #ccc",
-
-            fontSize:
-              "15px",
+            fontSize: "15px",
           }}
         >
           <option value="All">
@@ -2783,34 +2493,22 @@ function PioneerMapPage() {
                   country.value
                 }
               >
-                {
-                  country.label
-                }
+                {country.label}
               </option>
             )
           )}
         </select>
       </section>
 
-      {/* =================================================
-          ADD PLACE FORM
-      ================================================= */}
-
+      {/* ADD PLACE FORM */}
       {showForm && (
         <section
           style={{
-            margin:
-              "15px",
-
-            padding:
-              "20px",
-
-            background:
-              "#fff",
-
+            margin: "15px",
+            padding: "20px",
+            background: "#fff",
             borderRadius:
               "14px",
-
             boxShadow:
               "0 3px 14px rgba(0,0,0,.12)",
           }}
@@ -2830,7 +2528,6 @@ function PioneerMapPage() {
               style={{
                 color:
                   "#2e7d32",
-
                 fontWeight:
                   "700",
               }}
@@ -2850,25 +2547,18 @@ function PioneerMapPage() {
                 e.target.value
               )
             }
-            placeholder={
-              t("placeName")
-            }
+            placeholder={t(
+              "placeName"
+            )}
             style={{
-              width:
-                "100%",
-
+              width: "100%",
               boxSizing:
                 "border-box",
-
-              padding:
-                "12px",
-
+              padding: "12px",
               marginBottom:
                 "10px",
-
               borderRadius:
                 "8px",
-
               border:
                 "1px solid #ccc",
             }}
@@ -2880,25 +2570,20 @@ function PioneerMapPage() {
             }
             onChange={(e) =>
               setPlaceCategory(
-                e.target.value as Exclude<
+                e.target
+                  .value as Exclude<
                   Category,
                   "All"
                 >
               )
             }
             style={{
-              width:
-                "100%",
-
-              padding:
-                "12px",
-
+              width: "100%",
+              padding: "12px",
               marginBottom:
                 "10px",
-
               borderRadius:
                 "8px",
-
               border:
                 "1px solid #ccc",
             }}
@@ -2906,25 +2591,19 @@ function PioneerMapPage() {
             <option value="Stays">
               🏠 {t("stays")}
             </option>
-
             <option value="Shops">
               🛍️ {t("shops")}
             </option>
-
             <option value="Food">
               🍔 {t("food")}
             </option>
-
             <option value="Services">
               🔧 {t("services")}
             </option>
-
             <option value="Jobs">
               💼 {t("jobs")}
             </option>
           </select>
-
-          {/* PLACE LANGUAGE */}
 
           <select
             value={
@@ -2936,18 +2615,12 @@ function PioneerMapPage() {
               )
             }
             style={{
-              width:
-                "100%",
-
-              padding:
-                "12px",
-
+              width: "100%",
+              padding: "12px",
               marginBottom:
                 "10px",
-
               borderRadius:
                 "8px",
-
               border:
                 "1px solid #ccc",
             }}
@@ -2962,15 +2635,11 @@ function PioneerMapPage() {
                     language.value
                   }
                 >
-                  {
-                    language.label
-                  }
+                  {language.label}
                 </option>
               )
             )}
           </select>
-
-          {/* PLACE COUNTRY */}
 
           <select
             value={
@@ -2982,18 +2651,12 @@ function PioneerMapPage() {
               )
             }
             style={{
-              width:
-                "100%",
-
-              padding:
-                "12px",
-
+              width: "100%",
+              padding: "12px",
               marginBottom:
                 "10px",
-
               borderRadius:
                 "8px",
-
               border:
                 "1px solid #ccc",
             }}
@@ -3008,9 +2671,7 @@ function PioneerMapPage() {
                     country.value
                   }
                 >
-                  {
-                    country.label
-                  }
+                  {country.label}
                 </option>
               )
             )}
@@ -3025,28 +2686,19 @@ function PioneerMapPage() {
                 e.target.value
               )
             }
-            placeholder={
-              t(
-                "description"
-              )
-            }
+            placeholder={t(
+              "description"
+            )}
             rows={4}
             style={{
-              width:
-                "100%",
-
+              width: "100%",
               boxSizing:
                 "border-box",
-
-              padding:
-                "12px",
-
+              padding: "12px",
               marginBottom:
                 "10px",
-
               borderRadius:
                 "8px",
-
               border:
                 "1px solid #ccc",
             }}
@@ -3059,22 +2711,14 @@ function PioneerMapPage() {
             style={{
               padding:
                 "12px 20px",
-
-              border:
-                "none",
-
+              border: "none",
               borderRadius:
                 "9px",
-
               background:
                 "#2e7d32",
-
-              color:
-                "#fff",
-
+              color: "#fff",
               fontWeight:
                 "700",
-
               marginRight:
                 "8px",
             }}
@@ -3087,7 +2731,6 @@ function PioneerMapPage() {
               setShowForm(
                 false
               );
-
               setSelectedLocation(
                 null
               );
@@ -3095,19 +2738,12 @@ function PioneerMapPage() {
             style={{
               padding:
                 "12px 20px",
-
-              border:
-                "none",
-
+              border: "none",
               borderRadius:
                 "9px",
-
               background:
                 "#777",
-
-              color:
-                "#fff",
-
+              color: "#fff",
               fontWeight:
                 "700",
             }}
@@ -3120,24 +2756,21 @@ function PioneerMapPage() {
               style={{
                 marginTop:
                   "15px",
-
                 padding:
                   "12px",
-
                 borderRadius:
                   "10px",
-
                 background:
                   "#f5f5f5",
               }}
             >
               {t(
                 "selectedLocation"
-              )}
+              )}{" "}
               :{" "}
               {selectedLocation.lat.toFixed(
                 5
-              )}
+              )}{" "}
               ,{" "}
               {selectedLocation.lng.toFixed(
                 5
@@ -3147,33 +2780,21 @@ function PioneerMapPage() {
         </section>
       )}
 
-      {/* =================================================
-          MAP + DETAILS
-      ================================================= */}
-
+      {/* MAP + DETAILS */}
       <main
         style={{
-          padding:
-            "15px",
+          padding: "15px",
         }}
       >
         <div
-          ref={
-            mapRef
-          }
+          ref={mapRef}
           style={{
-            width:
-              "100%",
-
-            height:
-              "500px",
-
+            width: "100%",
+            height: "500px",
             borderRadius:
               "14px",
-
             overflow:
               "hidden",
-
             background:
               "#ddd",
           }}
@@ -3186,19 +2807,14 @@ function PioneerMapPage() {
               style={{
                 marginTop:
                   "16px",
-
                 background:
                   "#fff",
-
                 borderRadius:
                   "18px",
-
                 overflow:
                   "hidden",
-
                 boxShadow:
                   "0 4px 18px rgba(0,0,0,.16)",
-
                 borderTop:
                   `7px solid ${selectedCategory.color}`,
               }}
@@ -3213,10 +2829,8 @@ function PioneerMapPage() {
                   style={{
                     display:
                       "flex",
-
                     justifyContent:
                       "space-between",
-
                     alignItems:
                       "flex-start",
                   }}
@@ -3251,25 +2865,20 @@ function PioneerMapPage() {
                         null
                       )
                     }
-                    aria-label={
-                      t("close")
-                    }
+                    aria-label={t(
+                      "close"
+                    )}
                     style={{
                       width:
                         "38px",
-
                       height:
                         "38px",
-
                       borderRadius:
                         "50%",
-
                       border:
                         "none",
-
                       background:
                         "#eee",
-
                       fontSize:
                         "22px",
                     }}
@@ -3279,27 +2888,20 @@ function PioneerMapPage() {
                 </div>
 
                 {/* CATEGORY */}
-
                 <div
                   style={{
                     display:
                       "inline-block",
-
                     marginTop:
                       "10px",
-
                     padding:
                       "7px 14px",
-
                     borderRadius:
                       "20px",
-
                     background:
                       selectedCategory.color,
-
                     color:
                       "#fff",
-
                     fontWeight:
                       "700",
                   }}
@@ -3313,18 +2915,14 @@ function PioneerMapPage() {
                 </div>
 
                 {/* DESCRIPTION */}
-
                 <div
                   style={{
                     marginTop:
                       "15px",
-
                     padding:
                       "15px",
-
                     borderRadius:
                       "12px",
-
                     background:
                       "#f7f7f7",
                   }}
@@ -3339,7 +2937,6 @@ function PioneerMapPage() {
                     style={{
                       marginTop:
                         "6px",
-
                       lineHeight:
                         "1.5",
                     }}
@@ -3351,18 +2948,13 @@ function PioneerMapPage() {
                 </div>
 
                 {/* LANGUAGE + COUNTRY */}
-
                 <div
                   style={{
                     display:
                       "grid",
-
                     gridTemplateColumns:
                       "1fr 1fr",
-
-                    gap:
-                      "10px",
-
+                    gap: "10px",
                     marginTop:
                       "10px",
                   }}
@@ -3371,10 +2963,8 @@ function PioneerMapPage() {
                     style={{
                       padding:
                         "13px",
-
                       borderRadius:
                         "12px",
-
                       background:
                         "#eef7ff",
                     }}
@@ -3385,9 +2975,7 @@ function PioneerMapPage() {
                         "language"
                       )}
                     </strong>
-
                     <br />
-
                     {
                       selectedPlace.language ||
                       "Turkish"
@@ -3398,10 +2986,8 @@ function PioneerMapPage() {
                     style={{
                       padding:
                         "13px",
-
                       borderRadius:
                         "12px",
-
                       background:
                         "#f5f0ff",
                     }}
@@ -3412,9 +2998,7 @@ function PioneerMapPage() {
                         "country"
                       )}
                     </strong>
-
                     <br />
-
                     {
                       selectedPlace.country ||
                       "Türkiye"
@@ -3423,25 +3007,19 @@ function PioneerMapPage() {
                 </div>
 
                 {/* USER */}
-
                 {selectedPlace.username && (
                   <div
                     style={{
                       marginTop:
                         "10px",
-
                       padding:
                         "13px",
-
                       borderRadius:
                         "12px",
-
                       background:
                         "#f3e5f5",
-
                       color:
                         "#7b1fa2",
-
                       fontWeight:
                         "700",
                     }}
@@ -3454,26 +3032,20 @@ function PioneerMapPage() {
                 )}
 
                 {/* DISTANCE */}
-
                 {selectedDistance !==
                   null && (
                   <div
                     style={{
                       marginTop:
                         "10px",
-
                       padding:
                         "13px",
-
                       borderRadius:
                         "12px",
-
                       background:
                         "#e3f2fd",
-
                       color:
                         "#1565c0",
-
                       fontWeight:
                         "700",
                     }}
@@ -3489,18 +3061,13 @@ function PioneerMapPage() {
                 )}
 
                 {/* ACTIONS */}
-
                 <div
                   style={{
                     display:
                       "flex",
-
-                    gap:
-                      "9px",
-
+                    gap: "9px",
                     flexWrap:
                       "wrap",
-
                     marginTop:
                       "15px",
                   }}
@@ -3521,27 +3088,19 @@ function PioneerMapPage() {
                       }
                     }}
                     style={{
-                      flex:
-                        "1",
-
+                      flex: "1",
                       minWidth:
                         "160px",
-
                       padding:
                         "13px",
-
                       border:
                         "none",
-
                       borderRadius:
                         "10px",
-
                       background:
                         "#1976D2",
-
                       color:
                         "#fff",
-
                       fontWeight:
                         "700",
                     }}
@@ -3560,27 +3119,19 @@ function PioneerMapPage() {
                           )
                         }
                         style={{
-                          flex:
-                            "1",
-
+                          flex: "1",
                           minWidth:
                             "160px",
-
                           padding:
                             "13px",
-
                           border:
                             "none",
-
                           borderRadius:
                             "10px",
-
                           background:
                             "#d32f2f",
-
                           color:
                             "#fff",
-
                           fontWeight:
                             "700",
                         }}
@@ -3595,20 +3146,15 @@ function PioneerMapPage() {
             </section>
           )}
 
-        {/* =================================================
-            BOTTOM STATUS
-        ================================================= */}
-
+        {/* BOTTOM STATUS */}
         <div
           style={{
             textAlign:
               "center",
-
             fontWeight:
               "700",
-
             padding:
-              "15px 5px",
+              "15px 5px 20px",
           }}
         >
           {nearbyOnly &&
@@ -3637,62 +3183,201 @@ function PioneerMapPage() {
                 activeCategory
               )}`}
         </div>
-        <nav
-  style={{
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 2000,
-    background: "#fff",
-    borderTop: "1px solid #ddd",
-    boxShadow: "0 -4px 15px rgba(0,0,0,.12)",
-    display: "grid",
-    gridTemplateColumns: "repeat(5,1fr)",
-    padding: "8px 4px",
-  }}
->
-  {[
-    ["🏠", "Ana Sayfa", "home"],
-    ["📍", "Yakınımda", "nearby"],
-    ["➕", "Yer Ekle", "add"],
-    ["⭐", "Favoriler", "favorites"],
-    ["👤", "Profil", "profile"],
-  ].map(([icon, label, key]) => (
-    <button
-      key={key}
-      onClick={() => {
-        setActiveNav(key as typeof activeNav);
-
-        if (key === "home") {
-          setNearbyOnly(false);
-          setSelectedPlace(null);
-        }
-
-        if (key === "nearby") {
-          findNearbyPlaces();
-        }
-
-        if (key === "add") {
-          setShowForm(true);
-        }
-      }}
-      style={{
-        border: "none",
-        background: activeNav === key ? "#f0f0f0" : "transparent",
-        padding: "8px 2px",
-        borderRadius: "10px",
-        fontWeight: "700",
-        fontSize: "12px",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ fontSize: "22px" }}>{icon}</div>
-      {label}
-    </button>
-  ))}
-</nav>
       </main>
+
+      {/* =====================================================
+      BOTTOM NAVIGATION
+      ===================================================== */}
+
+      <nav
+        style={{
+          position:
+            "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          background:
+            "#ffffff",
+          borderTop:
+            "1px solid #ddd",
+          boxShadow:
+            "0 -4px 18px rgba(0,0,0,.15)",
+          display:
+            "grid",
+          gridTemplateColumns:
+            "repeat(5,1fr)",
+          padding:
+            "8px 4px",
+          paddingBottom:
+            "calc(8px + env(safe-area-inset-bottom))",
+        }}
+      >
+        {[
+          [
+            "🏠",
+            "Ana Sayfa",
+            "home",
+          ],
+          [
+            "📍",
+            "Yakınımda",
+            "nearby",
+          ],
+          [
+            "➕",
+            "Yer Ekle",
+            "add",
+          ],
+          [
+            "⭐",
+            "Favoriler",
+            "favorites",
+          ],
+          [
+            "👤",
+            "Profil",
+            "profile",
+          ],
+        ].map(
+          ([icon, label, key]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                setActiveNav(
+                  key as
+                    | "home"
+                    | "nearby"
+                    | "add"
+                    | "favorites"
+                    | "profile"
+                );
+
+                if (
+                  key === "home"
+                ) {
+                  setNearbyOnly(
+                    false
+                  );
+                  setUserLocation(
+                    null
+                  );
+                  setSelectedPlace(
+                    null
+                  );
+                  setStatus("");
+
+                  window.scrollTo(
+                    {
+                      top: 0,
+                      behavior:
+                        "smooth",
+                    }
+                  );
+                }
+
+                if (
+                  key ===
+                  "nearby"
+                ) {
+                  findNearbyPlaces();
+
+                  window.scrollTo(
+                    {
+                      top: 0,
+                      behavior:
+                        "smooth",
+                    }
+                  );
+                }
+
+                if (
+                  key === "add"
+                ) {
+                  setShowForm(
+                    true
+                  );
+                  setStatus("");
+
+                  window.scrollTo(
+                    {
+                      top: 0,
+                      behavior:
+                        "smooth",
+                    }
+                  );
+                }
+
+                if (
+                  key ===
+                  "favorites"
+                ) {
+                  setStatus(
+                    appLanguage ===
+                      "English"
+                      ? "⭐ Favorites will be added next."
+                      : "⭐ Favoriler özelliği sıradaki adım."
+                  );
+                }
+
+                if (
+                  key ===
+                  "profile"
+                ) {
+                  setStatus(
+                    signedIn
+                      ? `👤 @${username}`
+                      : appLanguage ===
+                        "English"
+                      ? "👤 Please sign in with Pi."
+                      : "👤 Pi ile giriş yapmalısın."
+                  );
+                }
+              }}
+              style={{
+                border:
+                  "none",
+                borderRadius:
+                  "12px",
+                background:
+                  activeNav ===
+                  key
+                    ? "#e3f2fd"
+                    : "transparent",
+                color:
+                  activeNav ===
+                  key
+                    ? "#1976D2"
+                    : "#333",
+                padding:
+                  "7px 2px",
+                fontWeight:
+                  "700",
+                fontSize:
+                  "11px",
+                cursor:
+                  "pointer",
+              }}
+            >
+              <div
+                style={{
+                  fontSize:
+                    "23px",
+                  lineHeight:
+                    "25px",
+                }}
+              >
+                {icon}
+              </div>
+
+              <div>
+                {label}
+              </div>
+            </button>
+          )
+        )}
+      </nav>
     </div>
   );
 }
