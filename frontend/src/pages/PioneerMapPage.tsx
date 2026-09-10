@@ -63,17 +63,33 @@ const categoryIcons: Record<
   Exclude<Category, "All">,
   { icon: string; color: string }
 > = {
-  Stays: { icon: "🏠", color: "#1976D2" },
-  Shops: { icon: "🛍️", color: "#E91E63" },
-  Food: { icon: "🍴", color: "#FF9800" },
-  Services: { icon: "🔧", color: "#00A6A6" },
-  Jobs: { icon: "💼", color: "#673AB7" },
+  Stays: {
+    icon: "🏠",
+    color: "#1976D2",
+  },
+  Shops: {
+    icon: "🛍️",
+    color: "#E91E63",
+  },
+  Food: {
+    icon: "🍔",
+    color: "#FF9800",
+  },
+  Services: {
+    icon: "🔧",
+    color: "#00A6A6",
+  },
+  Jobs: {
+    icon: "💼",
+    color: "#673AB7",
+  },
 };
 
 function createCategoryIcon(
   category: Exclude<Category, "All">
 ) {
-  const { icon, color } = categoryIcons[category];
+  const { icon, color } =
+    categoryIcons[category];
 
   return L.divIcon({
     className: "pioneer-map-marker",
@@ -94,12 +110,34 @@ function createCategoryIcon(
           transform:rotate(45deg);
           font-size:23px;
           line-height:1;
-        ">${icon}</span>
+        ">
+          ${icon}
+        </span>
       </div>
     `,
     iconSize: [56, 56],
     iconAnchor: [28, 56],
     popupAnchor: [0, -55],
+  });
+}
+
+function createUserLocationIcon() {
+  return L.divIcon({
+    className: "user-location-marker",
+    html: `
+      <div style="
+        width:22px;
+        height:22px;
+        background:#1976D2;
+        border:4px solid white;
+        border-radius:50%;
+        box-shadow:
+          0 0 0 8px rgba(25,118,210,0.20),
+          0 3px 10px rgba(0,0,0,0.35);
+      "></div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
   });
 }
 
@@ -138,9 +176,14 @@ function PioneerMapPage() {
     import.meta.env.VITE_BACKEND_URL ||
     "https://pioneermap-2.onrender.com";
 
-  const [status, setStatus] = useState("");
-  const [signedIn, setSignedIn] = useState(false);
-  const [username, setUsername] = useState("");
+  const [status, setStatus] =
+    useState("");
+
+  const [signedIn, setSignedIn] =
+    useState(false);
+
+  const [username, setUsername] =
+    useState("");
 
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
@@ -176,7 +219,9 @@ function PioneerMapPage() {
     useState("");
 
   const [placeCategory, setPlaceCategory] =
-    useState<Exclude<Category, "All">>("Stays");
+    useState<Exclude<Category, "All">>(
+      "Stays"
+    );
 
   const mapRef =
     useRef<HTMLDivElement | null>(null);
@@ -193,7 +238,9 @@ function PioneerMapPage() {
   const loginWithPi = async () => {
     try {
       if (!window.Pi) {
-        setStatus("Pi SDK yüklenemedi.");
+        setStatus(
+          "Pi SDK yüklenemedi."
+        );
         return;
       }
 
@@ -202,33 +249,40 @@ function PioneerMapPage() {
         sandbox: false,
       });
 
-      const auth = await window.Pi.authenticate(
-        ["username"],
-        () => true
-      );
+      const auth =
+        await window.Pi.authenticate(
+          ["username"],
+          () => true
+        );
 
       setSignedIn(true);
-      setUsername(auth.user.username);
+      setUsername(
+        auth.user.username
+      );
 
       setStatus(
         `Hoş geldin @${auth.user.username}`
       );
     } catch (error) {
       console.error(error);
-      setStatus("Pi Sign-In başarısız oldu.");
+
+      setStatus(
+        "Pi Sign-In başarısız oldu."
+      );
     }
   };
 
   useEffect(() => {
     const loadPlaces = async () => {
       try {
-        const response = await fetch(
-          `${backendUrl}/api/places`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const response =
+          await fetch(
+            `${backendUrl}/api/places`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
 
         if (!response.ok) {
           throw new Error(
@@ -236,7 +290,8 @@ function PioneerMapPage() {
           );
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (
           Array.isArray(data) &&
@@ -263,12 +318,13 @@ function PioneerMapPage() {
       return;
     }
 
-    const map = L.map(
-      mapRef.current
-    ).setView(
-      [39.9334, 32.8597],
-      6
-    );
+    const map =
+      L.map(
+        mapRef.current
+      ).setView(
+        [39.9334, 32.8597],
+        6
+      );
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -278,20 +334,24 @@ function PioneerMapPage() {
       }
     ).addTo(map);
 
-    map.on("click", (event) => {
-      setSelectedLocation({
-        lat: event.latlng.lat,
-        lng: event.latlng.lng,
-      });
+    map.on(
+      "click",
+      (event) => {
+        setSelectedLocation({
+          lat: event.latlng.lat,
+          lng: event.latlng.lng,
+        });
 
-      setShowForm(true);
+        setShowForm(true);
 
-      setStatus(
-        "Konum seçildi. Yer bilgilerini gir."
-      );
-    });
+        setStatus(
+          "Konum seçildi. Yer bilgilerini gir."
+        );
+      }
+    );
 
-    mapInstance.current = map;
+    mapInstance.current =
+      map;
 
     setTimeout(() => {
       map.invalidateSize();
@@ -299,162 +359,212 @@ function PioneerMapPage() {
 
     return () => {
       map.remove();
-      mapInstance.current = null;
+      mapInstance.current =
+        null;
     };
   }, []);
 
-  const findNearbyPlaces = () => {
-    if (!navigator.geolocation) {
+  const findNearbyPlaces =
+    () => {
+      if (!navigator.geolocation) {
+        setStatus(
+          "❌ Bu cihaz konum özelliğini desteklemiyor."
+        );
+        return;
+      }
+
       setStatus(
-        "❌ Bu cihaz konum özelliğini desteklemiyor."
+        "📍 Konumun alınıyor..."
       );
-      return;
-    }
 
-    setStatus("📍 Konumun alınıyor...");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat:
+              position.coords.latitude,
+            lng:
+              position.coords.longitude,
+          };
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
+          setUserLocation(
+            location
+          );
 
-        setUserLocation(location);
-        setNearbyOnly(true);
+          setNearbyOnly(true);
 
-        const map = mapInstance.current;
+          const map =
+            mapInstance.current;
 
-        if (map) {
-          map.setView(
-            [
-              location.lat,
-              location.lng,
-            ],
-            12
+          if (map) {
+            map.setView(
+              [
+                location.lat,
+                location.lng,
+              ],
+              12
+            );
+          }
+
+          if (
+            userMarkerRef.current
+          ) {
+            userMarkerRef.current.remove();
+          }
+
+          if (map) {
+            userMarkerRef.current =
+              L.marker(
+                [
+                  location.lat,
+                  location.lng,
+                ],
+                {
+                  icon:
+                    createUserLocationIcon(),
+                  zIndexOffset: 1000,
+                }
+              )
+                .addTo(map)
+                .bindPopup(
+                  "📍 Konumunuz"
+                );
+          }
+
+          setStatus(
+            "📍 Yakınındaki yerler gösteriliyor."
+          );
+        },
+        (error) => {
+          console.error(
+            "Konum hatası:",
+            error
+          );
+
+          setStatus(
+            "❌ Konum izni verilmedi. Konum iznini açıp tekrar dene."
+          );
+        },
+        {
+          enableHighAccuracy:
+            true,
+          timeout: 10000,
+          maximumAge: 300000,
+        }
+      );
+    };
+
+  const showAllPlaces =
+    () => {
+      setNearbyOnly(false);
+      setUserLocation(null);
+
+      if (
+        userMarkerRef.current
+      ) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current =
+          null;
+      }
+
+      setStatus(
+        "🌍 Tüm yerler gösteriliyor."
+      );
+    };
+
+  const deletePlace =
+    async (
+      place: Place
+    ) => {
+      if (!place._id) {
+        setStatus(
+          "❌ Bu yer silinemiyor: ID bulunamadı."
+        );
+        return;
+      }
+
+      if (!signedIn) {
+        setStatus(
+          "🔐 Silmek için önce Pi ile giriş yapmalısın."
+        );
+        return;
+      }
+
+      const confirmed =
+        window.confirm(
+          `"${place.name}" yerini silmek istediğine emin misin?`
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        setStatus(
+          "⏳ Yer siliniyor..."
+        );
+
+        const response =
+          await fetch(
+            `${backendUrl}/api/places/${place._id}`,
+            {
+              method: "DELETE",
+              credentials: "include",
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          if (
+            response.status ===
+            401
+          ) {
+            throw new Error(
+              "Oturum bulunamadı. Pi ile tekrar giriş yap."
+            );
+          }
+
+          if (
+            response.status ===
+            403
+          ) {
+            throw new Error(
+              "Bu yeri sadece sahibi silebilir."
+            );
+          }
+
+          throw new Error(
+            data?.message ||
+              "Yer silinemedi."
           );
         }
 
-        if (userMarkerRef.current) {
-          userMarkerRef.current.remove();
-        }
-
-        userMarkerRef.current =
-          L.marker(
-            [
-              location.lat,
-              location.lng,
-            ]
-          )
-            .addTo(mapInstance.current!)
-            .bindPopup(
-              "📍 Konumunuz"
-            );
+        setPlaces(
+          (current) =>
+            current.filter(
+              (item) =>
+                item._id !==
+                place._id
+            )
+        );
 
         setStatus(
-          "📍 Yakınındaki yerler gösteriliyor."
+          `✅ ${place.name} silindi.`
         );
-      },
-      (error) => {
+      } catch (error) {
         console.error(
-          "Konum hatası:",
+          "Yer silme hatası:",
           error
         );
 
         setStatus(
-          "❌ Konum izni verilmedi. Konum iznini açıp tekrar dene."
-        );
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000,
-      }
-    );
-  };
-
-  const deletePlace = async (
-    place: Place
-  ) => {
-    if (!place._id) {
-      setStatus(
-        "❌ Bu yer silinemiyor: ID bulunamadı."
-      );
-      return;
-    }
-
-    if (!signedIn) {
-      setStatus(
-        "🔐 Silmek için önce Pi ile giriş yapmalısın."
-      );
-      return;
-    }
-
-    const confirmed =
-      window.confirm(
-        `"${place.name}" yerini silmek istediğine emin misin?`
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setStatus("⏳ Yer siliniyor...");
-
-      const response = await fetch(
-        `${backendUrl}/api/places/${place._id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error(
-            "Oturum bulunamadı. Pi ile tekrar giriş yap."
-          );
-        }
-
-        if (response.status === 403) {
-          throw new Error(
-            "Bu yeri sadece sahibi silebilir."
-          );
-        }
-
-        throw new Error(
-          data?.message ||
-            "Yer silinemedi."
+          error instanceof Error
+            ? `❌ ${error.message}`
+            : "❌ Yer silinemedi."
         );
       }
-
-      setPlaces((current) =>
-        current.filter(
-          (item) =>
-            item._id !== place._id
-        )
-      );
-
-      setStatus(
-        `✅ ${place.name} silindi.`
-      );
-    } catch (error) {
-      console.error(
-        "Yer silme hatası:",
-        error
-      );
-
-      setStatus(
-        error instanceof Error
-          ? `❌ ${error.message}`
-          : "❌ Yer silinemedi."
-      );
-    }
-  };
+    };
 
   useEffect(() => {
     const map =
@@ -465,7 +575,8 @@ function PioneerMapPage() {
     }
 
     markersRef.current.forEach(
-      (marker) => marker.remove()
+      (marker) =>
+        marker.remove()
     );
 
     markersRef.current = [];
@@ -475,44 +586,81 @@ function PioneerMapPage() {
         .trim()
         .toLowerCase();
 
-    const filteredPlaces =
-      places.filter((place) => {
-        const matchesCategory =
-          activeCategory === "All" ||
-          place.category ===
-            activeCategory;
+    let filteredPlaces =
+      places.filter(
+        (place) => {
+          const matchesCategory =
+            activeCategory ===
+              "All" ||
+            place.category ===
+              activeCategory;
 
-        const searchableText = [
-          place.name,
-          place.description,
-          place.username || "",
-          place.category,
-        ]
-          .join(" ")
-          .toLowerCase();
+          const searchableText = [
+            place.name,
+            place.description,
+            place.username || "",
+            place.category,
+          ]
+            .join(" ")
+            .toLowerCase();
 
-        const matchesSearch =
-          normalizedSearch === "" ||
-          searchableText.includes(
-            normalizedSearch
+          const matchesSearch =
+            normalizedSearch ===
+              "" ||
+            searchableText.includes(
+              normalizedSearch
+            );
+
+          const distance =
+            userLocation
+              ? distanceInKm(
+                  userLocation.lat,
+                  userLocation.lng,
+                  place.lat,
+                  place.lng
+                )
+              : null;
+
+          const matchesNearby =
+            !nearbyOnly ||
+            !userLocation ||
+            distance! <= 50;
+
+          return (
+            matchesCategory &&
+            matchesSearch &&
+            matchesNearby
           );
+        }
+      );
 
-        const matchesNearby =
-          !nearbyOnly ||
-          !userLocation ||
-          distanceInKm(
-            userLocation.lat,
-            userLocation.lng,
-            place.lat,
-            place.lng
-          ) <= 50;
+    if (userLocation) {
+      filteredPlaces =
+        filteredPlaces.sort(
+          (a, b) => {
+            const distanceA =
+              distanceInKm(
+                userLocation.lat,
+                userLocation.lng,
+                a.lat,
+                a.lng
+              );
 
-        return (
-          matchesCategory &&
-          matchesSearch &&
-          matchesNearby
+            const distanceB =
+              distanceInKm(
+                userLocation.lat,
+                userLocation.lng,
+                b.lat,
+                b.lng
+              );
+
+            return (
+              distanceA -
+              distanceB
+            );
+          }
         );
-      });
+    }
 
     filteredPlaces.forEach(
       (place) => {
@@ -521,6 +669,16 @@ function PioneerMapPage() {
           !!username &&
           place.username ===
             username;
+
+        const distance =
+          userLocation
+            ? distanceInKm(
+                userLocation.lat,
+                userLocation.lng,
+                place.lat,
+                place.lng
+              )
+            : null;
 
         const marker =
           L.marker(
@@ -539,40 +697,49 @@ function PioneerMapPage() {
         const deleteButton =
           isMyPlace
             ? `
-          <button
-            id="delete-place-${place._id}"
-            style="
-              margin-top:10px;
-              padding:7px 12px;
-              border:none;
-              border-radius:7px;
-              background:#d32f2f;
-              color:white;
-              font-weight:bold;
-              cursor:pointer;
-              width:100%;
-            "
-          >
-            🗑️ Sil
-          </button>
-        `
+              <button
+                id="delete-place-${place._id}"
+                style="
+                  margin-top:10px;
+                  padding:7px 12px;
+                  border:none;
+                  border-radius:7px;
+                  background:#d32f2f;
+                  color:white;
+                  font-weight:bold;
+                  cursor:pointer;
+                  width:100%;
+                "
+              >
+                🗑️ Sil
+              </button>
+            `
             : "";
 
         const distanceText =
-          userLocation
-            ? distanceInKm(
-                userLocation.lat,
-                userLocation.lng,
-                place.lat,
-                place.lng
-              ).toFixed(1)
-            : null;
+          distance !== null
+            ? `
+              <br />
+              <span style="
+                display:inline-block;
+                margin-top:8px;
+                color:#1976D2;
+                font-weight:bold;
+                font-size:14px;
+              ">
+                📍 ${distance.toFixed(
+                  1
+                )} km
+              </span>
+            `
+            : "";
 
         marker.bindPopup(`
           <div style="
-            min-width:180px;
+            min-width:190px;
             text-align:center;
           ">
+
             <div style="
               font-size:28px;
               margin-bottom:5px;
@@ -632,23 +799,10 @@ function PioneerMapPage() {
               ${place.category}
             </span>
 
-            ${
-              distanceText
-                ? `
-                  <br />
-                  <span style="
-                    display:inline-block;
-                    margin-top:8px;
-                    color:#1976D2;
-                    font-weight:bold;
-                  ">
-                    📍 ${distanceText} km
-                  </span>
-                `
-                : ""
-            }
+            ${distanceText}
 
             ${deleteButton}
+
           </div>
         `);
 
@@ -668,9 +822,12 @@ function PioneerMapPage() {
               );
 
             if (button) {
-              button.onclick = () => {
-                deletePlace(place);
-              };
+              button.onclick =
+                () => {
+                  deletePlace(
+                    place
+                  );
+                };
             }
           }
         );
@@ -690,154 +847,157 @@ function PioneerMapPage() {
     userLocation,
   ]);
 
-  const addPlace = async () => {
-    if (!signedIn) {
-      setStatus(
-        "🔐 Önce Pi ile giriş yapmalısın."
-      );
-      return;
-    }
-
-    if (!placeName.trim()) {
-      setStatus(
-        "Yer adını yaz."
-      );
-      return;
-    }
-
-    const map =
-      mapInstance.current;
-
-    const location =
-      selectedLocation ||
-      (map
-        ? map.getCenter()
-        : {
-            lat: 39.9334,
-            lng: 32.8597,
-          });
-
-    const newPlace: Place = {
-      name:
-        placeName.trim(),
-      category:
-        placeCategory,
-      lat: location.lat,
-      lng: location.lng,
-      description:
-        placeDescription.trim() ||
-        "Pi Economy place",
-      username:
-        username || undefined,
-    };
-
-    try {
-      setStatus(
-        "⏳ Yer kaydediliyor..."
-      );
-
-      const response =
-        await fetch(
-          `${backendUrl}/api/places`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            credentials:
-              "include",
-            body:
-              JSON.stringify(
-                newPlace
-              ),
-          }
+  const addPlace =
+    async () => {
+      if (!signedIn) {
+        setStatus(
+          "🔐 Önce Pi ile giriş yapmalısın."
         );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.message ||
-            "Yer kaydedilemedi."
-        );
+        return;
       }
 
-      const savedPlace: Place =
+      if (!placeName.trim()) {
+        setStatus(
+          "Yer adını yaz."
+        );
+        return;
+      }
+
+      const map =
+        mapInstance.current;
+
+      const location =
+        selectedLocation ||
+        (map
+          ? map.getCenter()
+          : {
+              lat: 39.9334,
+              lng: 32.8597,
+            });
+
+      const newPlace: Place =
         {
-          _id: data._id,
           name:
-            data.name ||
-            newPlace.name,
+            placeName.trim(),
           category:
-            data.category ||
-            newPlace.category,
-          lat:
-            typeof data.lat ===
-            "number"
-              ? data.lat
-              : newPlace.lat,
-          lng:
-            typeof data.lng ===
-            "number"
-              ? data.lng
-              : newPlace.lng,
+            placeCategory,
+          lat: location.lat,
+          lng: location.lng,
           description:
-            data.description ||
-            newPlace.description,
+            placeDescription.trim() ||
+            "Pi Economy place",
           username:
-            data.username ||
-            newPlace.username,
-          user_id:
-            data.user_id ||
-            null,
+            username ||
+            undefined,
         };
 
-      setPlaces(
-        (current) => [
-          ...current,
-          savedPlace,
-        ]
-      );
+      try {
+        setStatus(
+          "⏳ Yer kaydediliyor..."
+        );
 
-      if (map) {
-        map.setView(
-          [
-            savedPlace.lat,
-            savedPlace.lng,
-          ],
-          Math.max(
-            map.getZoom(),
-            10
-          )
+        const response =
+          await fetch(
+            `${backendUrl}/api/places`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              credentials:
+                "include",
+              body:
+                JSON.stringify(
+                  newPlace
+                ),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data?.message ||
+              "Yer kaydedilemedi."
+          );
+        }
+
+        const savedPlace: Place =
+          {
+            _id: data._id,
+            name:
+              data.name ||
+              newPlace.name,
+            category:
+              data.category ||
+              newPlace.category,
+            lat:
+              typeof data.lat ===
+              "number"
+                ? data.lat
+                : newPlace.lat,
+            lng:
+              typeof data.lng ===
+              "number"
+                ? data.lng
+                : newPlace.lng,
+            description:
+              data.description ||
+              newPlace.description,
+            username:
+              data.username ||
+              newPlace.username,
+            user_id:
+              data.user_id ||
+              null,
+          };
+
+        setPlaces(
+          (current) => [
+            ...current,
+            savedPlace,
+          ]
+        );
+
+        if (map) {
+          map.setView(
+            [
+              savedPlace.lat,
+              savedPlace.lng,
+            ],
+            Math.max(
+              map.getZoom(),
+              10
+            )
+          );
+        }
+
+        setPlaceName("");
+        setPlaceDescription("");
+        setPlaceCategory(
+          "Stays"
+        );
+        setSelectedLocation(
+          null
+        );
+        setShowForm(false);
+
+        setStatus(
+          `✅ ${savedPlace.name} MongoDB'ye kaydedildi.`
+        );
+      } catch (error) {
+        console.error(
+          "Yer kaydetme hatası:",
+          error
+        );
+
+        setStatus(
+          "❌ Yer kaydedilemedi. Backend bağlantısını kontrol et."
         );
       }
-
-      setPlaceName("");
-      setPlaceDescription("");
-      setPlaceCategory(
-        "Stays"
-      );
-      setSelectedLocation(
-        null
-      );
-      setShowForm(false);
-
-      setStatus(
-        `✅ ${savedPlace.name} MongoDB'ye kaydedildi.`
-      );
-    } catch (error) {
-      console.error(
-        "Yer kaydetme hatası:",
-        error
-      );
-
-      setStatus(
-        "❌ Yer kaydedilemedi. Backend bağlantısını kontrol et."
-      );
-    }
-  };
+    };
 
   const categories = [
     {
@@ -877,7 +1037,8 @@ function PioneerMapPage() {
     >
       <header
         style={{
-          padding: "20px",
+          padding:
+            "20px",
           textAlign:
             "center",
           background:
@@ -906,7 +1067,8 @@ function PioneerMapPage() {
                 "16px",
               borderRadius:
                 "8px",
-              border: "none",
+              border:
+                "none",
               cursor:
                 "pointer",
             }}
@@ -1036,25 +1198,10 @@ function PioneerMapPage() {
 
         <button
           onClick={() => {
-            if (nearbyOnly) {
-              setNearbyOnly(
-                false
-              );
-              setUserLocation(
-                null
-              );
-
-              if (
-                userMarkerRef.current
-              ) {
-                userMarkerRef.current.remove();
-                userMarkerRef.current =
-                  null;
-              }
-
-              setStatus(
-                "🌍 Tüm yerler gösteriliyor."
-              );
+            if (
+              nearbyOnly
+            ) {
+              showAllPlaces();
             } else {
               findNearbyPlaces();
             }
@@ -1092,6 +1239,35 @@ function PioneerMapPage() {
             ? "🌍 Tüm Yerleri Göster"
             : "📍 Yakınımdaki Yerler"}
         </button>
+
+        {nearbyOnly &&
+          userLocation && (
+            <div
+              style={{
+                maxWidth:
+                  "700px",
+                margin:
+                  "10px auto 0",
+                padding:
+                  "10px",
+                borderRadius:
+                  "12px",
+                background:
+                  "#e3f2fd",
+                color:
+                  "#1565c0",
+                textAlign:
+                  "center",
+                fontWeight:
+                  "bold",
+              }}
+            >
+              📍 Konumun bulundu
+              <br />
+              📏 En yakın yerler
+              önce gösteriliyor
+            </div>
+          )}
       </div>
 
       <div
@@ -1198,8 +1374,8 @@ function PioneerMapPage() {
           </h2>
 
           <p>
-            Haritaya dokunursan o
-            konum kullanılır.
+            Haritaya dokunursan
+            o konum kullanılır.
             Dokunmazsan harita
             merkezi kullanılır.
           </p>
@@ -1277,15 +1453,19 @@ function PioneerMapPage() {
             <option value="Stays">
               🏠 Stays
             </option>
+
             <option value="Shops">
               🛍️ Shops
             </option>
+
             <option value="Food">
               🍔 Food
             </option>
+
             <option value="Services">
               🔧 Services
             </option>
+
             <option value="Jobs">
               💼 Jobs
             </option>
@@ -1402,8 +1582,9 @@ function PioneerMapPage() {
               "bold",
           }}
         >
-          {nearbyOnly
-            ? "📍 50 km içindeki yerler"
+          {nearbyOnly &&
+          userLocation
+            ? "📍 50 km içindeki yerler — en yakından uzağa"
             : searchText.trim()
             ? `🔎 "${searchText}" sonuçları`
             : activeCategory ===
