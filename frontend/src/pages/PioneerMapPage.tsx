@@ -3637,6 +3637,61 @@ function PioneerMapPage() {
                 activeCategory
               )}`}
         </div>
+        <nav
+  style={{
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 2000,
+    background: "#fff",
+    borderTop: "1px solid #ddd",
+    boxShadow: "0 -4px 15px rgba(0,0,0,.12)",
+    display: "grid",
+    gridTemplateColumns: "repeat(5,1fr)",
+    padding: "8px 4px",
+  }}
+>
+  {[
+    ["🏠", "Ana Sayfa", "home"],
+    ["📍", "Yakınımda", "nearby"],
+    ["➕", "Yer Ekle", "add"],
+    ["⭐", "Favoriler", "favorites"],
+    ["👤", "Profil", "profile"],
+  ].map(([icon, label, key]) => (
+    <button
+      key={key}
+      onClick={() => {
+        setActiveNav(key as typeof activeNav);
+
+        if (key === "home") {
+          setNearbyOnly(false);
+          setSelectedPlace(null);
+        }
+
+        if (key === "nearby") {
+          findNearbyPlaces();
+        }
+
+        if (key === "add") {
+          setShowForm(true);
+        }
+      }}
+      style={{
+        border: "none",
+        background: activeNav === key ? "#f0f0f0" : "transparent",
+        padding: "8px 2px",
+        borderRadius: "10px",
+        fontWeight: "700",
+        fontSize: "12px",
+        cursor: "pointer",
+      }}
+    >
+      <div style={{ fontSize: "22px" }}>{icon}</div>
+      {label}
+    </button>
+  ))}
+</nav>
       </main>
     </div>
   );
