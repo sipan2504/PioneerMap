@@ -22,6 +22,7 @@ type Place = {
   user_id?: string | null;
   language?: string;
   country?: string;
+  image?: string;
 };
 
 type AppLanguage =
@@ -152,7 +153,7 @@ const countries = [
   { value: "Armenia", label: "🇦🇲 Ermenistan" },
   { value: "Azerbaijan", label: "🇦🇿 Azerbaycan" },
   { value: "Kazakhstan", label: "🇰🇿 Kazakistan" },
-  { value: "Uzbekistan", label: "🇺🇿 Kazakistan" },
+  { value: "Uzbekistan", label: "🇺🇿 Özbekistan" },
   { value: "China", label: "🇨🇳 Çin" },
   { value: "Japan", label: "🇯🇵 Japonya" },
   { value: "South Korea", label: "🇰🇷 Güney Kore" },
@@ -1080,6 +1081,71 @@ function PioneerMapPage() {
     } catch {}
   }, [favorites]);
 
+  const getPlaceKey = (place: Place) =>
+    place._id ||
+    `${place.name}|${place.lat}|${place.lng}`;
+
+  const isFavorite = (place: Place) =>
+    favorites.some(
+      (favorite) =>
+        getPlaceKey(favorite) ===
+        getPlaceKey(place)
+    );
+
+  const toggleFavorite = (place: Place) => {
+    setFavorites((current) => {
+      const key = getPlaceKey(place);
+      const exists = current.some(
+        (favorite) =>
+          getPlaceKey(favorite) === key
+      );
+
+      if (exists) {
+        return current.filter(
+          (favorite) =>
+            getPlaceKey(favorite) !== key
+        );
+      }
+
+      return [...current, place];
+    });
+
+    setStatus(
+      isFavorite(place)
+        ? "⭐ Favorilerden çıkarıldı."
+        : "⭐ Favorilere eklendi."
+    );
+  };
+
+  const sharePlace = async (place: Place) => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?place=${encodeURIComponent(
+      place._id || `${place.name}|${place.lat}|${place.lng}`
+    )}`;
+    const shareText = `📍 ${place.name} — PioneerMap`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: place.name,
+          text: shareText,
+          url: shareUrl,
+        });
+        setStatus("📤 Yer paylaşım ekranı açıldı.");
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareUrl);
+      setStatus("📋 Yer bağlantısı kopyalandı.");
+    } catch {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setStatus("📋 Yer bağlantısı kopyalandı.");
+      } catch {
+        setStatus("❌ Paylaşım bağlantısı kopyalanamadı.");
+      }
+    }
+  };
+
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
@@ -1129,6 +1195,12 @@ function PioneerMapPage() {
 
   const [placeCountry, setPlaceCountry] =
     useState("Türkiye");
+
+  const [placeImage, setPlaceImage] =
+    useState("");
+
+  const [imageUploading, setImageUploading] =
+    useState(false);
 
   const mapRef =
     useRef<HTMLDivElement | null>(
@@ -1894,6 +1966,7 @@ function PioneerMapPage() {
         "Pi Economy place",
       language: placeLanguage,
       country: placeCountry,
+      image: placeImage || undefined,
       username:
         username || undefined,
     };
@@ -1961,6 +2034,9 @@ function PioneerMapPage() {
         country:
           data.country ||
           newPlace.country,
+        image:
+          data.image ||
+          newPlace.image,
       };
 
       setPlaces(
@@ -1985,6 +2061,8 @@ function PioneerMapPage() {
       setPlaceCountry(
         "Türkiye"
       );
+      setPlaceImage("");
+      setImageUploading(false);
       setSelectedLocation(
         null
       );
@@ -2716,6 +2794,103 @@ function PioneerMapPage() {
             }}
           />
 
+          {/* PHOTO */}
+          <div
+            style={{
+              marginBottom: "15px",
+              padding: "14px",
+              borderRadius: "12px",
+              background: "#f8f9fa",
+              border: "1px solid #e0e0e0",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: "800",
+                marginBottom: "8px",
+              }}
+            >
+              📷 İşletme Fotoğrafı
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                if (!file.type.startsWith("image/")) {
+                  setStatus("❌ Lütfen bir fotoğraf seç.");
+                  return;
+                }
+
+                if (file.size > 10 * 1024 * 1024) {
+                  setStatus("❌ Fotoğraf en fazla 10 MB olabilir.");
+                  return;
+                }
+
+                try {
+                  setImageUploading(true);
+                  const compressed = await compressPlaceImage(file);
+                  setPlaceImage(compressed);
+                  setStatus("📷 Fotoğraf eklendi.");
+                } catch (error) {
+                  console.error("Photo error:", error);
+                  setStatus("❌ Fotoğraf eklenemedi.");
+                } finally {
+                  setImageUploading(false);
+                }
+              }}
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            />
+
+            {imageUploading && (
+              <div
+                style={{
+                  marginTop: "8px",
+                  fontWeight: "700",
+                }}
+              >
+                ⏳ Fotoğraf hazırlanıyor...
+              </div>
+            )}
+
+            {placeImage && (
+              <div style={{ marginTop: "12px" }}>
+                <img
+                  src={placeImage}
+                  alt="İşletme önizleme"
+                  style={{
+                    width: "100%",
+                    maxHeight: "220px",
+                    objectFit: "cover",
+                    borderRadius: "10px",
+                    display: "block",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setPlaceImage("")}
+                  style={{
+                    marginTop: "8px",
+                    padding: "8px 12px",
+                    border: "none",
+                    borderRadius: "8px",
+                    background: "#eee",
+                    cursor: "pointer",
+                    fontWeight: "700",
+                  }}
+                >
+                  🗑️ Fotoğrafı kaldır
+                </button>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={
               addPlace
@@ -2837,6 +3012,21 @@ function PioneerMapPage() {
                     "20px",
                 }}
               >
+                {selectedPlace.image && (
+                  <img
+                    src={selectedPlace.image}
+                    alt={selectedPlace.name}
+                    style={{
+                      width: "100%",
+                      height: "220px",
+                      objectFit: "cover",
+                      borderRadius: "14px",
+                      display: "block",
+                      marginBottom: "16px",
+                    }}
+                  />
+                )}
+
                 <div
                   style={{
                     display:
@@ -2871,32 +3061,80 @@ function PioneerMapPage() {
                     </h2>
                   </div>
 
-                  <button
-                    onClick={() =>
-                      setSelectedPlace(
-                        null
-                      )
-                    }
-                    aria-label={t(
-                      "close"
-                    )}
+                  <div
                     style={{
-                      width:
-                        "38px",
-                      height:
-                        "38px",
-                      borderRadius:
-                        "50%",
-                      border:
-                        "none",
-                      background:
-                        "#eee",
-                      fontSize:
-                        "22px",
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
                     }}
                   >
-                    ×
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleFavorite(
+                          selectedPlace
+                        )
+                      }
+                      aria-label={
+                        isFavorite(
+                          selectedPlace
+                        )
+                          ? "Favorilerden çıkar"
+                          : "Favorilere ekle"
+                      }
+                      style={{
+                        minWidth: "48px",
+                        height: "38px",
+                        padding: "0 10px",
+                        border: "none",
+                        borderRadius: "19px",
+                        background:
+                          isFavorite(
+                            selectedPlace
+                          )
+                            ? "#FFF3CD"
+                            : "#f1f3f5",
+                        color:
+                          isFavorite(
+                            selectedPlace
+                          )
+                            ? "#E6A700"
+                            : "#555",
+                        fontSize: "22px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ⭐
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedPlace(
+                          null
+                        )
+                      }
+                      aria-label={t(
+                        "close"
+                      )}
+                      style={{
+                        width:
+                          "38px",
+                        height:
+                          "38px",
+                        borderRadius:
+                          "50%",
+                        border:
+                          "none",
+                        background:
+                          "#eee",
+                        fontSize:
+                          "22px",
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
                 </div>
 
                 {/* CATEGORY */}
@@ -3071,6 +3309,59 @@ function PioneerMapPage() {
                     )}
                   </div>
                 )}
+
+                {/* FAVORITE */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    toggleFavorite(
+                      selectedPlace
+                    )
+                  }
+                  style={{
+                    width: "100%",
+                    marginTop: "15px",
+                    padding: "13px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background:
+                      isFavorite(
+                        selectedPlace
+                      )
+                        ? "#FFF3CD"
+                        : "#FFD54F",
+                    color: "#5D4500",
+                    fontWeight: "800",
+                    fontSize: "15px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isFavorite(
+                    selectedPlace
+                  )
+                    ? "⭐ Favorilerden Çıkar"
+                    : "⭐ Favorilere Ekle"}
+                </button>
+
+                {/* SHARE */}
+                <button
+                  type="button"
+                  onClick={() => sharePlace(selectedPlace)}
+                  style={{
+                    width: "100%",
+                    marginTop: "10px",
+                    padding: "13px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background: "#E3F2FD",
+                    color: "#1565C0",
+                    fontWeight: "800",
+                    fontSize: "15px",
+                    cursor: "pointer",
+                  }}
+                >
+                  📤 Yeri Paylaş
+                </button>
 
                 {/* ACTIONS */}
                 <div
