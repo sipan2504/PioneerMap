@@ -3,6 +3,7 @@ import L from "leaflet";
 import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
 import Favorites from "../components/Favorites";
+import PlaceDetails from "../components/PlaceDetails";
 import PlaceList from "../components/PlaceList";
 import AddPlaceForm from "../components/AddPlaceForm";
 type Category =
@@ -1236,6 +1237,9 @@ function PioneerMapPage() {
   const [imageUploading, setImageUploading] =
     useState(false);
 
+  const [mapInteractive, setMapInteractive] =
+    useState(false);
+
   const mapRef =
     useRef<HTMLDivElement | null>(
       null
@@ -1412,7 +1416,12 @@ function PioneerMapPage() {
     }
 
     const map =
-      L.map(mapRef.current).setView(
+      L.map(mapRef.current, {
+        dragging: false,
+        touchZoom: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+      }).setView(
         [39.9334, 32.8597],
         6
       );
@@ -1451,6 +1460,27 @@ function PioneerMapPage() {
       mapInstance.current = null;
     };
   }, []);
+
+  /* =======================================================
+  MAP INTERACTION TOGGLE
+  ======================================================= */
+
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map) return;
+
+    if (mapInteractive) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.scrollWheelZoom.enable();
+      map.doubleClickZoom.enable();
+    } else {
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.doubleClickZoom.disable();
+    }
+  }, [mapInteractive]);
 
   /* =======================================================
   NEARBY
@@ -2454,526 +2484,287 @@ function PioneerMapPage() {
         </div>
       </section>
 
-      {/* CATEGORIES */}
-      <section
-        style={{
-          background: "#fff",
-          padding:
-            "0 15px 15px",
-          display: "flex",
-          gap: "8px",
-          justifyContent:
-            "center",
-          flexWrap: "wrap",
-        }}
-      >
-        {categories.map(
-          (category) => (
-            <button
-              key={
-                category.name
-              }
-              onClick={() =>
-                setActiveCategory(
-                  category.name
-                )
-              }
-              style={{
-                padding:
-                  "10px 16px",
-                borderRadius:
-                  "22px",
-                border:
-                  "1px solid #ddd",
-                background:
-                  activeCategory ===
-                  category.name
-                    ? "#f1c40f"
-                    : "#fff",
-                fontWeight:
-                  activeCategory ===
-                  category.name
-                    ? "700"
-                    : "400",
-              }}
-            >
-              {category.icon}{" "}
-              {categoryLabel(
-                category.name
-              )}
-            </button>
-          )
-        )}
-
-        <button
-          onClick={() =>
-            setShowForm(true)
-          }
-          style={{
-            padding:
-              "10px 18px",
-            border: "none",
-            borderRadius:
-              "22px",
-            background:
-              "#222",
-            color: "#fff",
-            fontWeight:
-              "700",
-          }}
-        >
-          {t("addPlace")}
-        </button>
-      </section>
-
-      {/* LANGUAGE + COUNTRY */}
-      <section
-        style={{
-          background: "#fff",
-          padding:
-            "0 15px 15px",
-          display: "grid",
-          gridTemplateColumns:
-            "1fr 1fr",
-          gap: "10px",
-          maxWidth:
-            "700px",
-          margin: "0 auto",
-        }}
-      >
-        <select
-          value={
-            activeLanguage
-          }
-          onChange={(e) =>
-            setActiveLanguage(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "12px",
-            borderRadius:
-              "10px",
-            border:
-              "1px solid #ccc",
-            fontSize: "15px",
-          }}
-        >
-          <option value="All">
-            {t(
-              "allLanguages"
-            )}
-          </option>
-
-          {languages.map(
-            (language) => (
-              <option
-                key={
-                  language.value
-                }
-                value={
-                  language.value
-                }
-              >
-                {language.label}
-              </option>
-            )
-          )}
-        </select>
-
-        <select
-          value={
-            activeCountry
-          }
-          onChange={(e) =>
-            setActiveCountry(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "12px",
-            borderRadius:
-              "10px",
-            border:
-              "1px solid #ccc",
-            fontSize: "15px",
-          }}
-        >
-          <option value="All">
-            {t(
-              "allCountries"
-            )}
-          </option>
-
-          {countries.map(
-            (country) => (
-              <option
-                key={
-                  country.value
-                }
-                value={
-                  country.value
-                }
-              >
-                {country.label}
-              </option>
-            )
-          )}
-        </select>
-      </section>
-
-      {/* ADD PLACE FORM */}
-      {showForm && (
-        <>
-          <section
-            style={{
-              margin: "15px",
-              padding: "14px",
-              background: "#f8f9fa",
-              borderRadius: "12px",
-              border: "1px solid #e0e0e0",
-            }}
-          >
-            <div style={{ fontWeight: 800, marginBottom: "8px" }}>📷 İşletme Fotoğrafı</div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                if (!file.type.startsWith("image/")) {
-                  setStatus("❌ Lütfen bir fotoğraf seç.");
-                  return;
-                }
-                if (file.size > 10 * 1024 * 1024) {
-                  setStatus("❌ Fotoğraf en fazla 10 MB olabilir.");
-                  return;
-                }
-                try {
-                  setImageUploading(true);
-                  const compressed = await compressPlaceImage(file);
-                  setPlaceImage(compressed);
-                  setStatus("📷 Fotoğraf eklendi.");
-                } catch (error) {
-                  console.error("Photo error:", error);
-                  setStatus("❌ Fotoğraf eklenemedi.");
-                } finally {
-                  setImageUploading(false);
-                }
-              }}
-              style={{ width: "100%", boxSizing: "border-box" }}
-            />
-            {imageUploading && <div style={{ marginTop: "8px", fontWeight: 700 }}>⏳ Fotoğraf hazırlanıyor...</div>}
-            {placeImage && (
-              <div style={{ marginTop: "12px" }}>
-                <img
-                  src={placeImage}
-                  alt="İşletme önizleme"
-                  style={{ width: "100%", maxHeight: "220px", objectFit: "cover", borderRadius: "10px", display: "block" }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setPlaceImage("")}
-                  style={{ marginTop: "8px", padding: "8px 12px", border: "none", borderRadius: "8px", background: "#eee", cursor: "pointer", fontWeight: 700 }}
-                >
-                  🗑️ Fotoğrafı kaldır
-                </button>
-              </div>
-            )}
-          </section>
-
-          <AddPlaceForm
-          placeName={placeName}
-          setPlaceName={setPlaceName}
-          placeDescription={placeDescription}
-          setPlaceDescription={setPlaceDescription}
-          placeCategory={placeCategory}
-          setPlaceCategory={(value: string) => setPlaceCategory(value as Exclude<Category, "All">)}
-          placeLanguage={placeLanguage}
-          setPlaceLanguage={setPlaceLanguage}
-          placeCountry={placeCountry}
-          setPlaceCountry={setPlaceCountry}
-          categories={["Stays", "Shops", "Food", "Services", "Jobs"]}
-          languages={languages.map((item) => item.value)}
-          countries={countries.map((item) => item.value)}
-          selectedLocation={selectedLocation}
-          onMapSelect={setSelectedLocation as unknown as () => void}
-          onSubmit={addPlace}
-          onCancel={() => {
-            setShowForm(false);
-            setSelectedLocation(null);
-            setPlaceImage("");
-          }}
-          submitting={imageUploading}
-        />
-        </>
-      )}
-
-      {/* MAP + DETAILS */}
+      {/* MAP */}
       <main
         style={{
           padding: "15px",
+          paddingTop: "10px",
         }}
       >
         <div
-          ref={mapRef}
           style={{
+            position: "relative",
             width: "100%",
-            height: "500px",
-            borderRadius:
-              "14px",
-            overflow:
-              "hidden",
-            background:
-              "#ddd",
+            maxWidth: "900px",
+            margin: "0 auto",
           }}
-        />
-
-        {selectedPlace && (
-          <section
-            id="pioneer-detail-card"
+        >
+          <div
+            ref={mapRef}
             style={{
-              marginTop: "16px",
+              width: "100%",
+              height: "360px",
+              borderRadius: "14px",
+              overflow: "hidden",
+              background: "#ddd",
+              boxShadow: "0 4px 16px rgba(0,0,0,.10)",
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={() => setMapInteractive((current) => !current)}
+            style={{
+              position: "absolute",
+              top: "12px",
+              right: "12px",
+              zIndex: 1000,
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              padding: "8px 12px",
               background: "#fff",
-              borderRadius: "18px",
-              padding: "18px",
-              boxShadow: "0 5px 20px rgba(0,0,0,.15)",
-              border: "1px solid #e5e7eb",
+              color: "#222",
+              fontSize: "13px",
+              fontWeight: 800,
+              boxShadow: "0 2px 8px rgba(0,0,0,.18)",
+              cursor: "pointer",
             }}
           >
+            MAP {mapInteractive ? "ON" : "OFF"}
+          </button>
+
+          {!mapInteractive && (
             <div
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: "10px",
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+                zIndex: 900,
+                pointerEvents: "none",
+                background: "rgba(255,255,255,.92)",
+                borderRadius: "12px",
+                padding: "10px 14px",
+                fontWeight: 800,
+                fontSize: "14px",
+                boxShadow: "0 3px 12px rgba(0,0,0,.18)",
+                whiteSpace: "nowrap",
               }}
             >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: "46px",
-                    lineHeight: 1,
-                  }}
-                >
-                  {selectedCategory?.icon || "📍"}
-                </div>
-                <h2 style={{ margin: "8px 0 0", fontSize: "28px" }}>
-                  {selectedPlace.name}
-                </h2>
-              </div>
-
-              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <button
-                  type="button"
-                  onClick={() => toggleFavorite(selectedPlace)}
-                  aria-label={isFavorite(selectedPlace) ? "Favorilerden çıkar" : "Favorilere ekle"}
-                  style={{
-                    minWidth: "48px",
-                    height: "40px",
-                    padding: "0 10px",
-                    border: "none",
-                    borderRadius: "20px",
-                    background: isFavorite(selectedPlace) ? "#FFF3CD" : "#f1f3f5",
-                    color: isFavorite(selectedPlace) ? "#E6A700" : "#555",
-                    fontSize: "22px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {isFavorite(selectedPlace) ? "⭐" : "☆"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedPlace(null)}
-                  aria-label={t("close")}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    border: "none",
-                    background: "#eee",
-                    fontSize: "22px",
-                    cursor: "pointer",
-                  }}
-                >
-                  ×
-                </button>
-              </div>
+              MAP OFF — Haritayı etkinleştir
             </div>
+          )}
+        </div>
 
-            {selectedPlace.image && (
-              <img
-                src={selectedPlace.image}
-                alt={selectedPlace.name}
-                style={{
-                  width: "100%",
-                  maxHeight: "280px",
-                  objectFit: "cover",
-                  borderRadius: "14px",
-                  marginTop: "14px",
-                  display: "block",
-                }}
-              />
-            )}
-
-            <div
+        {/* CATEGORIES */}
+        <section
+          style={{
+            background: "#fff",
+            marginTop: "12px",
+            padding: "12px",
+            borderRadius: "14px",
+            display: "flex",
+            gap: "8px",
+            overflowX: "auto",
+            justifyContent: "flex-start",
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          {categories.map((category) => (
+            <button
+              key={category.name}
+              onClick={() => setActiveCategory(category.name)}
               style={{
-                display: "inline-block",
-                marginTop: "12px",
-                padding: "8px 15px",
-                borderRadius: "20px",
-                background: selectedCategory?.color || "#1976D2",
-                color: "#fff",
-                fontWeight: "700",
+                flex: "0 0 auto",
+                padding: "10px 16px",
+                borderRadius: "22px",
+                border: "1px solid #ddd",
+                background:
+                  activeCategory === category.name ? "#f1c40f" : "#fff",
+                fontWeight: activeCategory === category.name ? "700" : "400",
+                whiteSpace: "nowrap",
               }}
             >
-              {selectedCategory?.icon || "📍"} {categoryLabel(selectedPlace.category)}
-            </div>
+              {category.icon} {categoryLabel(category.name)}
+            </button>
+          ))}
 
-            <div
+          <button
+            onClick={() => setShowForm(true)}
+            style={{
+              flex: "0 0 auto",
+              padding: "10px 18px",
+              border: "none",
+              borderRadius: "22px",
+              background: "#222",
+              color: "#fff",
+              fontWeight: "700",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {t("addPlace")}
+          </button>
+        </section>
+
+        {/* LANGUAGE + COUNTRY */}
+        <section
+          style={{
+            background: "#fff",
+            marginTop: "10px",
+            padding: "12px",
+            borderRadius: "14px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "10px",
+            maxWidth: "700px",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+        >
+          <select
+            value={activeLanguage}
+            onChange={(e) => setActiveLanguage(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "10px",
+              border: "1px solid #ccc",
+              fontSize: "15px",
+            }}
+          >
+            <option value="All">{t("allLanguages")}</option>
+            {languages.map((language) => (
+              <option key={language.value} value={language.value}>
+                {language.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={activeCountry}
+            onChange={(e) => setActiveCountry(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "10px",
+              border: "1px solid #ccc",
+              fontSize: "15px",
+            }}
+          >
+            <option value="All">{t("allCountries")}</option>
+            {countries.map((country) => (
+              <option key={country.value} value={country.value}>
+                {country.label}
+              </option>
+            ))}
+          </select>
+        </section>
+
+        {/* ADD PLACE FORM */}
+        {showForm && (
+          <>
+            <section
               style={{
                 marginTop: "15px",
-                padding: "15px",
+                padding: "14px",
+                background: "#f8f9fa",
                 borderRadius: "12px",
-                background: "#f7f7f7",
+                border: "1px solid #e0e0e0",
               }}
             >
-              <strong>{t("descriptionTitle")}</strong>
-              <div style={{ marginTop: "6px", lineHeight: "1.5" }}>
-                {selectedPlace.description || "Pi Economy place"}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "10px",
-                marginTop: "10px",
-              }}
-            >
-              <div style={{ padding: "13px", borderRadius: "12px", background: "#eef7ff" }}>
-                🗣️ <strong>{t("language")}</strong>
-                <br />
-                {selectedPlace.language || "Turkish"}
-              </div>
-              <div style={{ padding: "13px", borderRadius: "12px", background: "#f5f0ff" }}>
-                🌍 <strong>{t("country")}</strong>
-                <br />
-                {selectedPlace.country || "Türkiye"}
-              </div>
-            </div>
-
-            {selectedPlace.username && (
-              <div
-                style={{
-                  marginTop: "10px",
-                  padding: "13px",
-                  borderRadius: "12px",
-                  background: "#f3e5f5",
-                  color: "#7b1fa2",
-                  fontWeight: "700",
+              <div style={{ fontWeight: 800, marginBottom: "8px" }}>📷 İşletme Fotoğrafı</div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (!file.type.startsWith("image/")) {
+                    setStatus("❌ Lütfen bir fotoğraf seç.");
+                    return;
+                  }
+                  if (file.size > 10 * 1024 * 1024) {
+                    setStatus("❌ Fotoğraf en fazla 10 MB olabilir.");
+                    return;
+                  }
+                  try {
+                    setImageUploading(true);
+                    const compressed = await compressPlaceImage(file);
+                    setPlaceImage(compressed);
+                    setStatus("📷 Fotoğraf eklendi.");
+                  } catch (error) {
+                    console.error("Photo error:", error);
+                    setStatus("❌ Fotoğraf eklenemedi.");
+                  } finally {
+                    setImageUploading(false);
+                  }
                 }}
-              >
-                👤 @{selectedPlace.username.replace(/^@/, "")}
-              </div>
-            )}
-
-            {selectedDistance !== null && (
-              <div
-                style={{
-                  marginTop: "10px",
-                  padding: "13px",
-                  borderRadius: "12px",
-                  background: "#e3f2fd",
-                  color: "#1565c0",
-                  fontWeight: "700",
-                }}
-              >
-                📍 {selectedDistance.toFixed(1)} {t("distance")}
-              </div>
-            )}
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "15px" }}>
-              <button
-                type="button"
-                onClick={() => toggleFavorite(selectedPlace)}
-                style={{
-                  padding: "13px",
-                  border: "none",
-                  borderRadius: "10px",
-                  background: isFavorite(selectedPlace) ? "#FFF3CD" : "#FFD54F",
-                  color: "#5D4500",
-                  fontWeight: "800",
-                  fontSize: "15px",
-                  cursor: "pointer",
-                }}
-              >
-                {isFavorite(selectedPlace) ? "⭐ Favorilerden Çıkar" : "⭐ Favorilere Ekle"}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => sharePlace(selectedPlace)}
-                style={{
-                  padding: "13px",
-                  border: "none",
-                  borderRadius: "10px",
-                  background: "#E3F2FD",
-                  color: "#1565C0",
-                  fontWeight: "800",
-                  fontSize: "15px",
-                  cursor: "pointer",
-                }}
-              >
-                📤 Yeri Paylaş
-              </button>
-            </div>
-
-            <div style={{ display: "flex", gap: "9px", flexWrap: "wrap", marginTop: "10px" }}>
-              <button
-                type="button"
-                onClick={() => {
-                  const map = mapInstance.current;
-                  if (map) map.setView([selectedPlace.lat, selectedPlace.lng], 15);
-                }}
-                style={{
-                  flex: 1,
-                  minWidth: "160px",
-                  padding: "13px",
-                  border: "none",
-                  borderRadius: "10px",
-                  background: "#1976D2",
-                  color: "#fff",
-                  fontWeight: "700",
-                  cursor: "pointer",
-                }}
-              >
-                {t("map")}
-              </button>
-
-              {signedIn && username && selectedPlace.username === username && selectedPlace._id && (
-                <button
-                  type="button"
-                  onClick={() => deletePlace(selectedPlace)}
-                  style={{
-                    padding: "13px 16px",
-                    border: "none",
-                    borderRadius: "10px",
-                    background: "#d32f2f",
-                    color: "#fff",
-                    fontWeight: "700",
-                    cursor: "pointer",
-                  }}
-                >
-                  {t("delete")}
-                </button>
+                style={{ width: "100%", boxSizing: "border-box" }}
+              />
+              {imageUploading && (
+                <div style={{ marginTop: "8px", fontWeight: 700 }}>⏳ Fotoğraf hazırlanıyor...</div>
               )}
-            </div>
-          </section>
+              {placeImage && (
+                <div style={{ marginTop: "12px" }}>
+                  <img
+                    src={placeImage}
+                    alt="İşletme önizleme"
+                    style={{ width: "100%", maxHeight: "220px", objectFit: "cover", borderRadius: "10px", display: "block" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPlaceImage("")}
+                    style={{ marginTop: "8px", padding: "8px 12px", border: "none", borderRadius: "8px", background: "#eee", cursor: "pointer", fontWeight: 700 }}
+                  >
+                    🗑️ Fotoğrafı kaldır
+                  </button>
+                </div>
+              )}
+            </section>
+
+            <AddPlaceForm
+              placeName={placeName}
+              setPlaceName={setPlaceName}
+              placeDescription={placeDescription}
+              setPlaceDescription={setPlaceDescription}
+              placeCategory={placeCategory}
+              setPlaceCategory={setPlaceCategory}
+              placeLanguage={placeLanguage}
+              setPlaceLanguage={setPlaceLanguage}
+              placeCountry={placeCountry}
+              setPlaceCountry={setPlaceCountry}
+              categories={["Stays", "Shops", "Food", "Services", "Jobs"]}
+              languages={languages.map((item) => item.value)}
+              countries={countries.map((item) => item.value)}
+              selectedLocation={selectedLocation}
+              onMapSelect={(location) => setSelectedLocation(location)}
+              onSubmit={addPlace}
+              onCancel={() => {
+                setShowForm(false);
+                setSelectedLocation(null);
+                setPlaceImage("");
+              }}
+              submitting={imageUploading}
+            />
+          </>
+        )}
+
+        {selectedPlace && (
+          <PlaceDetails
+            place={selectedPlace}
+            onClose={() => setSelectedPlace(null)}
+            onShowOnMap={(place) => {
+              const map = mapInstance.current;
+              if (map) {
+                map.setView([place.lat, place.lng], 15);
+                setMapInteractive(true);
+              }
+            }}
+            onDelete={(place) => deletePlace(place)}
+            isFavorite={isFavorite(selectedPlace)}
+            onToggleFavorite={(place) => toggleFavorite(place as Place)}
+            onShare={(place) => sharePlace(place as Place)}
+          />
         )}
 
         <section style={{ marginTop: "16px" }}>
@@ -2994,47 +2785,28 @@ function PioneerMapPage() {
               const found = places.find((item) => item._id === place._id);
               if (found) deletePlace(found);
             }}
-            onToggleFavorite={(place) => toggleFavorite(place as Place)}
-            isFavorite={(place) => isFavorite(place as Place)}
           />
         </section>
 
         {/* BOTTOM STATUS */}
         <div
           style={{
-            textAlign:
-              "center",
-            fontWeight:
-              "700",
-            padding:
-              "15px 5px 20px",
+            textAlign: "center",
+            fontWeight: "700",
+            padding: "15px 5px 20px",
           }}
         >
-          {nearbyOnly &&
-          userLocation
-            ? t(
-                "nearbyPlaces"
-              )
+          {nearbyOnly && userLocation
+            ? t("nearbyPlaces")
             : searchText.trim()
-            ? `🔎 "${searchText}" ${t(
-                "results"
-              )}`
-            : activeLanguage !==
-              "All"
+            ? `🔎 "${searchText}" ${t("results")}`
+            : activeLanguage !== "All"
             ? `🗣️ ${activeLanguage}`
-            : activeCountry !==
-              "All"
+            : activeCountry !== "All"
             ? `🌍 ${activeCountry}`
-            : activeCategory ===
-              "All"
+            : activeCategory === "All"
             ? t("places")
-            : `${
-                categoryIcons[
-                  activeCategory
-                ].icon
-              } ${categoryLabel(
-                activeCategory
-              )}`}
+            : `${categoryIcons[activeCategory].icon} ${categoryLabel(activeCategory)}`}
         </div>
       </main>
 
