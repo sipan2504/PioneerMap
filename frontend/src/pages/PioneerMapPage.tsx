@@ -9,6 +9,7 @@ import AddPlaceForm from "../components/AddPlaceForm";
 import PlaceList from "../components/PlaceList";
 import BottomNav from "../components/BottomNav";
 import PlaceDetails from "../components/PlaceDetails";
+import Favorites from "../components/Favorites";
 type Category =
   | "All"
   | "Stays"
@@ -46,11 +47,11 @@ const categoryIcons: Record<
   Exclude<Category, "All">,
   { icon: string; color: string }
 > = {
-  Stays: { icon: "🏠", color: "#1976D2" },
-  Shops: { icon: "🛍️", color: "#E91E63" },
-  Food: { icon: "🍔", color: "#FF9800" },
-  Services: { icon: "🔧", color: "#009688" },
-  Jobs: { icon: "💼", color: "#673AB7" },
+  Stays: { icon: "ğŸ ", color: "#1976D2" },
+  Shops: { icon: "ğŸ›ï¸", color: "#E91E63" },
+  Food: { icon: "ğŸ”", color: "#FF9800" },
+  Services: { icon: "ğŸ”§", color: "#009688" },
+  Jobs: { icon: "ğŸ’¼", color: "#673AB7" },
 };
 
 /* =========================================================
@@ -59,144 +60,144 @@ PLACE LANGUAGE + COUNTRY DATA
 ========================================================= */
 
 const languages = [
-  { value: "Turkish", label: "🇹🇷 Türkçe" },
-  { value: "English", label: "🇬🇧 English" },
-  { value: "Arabic", label: "🇸🇦 العربية" },
-  { value: "Chinese", label: "🇨🇳 中文" },
-  { value: "Hindi", label: "🇮🇳 हिन्दी" },
-  { value: "Spanish", label: "🇪🇸 Español" },
-  { value: "French", label: "🇫🇷 Français" },
-  { value: "Portuguese", label: "🇵🇹 Português" },
-  { value: "Russian", label: "🇷🇺 Русский" },
-  { value: "Bengali", label: "🇧🇩 বাংলা" },
-  { value: "German", label: "🇩🇪 Deutsch" },
-  { value: "Japanese", label: "🇯🇵 日本語" },
-  { value: "Korean", label: "🇰🇷 한국어" },
-  { value: "Persian", label: "🇮🇷 فارسی" },
-  { value: "Italian", label: "🇮🇹 Italiano" },
-  { value: "Urdu", label: "🇵🇰 اردو" },
-  { value: "Vietnamese", label: "🇻🇳 Tiếng Việt" },
-  { value: "Telugu", label: "🇮🇳 తెలుగు" },
-  { value: "Marathi", label: "🇮🇳 मराठी" },
-  { value: "Tamil", label: "🇮🇳 தமிழ்" },
-  { value: "Yue Chinese", label: "🇭🇰 粵語" },
-  { value: "Wu Chinese", label: "🇨🇳 吴语" },
-  { value: "Gujarati", label: "🇮🇳 ગુજરાતી" },
-  { value: "Kannada", label: "🇮🇳 ಕನ್ನಡ" },
-  { value: "Polish", label: "🇵🇱 Polski" },
-  { value: "Ukrainian", label: "🇺🇦 Українська" },
-  { value: "Malay", label: "🇲🇾 Bahasa Melayu" },
-  { value: "Malayalam", label: "🇮🇳 മലയാളം" },
-  { value: "Odia", label: "🇮🇳 ଓଡ଼ିଆ" },
-  { value: "Punjabi", label: "🇮🇳 ਪੰਜਾਬੀ" },
-  { value: "Romanian", label: "🇷🇴 Română" },
-  { value: "Dutch", label: "🇳🇱 Nederlands" },
-  { value: "Greek", label: "🇬🇷 Ελληνικά" },
-  { value: "Czech", label: "🇨🇿 Čeština" },
-  { value: "Swedish", label: "🇸🇪 Svenska" },
-  { value: "Hungarian", label: "🇭🇺 Magyar" },
-  { value: "Hebrew", label: "🇮🇱 עברית" },
-  { value: "Finnish", label: "🇫🇮 Suomi" },
-  { value: "Norwegian", label: "🇳🇴 Norsk" },
-  { value: "Danish", label: "🇩🇰 Dansk" },
-  { value: "Bulgarian", label: "🇧🇬 Български" },
-  { value: "Serbian", label: "🇷🇸 Српски" },
-  { value: "Croatian", label: "🇭🇷 Hrvatski" },
-  { value: "Slovak", label: "🇸🇰 Slovenčina" },
-  { value: "Lithuanian", label: "🇱🇹 Lietuvių" },
-  { value: "Slovenian", label: "🇸🇮 Slovenščina" },
-  { value: "Latvian", label: "🇱🇻 Latviešu" },
-  { value: "Estonian", label: "🇪🇪 Eesti" },
-  { value: "Thai", label: "🇹🇭 ไทย" },
-  { value: "Indonesian", label: "🇮🇩 Bahasa Indonesia" },
+  { value: "Turkish", label: "ğŸ‡¹ğŸ‡· TÃ¼rkÃ§e" },
+  { value: "English", label: "ğŸ‡¬ğŸ‡§ English" },
+  { value: "Arabic", label: "ğŸ‡¸ğŸ‡¦ Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©" },
+  { value: "Chinese", label: "ğŸ‡¨ğŸ‡³ ä¸­æ–‡" },
+  { value: "Hindi", label: "ğŸ‡®ğŸ‡³ à¤¹à¤¿à¤¨à¥à¤¦à¥€" },
+  { value: "Spanish", label: "ğŸ‡ªğŸ‡¸ EspaÃ±ol" },
+  { value: "French", label: "ğŸ‡«ğŸ‡· FranÃ§ais" },
+  { value: "Portuguese", label: "ğŸ‡µğŸ‡¹ PortuguÃªs" },
+  { value: "Russian", label: "ğŸ‡·ğŸ‡º Ğ ÑƒÑÑĞºĞ¸Ğ¹" },
+  { value: "Bengali", label: "ğŸ‡§ğŸ‡© à¦¬à¦¾à¦‚à¦²à¦¾" },
+  { value: "German", label: "ğŸ‡©ğŸ‡ª Deutsch" },
+  { value: "Japanese", label: "ğŸ‡¯ğŸ‡µ æ—¥æœ¬èª" },
+  { value: "Korean", label: "ğŸ‡°ğŸ‡· í•œêµ­ì–´" },
+  { value: "Persian", label: "ğŸ‡®ğŸ‡· ÙØ§Ø±Ø³ÛŒ" },
+  { value: "Italian", label: "ğŸ‡®ğŸ‡¹ Italiano" },
+  { value: "Urdu", label: "ğŸ‡µğŸ‡° Ø§Ø±Ø¯Ùˆ" },
+  { value: "Vietnamese", label: "ğŸ‡»ğŸ‡³ Tiáº¿ng Viá»‡t" },
+  { value: "Telugu", label: "ğŸ‡®ğŸ‡³ à°¤à±†à°²à±à°—à±" },
+  { value: "Marathi", label: "ğŸ‡®ğŸ‡³ à¤®à¤°à¤¾à¤ à¥€" },
+  { value: "Tamil", label: "ğŸ‡®ğŸ‡³ à®¤à®®à®¿à®´à¯" },
+  { value: "Yue Chinese", label: "ğŸ‡­ğŸ‡° ç²µèª" },
+  { value: "Wu Chinese", label: "ğŸ‡¨ğŸ‡³ å´è¯­" },
+  { value: "Gujarati", label: "ğŸ‡®ğŸ‡³ àª—à«àªœàª°àª¾àª¤à«€" },
+  { value: "Kannada", label: "ğŸ‡®ğŸ‡³ à²•à²¨à³à²¨à²¡" },
+  { value: "Polish", label: "ğŸ‡µğŸ‡± Polski" },
+  { value: "Ukrainian", label: "ğŸ‡ºğŸ‡¦ Ğ£ĞºÑ€Ğ°Ñ—Ğ½ÑÑŒĞºĞ°" },
+  { value: "Malay", label: "ğŸ‡²ğŸ‡¾ Bahasa Melayu" },
+  { value: "Malayalam", label: "ğŸ‡®ğŸ‡³ à´®à´²à´¯à´¾à´³à´‚" },
+  { value: "Odia", label: "ğŸ‡®ğŸ‡³ à¬“à¬¡à¬¼à¬¿à¬†" },
+  { value: "Punjabi", label: "ğŸ‡®ğŸ‡³ à¨ªà©°à¨œà¨¾à¨¬à©€" },
+  { value: "Romanian", label: "ğŸ‡·ğŸ‡´ RomÃ¢nÄƒ" },
+  { value: "Dutch", label: "ğŸ‡³ğŸ‡± Nederlands" },
+  { value: "Greek", label: "ğŸ‡¬ğŸ‡· Î•Î»Î»Î·Î½Î¹ÎºÎ¬" },
+  { value: "Czech", label: "ğŸ‡¨ğŸ‡¿ ÄŒeÅ¡tina" },
+  { value: "Swedish", label: "ğŸ‡¸ğŸ‡ª Svenska" },
+  { value: "Hungarian", label: "ğŸ‡­ğŸ‡º Magyar" },
+  { value: "Hebrew", label: "ğŸ‡®ğŸ‡± ×¢×‘×¨×™×ª" },
+  { value: "Finnish", label: "ğŸ‡«ğŸ‡® Suomi" },
+  { value: "Norwegian", label: "ğŸ‡³ğŸ‡´ Norsk" },
+  { value: "Danish", label: "ğŸ‡©ğŸ‡° Dansk" },
+  { value: "Bulgarian", label: "ğŸ‡§ğŸ‡¬ Ğ‘ÑŠĞ»Ğ³Ğ°Ñ€ÑĞºĞ¸" },
+  { value: "Serbian", label: "ğŸ‡·ğŸ‡¸ Ğ¡Ñ€Ğ¿ÑĞºĞ¸" },
+  { value: "Croatian", label: "ğŸ‡­ğŸ‡· Hrvatski" },
+  { value: "Slovak", label: "ğŸ‡¸ğŸ‡° SlovenÄina" },
+  { value: "Lithuanian", label: "ğŸ‡±ğŸ‡¹ LietuviÅ³" },
+  { value: "Slovenian", label: "ğŸ‡¸ğŸ‡® SlovenÅ¡Äina" },
+  { value: "Latvian", label: "ğŸ‡±ğŸ‡» LatvieÅ¡u" },
+  { value: "Estonian", label: "ğŸ‡ªğŸ‡ª Eesti" },
+  { value: "Thai", label: "ğŸ‡¹ğŸ‡­ à¹„à¸—à¸¢" },
+  { value: "Indonesian", label: "ğŸ‡®ğŸ‡© Bahasa Indonesia" },
 ];
 
 const countries = [
-  { value: "Türkiye", label: "🇹🇷 Türkiye" },
-  { value: "United States", label: "🇺🇸 ABD" },
-  { value: "Canada", label: "🇨🇦 Kanada" },
-  { value: "Mexico", label: "🇲🇽 Meksika" },
-  { value: "Brazil", label: "🇧🇷 Brezilya" },
-  { value: "Argentina", label: "🇦🇷 Arjantin" },
-  { value: "Chile", label: "🇨🇱 Şili" },
-  { value: "Colombia", label: "🇨🇴 Kolombiya" },
-  { value: "Peru", label: "🇵🇪 Peru" },
-  { value: "United Kingdom", label: "🇬🇧 İngiltere" },
-  { value: "Ireland", label: "🇮🇪 İrlanda" },
-  { value: "France", label: "🇫🇷 Fransa" },
-  { value: "Germany", label: "🇩🇪 Almanya" },
-  { value: "Italy", label: "🇮🇹 İtalya" },
-  { value: "Spain", label: "🇪🇸 İspanya" },
-  { value: "Portugal", label: "🇵🇹 Portekiz" },
-  { value: "Netherlands", label: "🇳🇱 Hollanda" },
-  { value: "Belgium", label: "🇧🇪 Belçika" },
-  { value: "Switzerland", label: "🇨🇭 İsviçre" },
-  { value: "Austria", label: "🇦🇹 Avusturya" },
-  { value: "Sweden", label: "🇸🇪 İsveç" },
-  { value: "Norway", label: "🇳🇴 Norveç" },
-  { value: "Denmark", label: "🇩🇰 Danimarka" },
-  { value: "Finland", label: "🇫🇮 Finlandiya" },
-  { value: "Iceland", label: "🇮🇸 İzlanda" },
-  { value: "Poland", label: "🇵🇱 Polonya" },
-  { value: "Czechia", label: "🇨🇿 Çekya" },
-  { value: "Slovakia", label: "🇸🇰 Slovakya" },
-  { value: "Hungary", label: "🇭🇺 Macaristan" },
-  { value: "Romania", label: "🇷🇴 Romanya" },
-  { value: "Bulgaria", label: "🇧🇬 Bulgaristan" },
-  { value: "Greece", label: "🇬🇷 Yunanistan" },
-  { value: "Ukraine", label: "🇺🇦 Ukrayna" },
-  { value: "Serbia", label: "🇷🇸 Sırbistan" },
-  { value: "Croatia", label: "🇭🇷 Hırvatistan" },
-  { value: "Slovenia", label: "🇸🇮 Slovenya" },
-  { value: "Bosnia and Herzegovina", label: "🇧🇦 Bosna-Hersek" },
-  { value: "Albania", label: "🇦🇱 Arnavutluk" },
-  { value: "Lithuania", label: "🇱🇹 Litvanya" },
-  { value: "Latvia", label: "🇱🇻 Letonya" },
-  { value: "Estonia", label: "🇪🇪 Estonya" },
-  { value: "Russia", label: "🇷🇺 Rusya" },
-  { value: "Georgia", label: "🇬🇪 Gürcistan" },
-  { value: "Armenia", label: "🇦🇲 Ermenistan" },
-  { value: "Azerbaijan", label: "🇦🇿 Azerbaycan" },
-  { value: "Kazakhstan", label: "🇰🇿 Kazakistan" },
-  { value: "Uzbekistan", label: "🇺🇿 Kazakistan" },
-  { value: "China", label: "🇨🇳 Çin" },
-  { value: "Japan", label: "🇯🇵 Japonya" },
-  { value: "South Korea", label: "🇰🇷 Güney Kore" },
-  { value: "India", label: "🇮🇳 Hindistan" },
-  { value: "Pakistan", label: "🇵🇰 Pakistan" },
-  { value: "Bangladesh", label: "🇧🇩 Bangladeş" },
-  { value: "Nepal", label: "🇳🇵 Nepal" },
-  { value: "Sri Lanka", label: "🇱🇰 Sri Lanka" },
-  { value: "Thailand", label: "🇹🇭 Tayland" },
-  { value: "Vietnam", label: "🇻🇳 Vietnam" },
-  { value: "Malaysia", label: "🇲🇾 Malezya" },
-  { value: "Singapore", label: "🇸🇬 Singapur" },
-  { value: "Indonesia", label: "🇮🇩 Endonezya" },
-  { value: "Philippines", label: "🇵🇭 Filipinler" },
-  { value: "Australia", label: "🇦🇺 Avustralya" },
-  { value: "New Zealand", label: "🇳🇿 Yeni Zelanda" },
-  { value: "Saudi Arabia", label: "🇸🇦 Suudi Arabistan" },
-  { value: "United Arab Emirates", label: "🇦🇪 BAE" },
-  { value: "Qatar", label: "🇶🇦 Katar" },
-  { value: "Kuwait", label: "🇰🇼 Kuveyt" },
-  { value: "Bahrain", label: "🇧🇭 Bahreyn" },
-  { value: "Oman", label: "🇴🇲 Umman" },
-  { value: "Jordan", label: "🇯🇴 Ürdün" },
-  { value: "Lebanon", label: "🇱🇧 Lübnan" },
-  { value: "Israel", label: "🇮🇱 İsrail" },
-  { value: "Iraq", label: "🇮🇶 Irak" },
-  { value: "Iran", label: "🇮🇷 İran" },
-  { value: "Egypt", label: "🇪🇬 Mısır" },
-  { value: "Morocco", label: "🇲🇦 Fas" },
-  { value: "Algeria", label: "🇩🇿 Cezayir" },
-  { value: "Tunisia", label: "🇹🇳 Tunus" },
-  { value: "Libya", label: "🇱🇾 Libya" },
-  { value: "South Africa", label: "🇿🇦 Güney Afrika" },
-  { value: "Nigeria", label: "🇳🇬 Nijerya" },
-  { value: "Ghana", label: "🇬🇭 Gana" },
-  { value: "Kenya", label: "🇰🇪 Kenya" },
-  { value: "Ethiopia", label: "🇪🇹 Etiyopya" },
-  { value: "Tanzania", label: "🇹🇿 Tanzanya" },
+  { value: "TÃ¼rkiye", label: "ğŸ‡¹ğŸ‡· TÃ¼rkiye" },
+  { value: "United States", label: "ğŸ‡ºğŸ‡¸ ABD" },
+  { value: "Canada", label: "ğŸ‡¨ğŸ‡¦ Kanada" },
+  { value: "Mexico", label: "ğŸ‡²ğŸ‡½ Meksika" },
+  { value: "Brazil", label: "ğŸ‡§ğŸ‡· Brezilya" },
+  { value: "Argentina", label: "ğŸ‡¦ğŸ‡· Arjantin" },
+  { value: "Chile", label: "ğŸ‡¨ğŸ‡± Åili" },
+  { value: "Colombia", label: "ğŸ‡¨ğŸ‡´ Kolombiya" },
+  { value: "Peru", label: "ğŸ‡µğŸ‡ª Peru" },
+  { value: "United Kingdom", label: "ğŸ‡¬ğŸ‡§ Ä°ngiltere" },
+  { value: "Ireland", label: "ğŸ‡®ğŸ‡ª Ä°rlanda" },
+  { value: "France", label: "ğŸ‡«ğŸ‡· Fransa" },
+  { value: "Germany", label: "ğŸ‡©ğŸ‡ª Almanya" },
+  { value: "Italy", label: "ğŸ‡®ğŸ‡¹ Ä°talya" },
+  { value: "Spain", label: "ğŸ‡ªğŸ‡¸ Ä°spanya" },
+  { value: "Portugal", label: "ğŸ‡µğŸ‡¹ Portekiz" },
+  { value: "Netherlands", label: "ğŸ‡³ğŸ‡± Hollanda" },
+  { value: "Belgium", label: "ğŸ‡§ğŸ‡ª BelÃ§ika" },
+  { value: "Switzerland", label: "ğŸ‡¨ğŸ‡­ Ä°sviÃ§re" },
+  { value: "Austria", label: "ğŸ‡¦ğŸ‡¹ Avusturya" },
+  { value: "Sweden", label: "ğŸ‡¸ğŸ‡ª Ä°sveÃ§" },
+  { value: "Norway", label: "ğŸ‡³ğŸ‡´ NorveÃ§" },
+  { value: "Denmark", label: "ğŸ‡©ğŸ‡° Danimarka" },
+  { value: "Finland", label: "ğŸ‡«ğŸ‡® Finlandiya" },
+  { value: "Iceland", label: "ğŸ‡®ğŸ‡¸ Ä°zlanda" },
+  { value: "Poland", label: "ğŸ‡µğŸ‡± Polonya" },
+  { value: "Czechia", label: "ğŸ‡¨ğŸ‡¿ Ã‡ekya" },
+  { value: "Slovakia", label: "ğŸ‡¸ğŸ‡° Slovakya" },
+  { value: "Hungary", label: "ğŸ‡­ğŸ‡º Macaristan" },
+  { value: "Romania", label: "ğŸ‡·ğŸ‡´ Romanya" },
+  { value: "Bulgaria", label: "ğŸ‡§ğŸ‡¬ Bulgaristan" },
+  { value: "Greece", label: "ğŸ‡¬ğŸ‡· Yunanistan" },
+  { value: "Ukraine", label: "ğŸ‡ºğŸ‡¦ Ukrayna" },
+  { value: "Serbia", label: "ğŸ‡·ğŸ‡¸ SÄ±rbistan" },
+  { value: "Croatia", label: "ğŸ‡­ğŸ‡· HÄ±rvatistan" },
+  { value: "Slovenia", label: "ğŸ‡¸ğŸ‡® Slovenya" },
+  { value: "Bosnia and Herzegovina", label: "ğŸ‡§ğŸ‡¦ Bosna-Hersek" },
+  { value: "Albania", label: "ğŸ‡¦ğŸ‡± Arnavutluk" },
+  { value: "Lithuania", label: "ğŸ‡±ğŸ‡¹ Litvanya" },
+  { value: "Latvia", label: "ğŸ‡±ğŸ‡» Letonya" },
+  { value: "Estonia", label: "ğŸ‡ªğŸ‡ª Estonya" },
+  { value: "Russia", label: "ğŸ‡·ğŸ‡º Rusya" },
+  { value: "Georgia", label: "ğŸ‡¬ğŸ‡ª GÃ¼rcistan" },
+  { value: "Armenia", label: "ğŸ‡¦ğŸ‡² Ermenistan" },
+  { value: "Azerbaijan", label: "ğŸ‡¦ğŸ‡¿ Azerbaycan" },
+  { value: "Kazakhstan", label: "ğŸ‡°ğŸ‡¿ Kazakistan" },
+  { value: "Uzbekistan", label: "ğŸ‡ºğŸ‡¿ Kazakistan" },
+  { value: "China", label: "ğŸ‡¨ğŸ‡³ Ã‡in" },
+  { value: "Japan", label: "ğŸ‡¯ğŸ‡µ Japonya" },
+  { value: "South Korea", label: "ğŸ‡°ğŸ‡· GÃ¼ney Kore" },
+  { value: "India", label: "ğŸ‡®ğŸ‡³ Hindistan" },
+  { value: "Pakistan", label: "ğŸ‡µğŸ‡° Pakistan" },
+  { value: "Bangladesh", label: "ğŸ‡§ğŸ‡© BangladeÅŸ" },
+  { value: "Nepal", label: "ğŸ‡³ğŸ‡µ Nepal" },
+  { value: "Sri Lanka", label: "ğŸ‡±ğŸ‡° Sri Lanka" },
+  { value: "Thailand", label: "ğŸ‡¹ğŸ‡­ Tayland" },
+  { value: "Vietnam", label: "ğŸ‡»ğŸ‡³ Vietnam" },
+  { value: "Malaysia", label: "ğŸ‡²ğŸ‡¾ Malezya" },
+  { value: "Singapore", label: "ğŸ‡¸ğŸ‡¬ Singapur" },
+  { value: "Indonesia", label: "ğŸ‡®ğŸ‡© Endonezya" },
+  { value: "Philippines", label: "ğŸ‡µğŸ‡­ Filipinler" },
+  { value: "Australia", label: "ğŸ‡¦ğŸ‡º Avustralya" },
+  { value: "New Zealand", label: "ğŸ‡³ğŸ‡¿ Yeni Zelanda" },
+  { value: "Saudi Arabia", label: "ğŸ‡¸ğŸ‡¦ Suudi Arabistan" },
+  { value: "United Arab Emirates", label: "ğŸ‡¦ğŸ‡ª BAE" },
+  { value: "Qatar", label: "ğŸ‡¶ğŸ‡¦ Katar" },
+  { value: "Kuwait", label: "ğŸ‡°ğŸ‡¼ Kuveyt" },
+  { value: "Bahrain", label: "ğŸ‡§ğŸ‡­ Bahreyn" },
+  { value: "Oman", label: "ğŸ‡´ğŸ‡² Umman" },
+  { value: "Jordan", label: "ğŸ‡¯ğŸ‡´ ÃœrdÃ¼n" },
+  { value: "Lebanon", label: "ğŸ‡±ğŸ‡§ LÃ¼bnan" },
+  { value: "Israel", label: "ğŸ‡®ğŸ‡± Ä°srail" },
+  { value: "Iraq", label: "ğŸ‡®ğŸ‡¶ Irak" },
+  { value: "Iran", label: "ğŸ‡®ğŸ‡· Ä°ran" },
+  { value: "Egypt", label: "ğŸ‡ªğŸ‡¬ MÄ±sÄ±r" },
+  { value: "Morocco", label: "ğŸ‡²ğŸ‡¦ Fas" },
+  { value: "Algeria", label: "ğŸ‡©ğŸ‡¿ Cezayir" },
+  { value: "Tunisia", label: "ğŸ‡¹ğŸ‡³ Tunus" },
+  { value: "Libya", label: "ğŸ‡±ğŸ‡¾ Libya" },
+  { value: "South Africa", label: "ğŸ‡¿ğŸ‡¦ GÃ¼ney Afrika" },
+  { value: "Nigeria", label: "ğŸ‡³ğŸ‡¬ Nijerya" },
+  { value: "Ghana", label: "ğŸ‡¬ğŸ‡­ Gana" },
+  { value: "Kenya", label: "ğŸ‡°ğŸ‡ª Kenya" },
+  { value: "Ethiopia", label: "ğŸ‡ªğŸ‡¹ Etiyopya" },
+  { value: "Tanzania", label: "ğŸ‡¹ğŸ‡¿ Tanzanya" },
 ];
 
 /* =========================================================
@@ -208,648 +209,648 @@ const appLanguages: Array<{
   value: AppLanguage;
   label: string;
 }> = [
-  { value: "Turkish", label: "🇹🇷 Türkçe" },
-  { value: "English", label: "🇬🇧 English" },
-  { value: "Arabic", label: "🇸🇦 العربية" },
-  { value: "Spanish", label: "🇪🇸 Español" },
-  { value: "French", label: "🇫🇷 Français" },
-  { value: "German", label: "🇩🇪 Deutsch" },
-  { value: "Portuguese", label: "🇵🇹 Português" },
-  { value: "Russian", label: "🇷🇺 Русский" },
-  { value: "Chinese", label: "🇨🇳 中文" },
-  { value: "Hindi", label: "🇮🇳 हिन्दी" },
+  { value: "Turkish", label: "ğŸ‡¹ğŸ‡· TÃ¼rkÃ§e" },
+  { value: "English", label: "ğŸ‡¬ğŸ‡§ English" },
+  { value: "Arabic", label: "ğŸ‡¸ğŸ‡¦ Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©" },
+  { value: "Spanish", label: "ğŸ‡ªğŸ‡¸ EspaÃ±ol" },
+  { value: "French", label: "ğŸ‡«ğŸ‡· FranÃ§ais" },
+  { value: "German", label: "ğŸ‡©ğŸ‡ª Deutsch" },
+  { value: "Portuguese", label: "ğŸ‡µğŸ‡¹ PortuguÃªs" },
+  { value: "Russian", label: "ğŸ‡·ğŸ‡º Ğ ÑƒÑÑĞºĞ¸Ğ¹" },
+  { value: "Chinese", label: "ğŸ‡¨ğŸ‡³ ä¸­æ–‡" },
+  { value: "Hindi", label: "ğŸ‡®ğŸ‡³ à¤¹à¤¿à¤¨à¥à¤¦à¥€" },
 ];
 
 const translations = {
   Turkish: {
     appDescription:
-      "Pi destekli mağazaları, ürünleri, hizmetleri ve işletmeleri yakınında keşfet.",
-    signIn: "π Pi ile Giriş Yap",
-    connected: "Pi Bağlandı",
-    search: "🔎 Yer, işletme veya kullanıcı ara...",
-    nearby: "📍 Yakınımdaki Yerler",
-    allPlaces: "🌍 Tüm Yerleri Göster",
-    locationFound: "📍 Konumun bulundu",
-    nearestFirst: "📏 En yakın yerler önce gösteriliyor",
-    all: "Tümü",
+      "Pi destekli maÄŸazalarÄ±, Ã¼rÃ¼nleri, hizmetleri ve iÅŸletmeleri yakÄ±nÄ±nda keÅŸfet.",
+    signIn: "Ï€ Pi ile GiriÅŸ Yap",
+    connected: "Pi BaÄŸlandÄ±",
+    search: "ğŸ” Yer, iÅŸletme veya kullanÄ±cÄ± ara...",
+    nearby: "ğŸ“ YakÄ±nÄ±mdaki Yerler",
+    allPlaces: "ğŸŒ TÃ¼m Yerleri GÃ¶ster",
+    locationFound: "ğŸ“ Konumun bulundu",
+    nearestFirst: "ğŸ“ En yakÄ±n yerler Ã¶nce gÃ¶steriliyor",
+    all: "TÃ¼mÃ¼",
     stays: "Konaklama",
-    shops: "Mağazalar",
+    shops: "MaÄŸazalar",
     food: "Yemek",
     services: "Hizmetler",
-    jobs: "İşler",
-    addPlace: "📍 Yer Ekle",
+    jobs: "Ä°ÅŸler",
+    addPlace: "ğŸ“ Yer Ekle",
     language: "Dil",
-    country: "Ülke",
-    allLanguages: "🗣️ Tüm Diller",
-    allCountries: "🌍 Tüm Ülkeler",
-    addPlaceTitle: "📍 Yer Ekle",
-    tapMap: "Konum seçmek için haritaya dokunabilirsin.",
-    locationSelected: "✅ Konum seçildi",
-    placeName: "Yer adı",
-    description: "Açıklama",
-    save: "💾 Kaydet",
-    cancel: "İptal",
-    selectedLocation: "📍 Seçilen konum",
-    details: "📋 Detayları Gör",
+    country: "Ãœlke",
+    allLanguages: "ğŸ—£ï¸ TÃ¼m Diller",
+    allCountries: "ğŸŒ TÃ¼m Ãœlkeler",
+    addPlaceTitle: "ğŸ“ Yer Ekle",
+    tapMap: "Konum seÃ§mek iÃ§in haritaya dokunabilirsin.",
+    locationSelected: "âœ… Konum seÃ§ildi",
+    placeName: "Yer adÄ±",
+    description: "AÃ§Ä±klama",
+    save: "ğŸ’¾ Kaydet",
+    cancel: "Ä°ptal",
+    selectedLocation: "ğŸ“ SeÃ§ilen konum",
+    details: "ğŸ“‹ DetaylarÄ± GÃ¶r",
     detailsTitle: "Detaylar",
-    map: "🗺️ Haritada Göster",
-    delete: "🗑️ Yeri Sil",
+    map: "ğŸ—ºï¸ Haritada GÃ¶ster",
+    delete: "ğŸ—‘ï¸ Yeri Sil",
     close: "Kapat",
-    distance: "km uzaklıkta",
-    places: "🌍 Pi Economy Yerleri",
-    nearbyPlaces: "📍 50 km içindeki yerler — en yakından uzağa",
-    results: "sonuçları",
-    searchingLocation: "📍 Konumun alınıyor...",
-    locationNotSupported: "❌ Konum özelliği desteklenmiyor.",
-    locationDenied: "❌ Konum izni verilmedi.",
-    signInFirst: "❌ Önce Pi ile giriş yapmalısın.",
-    deleteLogin: "❌ Silmek için Pi ile giriş yapmalısın.",
-    saving: "⏳ Yer kaydediliyor...",
-    deleting: "⏳ Yer siliniyor...",
+    distance: "km uzaklÄ±kta",
+    places: "ğŸŒ Pi Economy Yerleri",
+    nearbyPlaces: "ğŸ“ 50 km iÃ§indeki yerler â€” en yakÄ±ndan uzaÄŸa",
+    results: "sonuÃ§larÄ±",
+    searchingLocation: "ğŸ“ Konumun alÄ±nÄ±yor...",
+    locationNotSupported: "âŒ Konum Ã¶zelliÄŸi desteklenmiyor.",
+    locationDenied: "âŒ Konum izni verilmedi.",
+    signInFirst: "âŒ Ã–nce Pi ile giriÅŸ yapmalÄ±sÄ±n.",
+    deleteLogin: "âŒ Silmek iÃ§in Pi ile giriÅŸ yapmalÄ±sÄ±n.",
+    saving: "â³ Yer kaydediliyor...",
+    deleting: "â³ Yer siliniyor...",
     deleted: "silindi.",
     saved: "kaydedildi.",
-    nameRequired: "❌ Yer adını yaz.",
-    descriptionTitle: "AÇIKLAMA",
-    languageSelector: "🌐 Uygulama Dili",
-    confirmDelete: "yerini silmek istediğine emin misin?",
-    piSdkError: "❌ Pi SDK yüklenemedi.",
-    piUserError: "Pi kullanıcı bilgisi alınamadı.",
-    backendError: "Backend giriş işlemi başarısız.",
-    loginFailed: "❌ Pi Sign-In başarısız.",
-    locationChosen: "📍 Konum seçildi. Yer bilgilerini gir.",
-    location: "📍 Konum",
-    anonymous: "Kullanıcı",
+    nameRequired: "âŒ Yer adÄ±nÄ± yaz.",
+    descriptionTitle: "AÃ‡IKLAMA",
+    languageSelector: "ğŸŒ Uygulama Dili",
+    confirmDelete: "yerini silmek istediÄŸine emin misin?",
+    piSdkError: "âŒ Pi SDK yÃ¼klenemedi.",
+    piUserError: "Pi kullanÄ±cÄ± bilgisi alÄ±namadÄ±.",
+    backendError: "Backend giriÅŸ iÅŸlemi baÅŸarÄ±sÄ±z.",
+    loginFailed: "âŒ Pi Sign-In baÅŸarÄ±sÄ±z.",
+    locationChosen: "ğŸ“ Konum seÃ§ildi. Yer bilgilerini gir.",
+    location: "ğŸ“ Konum",
+    anonymous: "KullanÄ±cÄ±",
   },
 
   English: {
     appDescription:
       "Discover Pi-powered stores, products, services, and businesses near you.",
-    signIn: "π Sign in with Pi",
+    signIn: "Ï€ Sign in with Pi",
     connected: "Pi Connected",
-    search: "🔎 Search places, businesses or users...",
-    nearby: "📍 Nearby Places",
-    allPlaces: "🌍 Show All Places",
-    locationFound: "📍 Location found",
-    nearestFirst: "📏 Nearest places shown first",
+    search: "ğŸ” Search places, businesses or users...",
+    nearby: "ğŸ“ Nearby Places",
+    allPlaces: "ğŸŒ Show All Places",
+    locationFound: "ğŸ“ Location found",
+    nearestFirst: "ğŸ“ Nearest places shown first",
     all: "All",
     stays: "Stays",
     shops: "Shops",
     food: "Food",
     services: "Services",
     jobs: "Jobs",
-    addPlace: "📍 Add Place",
+    addPlace: "ğŸ“ Add Place",
     language: "Language",
     country: "Country",
-    allLanguages: "🗣️ All Languages",
-    allCountries: "🌍 All Countries",
-    addPlaceTitle: "📍 Add Place",
+    allLanguages: "ğŸ—£ï¸ All Languages",
+    allCountries: "ğŸŒ All Countries",
+    addPlaceTitle: "ğŸ“ Add Place",
     tapMap: "Tap the map to select a location.",
-    locationSelected: "✅ Location selected",
+    locationSelected: "âœ… Location selected",
     placeName: "Place name",
     description: "Description",
-    save: "💾 Save",
+    save: "ğŸ’¾ Save",
     cancel: "Cancel",
-    selectedLocation: "📍 Selected location",
-    details: "📋 View Details",
+    selectedLocation: "ğŸ“ Selected location",
+    details: "ğŸ“‹ View Details",
     detailsTitle: "Details",
-    map: "🗺️ Show on Map",
-    delete: "🗑️ Delete Place",
+    map: "ğŸ—ºï¸ Show on Map",
+    delete: "ğŸ—‘ï¸ Delete Place",
     close: "Close",
     distance: "km away",
-    places: "🌍 Pi Economy Places",
-    nearbyPlaces: "📍 Places within 50 km — nearest first",
+    places: "ğŸŒ Pi Economy Places",
+    nearbyPlaces: "ğŸ“ Places within 50 km â€” nearest first",
     results: "results",
-    searchingLocation: "📍 Getting your location...",
-    locationNotSupported: "❌ Location is not supported.",
-    locationDenied: "❌ Location permission denied.",
-    signInFirst: "❌ Please sign in with Pi first.",
-    deleteLogin: "❌ You must sign in with Pi to delete.",
-    saving: "⏳ Saving place...",
-    deleting: "⏳ Deleting place...",
+    searchingLocation: "ğŸ“ Getting your location...",
+    locationNotSupported: "âŒ Location is not supported.",
+    locationDenied: "âŒ Location permission denied.",
+    signInFirst: "âŒ Please sign in with Pi first.",
+    deleteLogin: "âŒ You must sign in with Pi to delete.",
+    saving: "â³ Saving place...",
+    deleting: "â³ Deleting place...",
     deleted: "deleted.",
     saved: "saved.",
-    nameRequired: "❌ Enter a place name.",
+    nameRequired: "âŒ Enter a place name.",
     descriptionTitle: "DESCRIPTION",
-    languageSelector: "🌐 App Language",
+    languageSelector: "ğŸŒ App Language",
     confirmDelete: "Are you sure you want to delete this place?",
-    piSdkError: "❌ Pi SDK could not be loaded.",
+    piSdkError: "âŒ Pi SDK could not be loaded.",
     piUserError: "Pi user information could not be obtained.",
     backendError: "Backend sign-in failed.",
-    loginFailed: "❌ Pi Sign-In failed.",
+    loginFailed: "âŒ Pi Sign-In failed.",
     locationChosen:
-      "📍 Location selected. Enter the place information.",
-    location: "📍 Location",
+      "ğŸ“ Location selected. Enter the place information.",
+    location: "ğŸ“ Location",
     anonymous: "User",
   },
 
   Arabic: {
     appDescription:
-      "اكتشف المتاجر والمنتجات والخدمات والأعمال المدعومة من Pi بالقرب منك.",
-    signIn: "π تسجيل الدخول باستخدام Pi",
-    connected: "Pi متصل",
-    search: "🔎 ابحث عن الأماكن أو الأعمال أو المستخدمين...",
-    nearby: "📍 الأماكن القريبة",
-    allPlaces: "🌍 عرض جميع الأماكن",
-    locationFound: "📍 تم العثور على موقعك",
-    nearestFirst: "📏 عرض الأماكن الأقرب أولاً",
-    all: "الكل",
-    stays: "الإقامات",
-    shops: "المتاجر",
-    food: "الطعام",
-    services: "الخدمات",
-    jobs: "الوظائف",
-    addPlace: "📍 إضافة مكان",
-    language: "اللغة",
-    country: "الدولة",
-    allLanguages: "🗣️ جميع اللغات",
-    allCountries: "🌍 جميع الدول",
-    addPlaceTitle: "📍 إضافة مكان",
-    tapMap: "اضغط على الخريطة لاختيار الموقع.",
-    locationSelected: "✅ تم اختيار الموقع",
-    placeName: "اسم المكان",
-    description: "الوصف",
-    save: "💾 حفظ",
-    cancel: "إلغاء",
-    selectedLocation: "📍 الموقع المحدد",
-    details: "📋 عرض التفاصيل",
-    detailsTitle: "التفاصيل",
-    map: "🗺️ عرض على الخريطة",
-    delete: "🗑️ حذف المكان",
-    close: "إغلاق",
-    distance: "كم",
-    places: "🌍 أماكن Pi Economy",
-    nearbyPlaces: "📍 الأماكن ضمن 50 كم — الأقرب أولاً",
-    results: "النتائج",
-    searchingLocation: "📍 جارٍ تحديد موقعك...",
-    locationNotSupported: "❌ الموقع غير مدعوم.",
-    locationDenied: "❌ تم رفض إذن الموقع.",
-    signInFirst: "❌ يرجى تسجيل الدخول باستخدام Pi أولاً.",
-    deleteLogin: "❌ يجب تسجيل الدخول باستخدام Pi للحذف.",
-    saving: "⏳ جارٍ حفظ المكان...",
-    deleting: "⏳ جارٍ حذف المكان...",
-    deleted: "تم حذفه.",
-    saved: "تم حفظه.",
-    nameRequired: "❌ أدخل اسم المكان.",
-    descriptionTitle: "الوصف",
-    languageSelector: "🌐 لغة التطبيق",
-    confirmDelete: "هل أنت متأكد من حذف هذا المكان؟",
-    piSdkError: "❌ تعذر تحميل Pi SDK.",
-    piUserError: "تعذر الحصول على معلومات مستخدم Pi.",
-    backendError: "فشل تسجيل الدخول إلى الخادم.",
-    loginFailed: "❌ فشل تسجيل الدخول باستخدام Pi.",
-    locationChosen: "📍 تم اختيار الموقع. أدخل معلومات المكان.",
-    location: "📍 الموقع",
-    anonymous: "مستخدم",
+      "Ø§ÙƒØªØ´Ù Ø§Ù„Ù…ØªØ§Ø¬Ø± ÙˆØ§Ù„Ù…Ù†ØªØ¬Ø§Øª ÙˆØ§Ù„Ø®Ø¯Ù…Ø§Øª ÙˆØ§Ù„Ø£Ø¹Ù…Ø§Ù„ Ø§Ù„Ù…Ø¯Ø¹ÙˆÙ…Ø© Ù…Ù† Pi Ø¨Ø§Ù„Ù‚Ø±Ø¨ Ù…Ù†Ùƒ.",
+    signIn: "Ï€ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¨Ø§Ø³ØªØ®Ø¯Ø§Ù… Pi",
+    connected: "Pi Ù…ØªØµÙ„",
+    search: "ğŸ” Ø§Ø¨Ø­Ø« Ø¹Ù† Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø£Ùˆ Ø§Ù„Ø£Ø¹Ù…Ø§Ù„ Ø£Ùˆ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ†...",
+    nearby: "ğŸ“ Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ù‚Ø±ÙŠØ¨Ø©",
+    allPlaces: "ğŸŒ Ø¹Ø±Ø¶ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø£Ù…Ø§ÙƒÙ†",
+    locationFound: "ğŸ“ ØªÙ… Ø§Ù„Ø¹Ø«ÙˆØ± Ø¹Ù„Ù‰ Ù…ÙˆÙ‚Ø¹Ùƒ",
+    nearestFirst: "ğŸ“ Ø¹Ø±Ø¶ Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø§Ù„Ø£Ù‚Ø±Ø¨ Ø£ÙˆÙ„Ø§Ù‹",
+    all: "Ø§Ù„ÙƒÙ„",
+    stays: "Ø§Ù„Ø¥Ù‚Ø§Ù…Ø§Øª",
+    shops: "Ø§Ù„Ù…ØªØ§Ø¬Ø±",
+    food: "Ø§Ù„Ø·Ø¹Ø§Ù…",
+    services: "Ø§Ù„Ø®Ø¯Ù…Ø§Øª",
+    jobs: "Ø§Ù„ÙˆØ¸Ø§Ø¦Ù",
+    addPlace: "ğŸ“ Ø¥Ø¶Ø§ÙØ© Ù…ÙƒØ§Ù†",
+    language: "Ø§Ù„Ù„ØºØ©",
+    country: "Ø§Ù„Ø¯ÙˆÙ„Ø©",
+    allLanguages: "ğŸ—£ï¸ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù„ØºØ§Øª",
+    allCountries: "ğŸŒ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø¯ÙˆÙ„",
+    addPlaceTitle: "ğŸ“ Ø¥Ø¶Ø§ÙØ© Ù…ÙƒØ§Ù†",
+    tapMap: "Ø§Ø¶ØºØ· Ø¹Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø© Ù„Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…ÙˆÙ‚Ø¹.",
+    locationSelected: "âœ… ØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…ÙˆÙ‚Ø¹",
+    placeName: "Ø§Ø³Ù… Ø§Ù„Ù…ÙƒØ§Ù†",
+    description: "Ø§Ù„ÙˆØµÙ",
+    save: "ğŸ’¾ Ø­ÙØ¸",
+    cancel: "Ø¥Ù„ØºØ§Ø¡",
+    selectedLocation: "ğŸ“ Ø§Ù„Ù…ÙˆÙ‚Ø¹ Ø§Ù„Ù…Ø­Ø¯Ø¯",
+    details: "ğŸ“‹ Ø¹Ø±Ø¶ Ø§Ù„ØªÙØ§ØµÙŠÙ„",
+    detailsTitle: "Ø§Ù„ØªÙØ§ØµÙŠÙ„",
+    map: "ğŸ—ºï¸ Ø¹Ø±Ø¶ Ø¹Ù„Ù‰ Ø§Ù„Ø®Ø±ÙŠØ·Ø©",
+    delete: "ğŸ—‘ï¸ Ø­Ø°Ù Ø§Ù„Ù…ÙƒØ§Ù†",
+    close: "Ø¥ØºÙ„Ø§Ù‚",
+    distance: "ÙƒÙ…",
+    places: "ğŸŒ Ø£Ù…Ø§ÙƒÙ† Pi Economy",
+    nearbyPlaces: "ğŸ“ Ø§Ù„Ø£Ù…Ø§ÙƒÙ† Ø¶Ù…Ù† 50 ÙƒÙ… â€” Ø§Ù„Ø£Ù‚Ø±Ø¨ Ø£ÙˆÙ„Ø§Ù‹",
+    results: "Ø§Ù„Ù†ØªØ§Ø¦Ø¬",
+    searchingLocation: "ğŸ“ Ø¬Ø§Ø±Ù ØªØ­Ø¯ÙŠØ¯ Ù…ÙˆÙ‚Ø¹Ùƒ...",
+    locationNotSupported: "âŒ Ø§Ù„Ù…ÙˆÙ‚Ø¹ ØºÙŠØ± Ù…Ø¯Ø¹ÙˆÙ….",
+    locationDenied: "âŒ ØªÙ… Ø±ÙØ¶ Ø¥Ø°Ù† Ø§Ù„Ù…ÙˆÙ‚Ø¹.",
+    signInFirst: "âŒ ÙŠØ±Ø¬Ù‰ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¨Ø§Ø³ØªØ®Ø¯Ø§Ù… Pi Ø£ÙˆÙ„Ø§Ù‹.",
+    deleteLogin: "âŒ ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¨Ø§Ø³ØªØ®Ø¯Ø§Ù… Pi Ù„Ù„Ø­Ø°Ù.",
+    saving: "â³ Ø¬Ø§Ø±Ù Ø­ÙØ¸ Ø§Ù„Ù…ÙƒØ§Ù†...",
+    deleting: "â³ Ø¬Ø§Ø±Ù Ø­Ø°Ù Ø§Ù„Ù…ÙƒØ§Ù†...",
+    deleted: "ØªÙ… Ø­Ø°ÙÙ‡.",
+    saved: "ØªÙ… Ø­ÙØ¸Ù‡.",
+    nameRequired: "âŒ Ø£Ø¯Ø®Ù„ Ø§Ø³Ù… Ø§Ù„Ù…ÙƒØ§Ù†.",
+    descriptionTitle: "Ø§Ù„ÙˆØµÙ",
+    languageSelector: "ğŸŒ Ù„ØºØ© Ø§Ù„ØªØ·Ø¨ÙŠÙ‚",
+    confirmDelete: "Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø­Ø°Ù Ù‡Ø°Ø§ Ø§Ù„Ù…ÙƒØ§Ù†ØŸ",
+    piSdkError: "âŒ ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Pi SDK.",
+    piUserError: "ØªØ¹Ø°Ø± Ø§Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ù…Ø³ØªØ®Ø¯Ù… Pi.",
+    backendError: "ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø§Ù„Ø®Ø§Ø¯Ù….",
+    loginFailed: "âŒ ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¨Ø§Ø³ØªØ®Ø¯Ø§Ù… Pi.",
+    locationChosen: "ğŸ“ ØªÙ… Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…ÙˆÙ‚Ø¹. Ø£Ø¯Ø®Ù„ Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ù…ÙƒØ§Ù†.",
+    location: "ğŸ“ Ø§Ù„Ù…ÙˆÙ‚Ø¹",
+    anonymous: "Ù…Ø³ØªØ®Ø¯Ù…",
   },
 
   Spanish: {
     appDescription:
       "Descubre tiendas, productos, servicios y negocios impulsados por Pi cerca de ti.",
-    signIn: "π Iniciar sesión con Pi",
+    signIn: "Ï€ Iniciar sesiÃ³n con Pi",
     connected: "Pi conectado",
-    search: "🔎 Buscar lugares, negocios o usuarios...",
-    nearby: "📍 Lugares cercanos",
-    allPlaces: "🌍 Mostrar todos los lugares",
-    locationFound: "📍 Ubicación encontrada",
-    nearestFirst: "📏 Los lugares más cercanos aparecen primero",
+    search: "ğŸ” Buscar lugares, negocios o usuarios...",
+    nearby: "ğŸ“ Lugares cercanos",
+    allPlaces: "ğŸŒ Mostrar todos los lugares",
+    locationFound: "ğŸ“ UbicaciÃ³n encontrada",
+    nearestFirst: "ğŸ“ Los lugares mÃ¡s cercanos aparecen primero",
     all: "Todos",
     stays: "Alojamientos",
     shops: "Tiendas",
     food: "Comida",
     services: "Servicios",
     jobs: "Empleos",
-    addPlace: "📍 Añadir lugar",
+    addPlace: "ğŸ“ AÃ±adir lugar",
     language: "Idioma",
-    country: "País",
-    allLanguages: "🗣️ Todos los idiomas",
-    allCountries: "🌍 Todos los países",
-    addPlaceTitle: "📍 Añadir lugar",
-    tapMap: "Toca el mapa para seleccionar una ubicación.",
-    locationSelected: "✅ Ubicación seleccionada",
+    country: "PaÃ­s",
+    allLanguages: "ğŸ—£ï¸ Todos los idiomas",
+    allCountries: "ğŸŒ Todos los paÃ­ses",
+    addPlaceTitle: "ğŸ“ AÃ±adir lugar",
+    tapMap: "Toca el mapa para seleccionar una ubicaciÃ³n.",
+    locationSelected: "âœ… UbicaciÃ³n seleccionada",
     placeName: "Nombre del lugar",
-    description: "Descripción",
-    save: "💾 Guardar",
+    description: "DescripciÃ³n",
+    save: "ğŸ’¾ Guardar",
     cancel: "Cancelar",
-    selectedLocation: "📍 Ubicación seleccionada",
-    details: "📋 Ver detalles",
+    selectedLocation: "ğŸ“ UbicaciÃ³n seleccionada",
+    details: "ğŸ“‹ Ver detalles",
     detailsTitle: "Detalles",
-    map: "🗺️ Mostrar en el mapa",
-    delete: "🗑️ Eliminar lugar",
+    map: "ğŸ—ºï¸ Mostrar en el mapa",
+    delete: "ğŸ—‘ï¸ Eliminar lugar",
     close: "Cerrar",
     distance: "km de distancia",
-    places: "🌍 Lugares de Pi Economy",
-    nearbyPlaces: "📍 Lugares en 50 km — más cercanos primero",
+    places: "ğŸŒ Lugares de Pi Economy",
+    nearbyPlaces: "ğŸ“ Lugares en 50 km â€” mÃ¡s cercanos primero",
     results: "resultados",
-    searchingLocation: "📍 Obteniendo tu ubicación...",
-    locationNotSupported: "❌ La ubicación no es compatible.",
-    locationDenied: "❌ Permiso de ubicación denegado.",
-    signInFirst: "❌ Inicia sesión con Pi primero.",
-    deleteLogin: "❌ Debes iniciar sesión con Pi para eliminar.",
-    saving: "⏳ Guardando lugar...",
-    deleting: "⏳ Eliminando lugar...",
+    searchingLocation: "ğŸ“ Obteniendo tu ubicaciÃ³n...",
+    locationNotSupported: "âŒ La ubicaciÃ³n no es compatible.",
+    locationDenied: "âŒ Permiso de ubicaciÃ³n denegado.",
+    signInFirst: "âŒ Inicia sesiÃ³n con Pi primero.",
+    deleteLogin: "âŒ Debes iniciar sesiÃ³n con Pi para eliminar.",
+    saving: "â³ Guardando lugar...",
+    deleting: "â³ Eliminando lugar...",
     deleted: "eliminado.",
     saved: "guardado.",
-    nameRequired: "❌ Introduce un nombre.",
-    descriptionTitle: "DESCRIPCIÓN",
-    languageSelector: "🌐 Idioma de la aplicación",
-    confirmDelete: "¿Seguro que quieres eliminar este lugar?",
-    piSdkError: "❌ No se pudo cargar Pi SDK.",
-    piUserError: "No se pudo obtener la información del usuario Pi.",
-    backendError: "Error al iniciar sesión en el backend.",
-    loginFailed: "❌ Falló el inicio de sesión con Pi.",
+    nameRequired: "âŒ Introduce un nombre.",
+    descriptionTitle: "DESCRIPCIÃ“N",
+    languageSelector: "ğŸŒ Idioma de la aplicaciÃ³n",
+    confirmDelete: "Â¿Seguro que quieres eliminar este lugar?",
+    piSdkError: "âŒ No se pudo cargar Pi SDK.",
+    piUserError: "No se pudo obtener la informaciÃ³n del usuario Pi.",
+    backendError: "Error al iniciar sesiÃ³n en el backend.",
+    loginFailed: "âŒ FallÃ³ el inicio de sesiÃ³n con Pi.",
     locationChosen:
-      "📍 Ubicación seleccionada. Introduce la información.",
-    location: "📍 Ubicación",
+      "ğŸ“ UbicaciÃ³n seleccionada. Introduce la informaciÃ³n.",
+    location: "ğŸ“ UbicaciÃ³n",
     anonymous: "Usuario",
   },
 
   French: {
     appDescription:
-      "Découvrez les magasins, produits, services et entreprises propulsés par Pi près de chez vous.",
-    signIn: "π Se connecter avec Pi",
-    connected: "Pi connecté",
-    search: "🔎 Rechercher des lieux, entreprises ou utilisateurs...",
-    nearby: "📍 Lieux à proximité",
-    allPlaces: "🌍 Afficher tous les lieux",
-    locationFound: "📍 Position trouvée",
-    nearestFirst: "📏 Les lieux les plus proches en premier",
+      "DÃ©couvrez les magasins, produits, services et entreprises propulsÃ©s par Pi prÃ¨s de chez vous.",
+    signIn: "Ï€ Se connecter avec Pi",
+    connected: "Pi connectÃ©",
+    search: "ğŸ” Rechercher des lieux, entreprises ou utilisateurs...",
+    nearby: "ğŸ“ Lieux Ã  proximitÃ©",
+    allPlaces: "ğŸŒ Afficher tous les lieux",
+    locationFound: "ğŸ“ Position trouvÃ©e",
+    nearestFirst: "ğŸ“ Les lieux les plus proches en premier",
     all: "Tous",
-    stays: "Hébergements",
+    stays: "HÃ©bergements",
     shops: "Boutiques",
     food: "Restaurants",
     services: "Services",
     jobs: "Emplois",
-    addPlace: "📍 Ajouter un lieu",
+    addPlace: "ğŸ“ Ajouter un lieu",
     language: "Langue",
     country: "Pays",
-    allLanguages: "🗣️ Toutes les langues",
-    allCountries: "🌍 Tous les pays",
-    addPlaceTitle: "📍 Ajouter un lieu",
-    tapMap: "Touchez la carte pour sélectionner un emplacement.",
-    locationSelected: "✅ Emplacement sélectionné",
+    allLanguages: "ğŸ—£ï¸ Toutes les langues",
+    allCountries: "ğŸŒ Tous les pays",
+    addPlaceTitle: "ğŸ“ Ajouter un lieu",
+    tapMap: "Touchez la carte pour sÃ©lectionner un emplacement.",
+    locationSelected: "âœ… Emplacement sÃ©lectionnÃ©",
     placeName: "Nom du lieu",
     description: "Description",
-    save: "💾 Enregistrer",
+    save: "ğŸ’¾ Enregistrer",
     cancel: "Annuler",
-    selectedLocation: "📍 Emplacement sélectionné",
-    details: "📋 Voir les détails",
-    detailsTitle: "Détails",
-    map: "🗺️ Afficher sur la carte",
-    delete: "🗑️ Supprimer le lieu",
+    selectedLocation: "ğŸ“ Emplacement sÃ©lectionnÃ©",
+    details: "ğŸ“‹ Voir les dÃ©tails",
+    detailsTitle: "DÃ©tails",
+    map: "ğŸ—ºï¸ Afficher sur la carte",
+    delete: "ğŸ—‘ï¸ Supprimer le lieu",
     close: "Fermer",
     distance: "km",
-    places: "🌍 Lieux Pi Economy",
+    places: "ğŸŒ Lieux Pi Economy",
     nearbyPlaces:
-      "📍 Lieux dans un rayon de 50 km — plus proches en premier",
-    results: "résultats",
-    searchingLocation: "📍 Obtention de votre position...",
+      "ğŸ“ Lieux dans un rayon de 50 km â€” plus proches en premier",
+    results: "rÃ©sultats",
+    searchingLocation: "ğŸ“ Obtention de votre position...",
     locationNotSupported:
-      "❌ La localisation n'est pas prise en charge.",
-    locationDenied: "❌ Autorisation de localisation refusée.",
-    signInFirst: "❌ Connectez-vous d'abord avec Pi.",
+      "âŒ La localisation n'est pas prise en charge.",
+    locationDenied: "âŒ Autorisation de localisation refusÃ©e.",
+    signInFirst: "âŒ Connectez-vous d'abord avec Pi.",
     deleteLogin:
-      "❌ Vous devez être connecté avec Pi pour supprimer.",
-    saving: "⏳ Enregistrement...",
-    deleting: "⏳ Suppression...",
-    deleted: "supprimé.",
-    saved: "enregistré.",
-    nameRequired: "❌ Entrez le nom du lieu.",
+      "âŒ Vous devez Ãªtre connectÃ© avec Pi pour supprimer.",
+    saving: "â³ Enregistrement...",
+    deleting: "â³ Suppression...",
+    deleted: "supprimÃ©.",
+    saved: "enregistrÃ©.",
+    nameRequired: "âŒ Entrez le nom du lieu.",
     descriptionTitle: "DESCRIPTION",
-    languageSelector: "🌐 Langue de l'application",
+    languageSelector: "ğŸŒ Langue de l'application",
     confirmDelete: "Voulez-vous vraiment supprimer ce lieu ?",
-    piSdkError: "❌ Pi SDK n'a pas pu être chargé.",
+    piSdkError: "âŒ Pi SDK n'a pas pu Ãªtre chargÃ©.",
     piUserError:
       "Impossible d'obtenir les informations utilisateur Pi.",
-    backendError: "Échec de la connexion au backend.",
-    loginFailed: "❌ Échec de la connexion Pi.",
+    backendError: "Ã‰chec de la connexion au backend.",
+    loginFailed: "âŒ Ã‰chec de la connexion Pi.",
     locationChosen:
-      "📍 Emplacement sélectionné. Saisissez les informations.",
-    location: "📍 Emplacement",
+      "ğŸ“ Emplacement sÃ©lectionnÃ©. Saisissez les informations.",
+    location: "ğŸ“ Emplacement",
     anonymous: "Utilisateur",
   },
 
   German: {
     appDescription:
-      "Entdecke Pi-betriebene Geschäfte, Produkte, Dienstleistungen und Unternehmen in deiner Nähe.",
-    signIn: "π Mit Pi anmelden",
+      "Entdecke Pi-betriebene GeschÃ¤fte, Produkte, Dienstleistungen und Unternehmen in deiner NÃ¤he.",
+    signIn: "Ï€ Mit Pi anmelden",
     connected: "Pi verbunden",
-    search: "🔎 Orte, Unternehmen oder Nutzer suchen...",
-    nearby: "📍 Orte in der Nähe",
-    allPlaces: "🌍 Alle Orte anzeigen",
-    locationFound: "📍 Standort gefunden",
-    nearestFirst: "📏 Nächste Orte zuerst",
+    search: "ğŸ” Orte, Unternehmen oder Nutzer suchen...",
+    nearby: "ğŸ“ Orte in der NÃ¤he",
+    allPlaces: "ğŸŒ Alle Orte anzeigen",
+    locationFound: "ğŸ“ Standort gefunden",
+    nearestFirst: "ğŸ“ NÃ¤chste Orte zuerst",
     all: "Alle",
-    stays: "Unterkünfte",
-    shops: "Geschäfte",
+    stays: "UnterkÃ¼nfte",
+    shops: "GeschÃ¤fte",
     food: "Essen",
     services: "Dienstleistungen",
     jobs: "Jobs",
-    addPlace: "📍 Ort hinzufügen",
+    addPlace: "ğŸ“ Ort hinzufÃ¼gen",
     language: "Sprache",
     country: "Land",
-    allLanguages: "🗣️ Alle Sprachen",
-    allCountries: "🌍 Alle Länder",
-    addPlaceTitle: "📍 Ort hinzufügen",
-    tapMap: "Tippe auf die Karte, um einen Standort auszuwählen.",
-    locationSelected: "✅ Standort ausgewählt",
+    allLanguages: "ğŸ—£ï¸ Alle Sprachen",
+    allCountries: "ğŸŒ Alle LÃ¤nder",
+    addPlaceTitle: "ğŸ“ Ort hinzufÃ¼gen",
+    tapMap: "Tippe auf die Karte, um einen Standort auszuwÃ¤hlen.",
+    locationSelected: "âœ… Standort ausgewÃ¤hlt",
     placeName: "Name des Ortes",
     description: "Beschreibung",
-    save: "💾 Speichern",
+    save: "ğŸ’¾ Speichern",
     cancel: "Abbrechen",
-    selectedLocation: "📍 Ausgewählter Standort",
-    details: "📋 Details anzeigen",
+    selectedLocation: "ğŸ“ AusgewÃ¤hlter Standort",
+    details: "ğŸ“‹ Details anzeigen",
     detailsTitle: "Details",
-    map: "🗺️ Auf Karte anzeigen",
-    delete: "🗑️ Ort löschen",
-    close: "Schließen",
+    map: "ğŸ—ºï¸ Auf Karte anzeigen",
+    delete: "ğŸ—‘ï¸ Ort lÃ¶schen",
+    close: "SchlieÃŸen",
     distance: "km entfernt",
-    places: "🌍 Pi Economy Orte",
-    nearbyPlaces: "📍 Orte innerhalb von 50 km — nächste zuerst",
+    places: "ğŸŒ Pi Economy Orte",
+    nearbyPlaces: "ğŸ“ Orte innerhalb von 50 km â€” nÃ¤chste zuerst",
     results: "Ergebnisse",
-    searchingLocation: "📍 Standort wird ermittelt...",
-    locationNotSupported: "❌ Standort wird nicht unterstützt.",
-    locationDenied: "❌ Standortberechtigung verweigert.",
-    signInFirst: "❌ Bitte zuerst mit Pi anmelden.",
+    searchingLocation: "ğŸ“ Standort wird ermittelt...",
+    locationNotSupported: "âŒ Standort wird nicht unterstÃ¼tzt.",
+    locationDenied: "âŒ Standortberechtigung verweigert.",
+    signInFirst: "âŒ Bitte zuerst mit Pi anmelden.",
     deleteLogin:
-      "❌ Zum Löschen musst du mit Pi angemeldet sein.",
-    saving: "⏳ Ort wird gespeichert...",
-    deleting: "⏳ Ort wird gelöscht...",
-    deleted: "gelöscht.",
+      "âŒ Zum LÃ¶schen musst du mit Pi angemeldet sein.",
+    saving: "â³ Ort wird gespeichert...",
+    deleting: "â³ Ort wird gelÃ¶scht...",
+    deleted: "gelÃ¶scht.",
     saved: "gespeichert.",
-    nameRequired: "❌ Bitte einen Namen eingeben.",
+    nameRequired: "âŒ Bitte einen Namen eingeben.",
     descriptionTitle: "BESCHREIBUNG",
-    languageSelector: "🌐 App-Sprache",
-    confirmDelete: "Möchtest du diesen Ort wirklich löschen?",
-    piSdkError: "❌ Pi SDK konnte nicht geladen werden.",
+    languageSelector: "ğŸŒ App-Sprache",
+    confirmDelete: "MÃ¶chtest du diesen Ort wirklich lÃ¶schen?",
+    piSdkError: "âŒ Pi SDK konnte nicht geladen werden.",
     piUserError:
       "Pi-Benutzerinformationen konnten nicht abgerufen werden.",
     backendError: "Backend-Anmeldung fehlgeschlagen.",
-    loginFailed: "❌ Pi-Anmeldung fehlgeschlagen.",
+    loginFailed: "âŒ Pi-Anmeldung fehlgeschlagen.",
     locationChosen:
-      "📍 Standort ausgewählt. Gib die Informationen ein.",
-    location: "📍 Standort",
+      "ğŸ“ Standort ausgewÃ¤hlt. Gib die Informationen ein.",
+    location: "ğŸ“ Standort",
     anonymous: "Benutzer",
   },
 
   Portuguese: {
     appDescription:
-      "Descubra lojas, produtos, serviços e empresas com tecnologia Pi perto de você.",
-    signIn: "π Entrar com Pi",
+      "Descubra lojas, produtos, serviÃ§os e empresas com tecnologia Pi perto de vocÃª.",
+    signIn: "Ï€ Entrar com Pi",
     connected: "Pi conectado",
-    search: "🔎 Pesquisar lugares, empresas ou usuários...",
-    nearby: "📍 Lugares próximos",
-    allPlaces: "🌍 Mostrar todos os lugares",
-    locationFound: "📍 Localização encontrada",
-    nearestFirst: "📏 Lugares mais próximos primeiro",
+    search: "ğŸ” Pesquisar lugares, empresas ou usuÃ¡rios...",
+    nearby: "ğŸ“ Lugares prÃ³ximos",
+    allPlaces: "ğŸŒ Mostrar todos os lugares",
+    locationFound: "ğŸ“ LocalizaÃ§Ã£o encontrada",
+    nearestFirst: "ğŸ“ Lugares mais prÃ³ximos primeiro",
     all: "Todos",
     stays: "Hospedagens",
     shops: "Lojas",
     food: "Comida",
-    services: "Serviços",
+    services: "ServiÃ§os",
     jobs: "Empregos",
-    addPlace: "📍 Adicionar lugar",
+    addPlace: "ğŸ“ Adicionar lugar",
     language: "Idioma",
-    country: "País",
-    allLanguages: "🗣️ Todos os idiomas",
-    allCountries: "🌍 Todos os países",
-    addPlaceTitle: "📍 Adicionar lugar",
+    country: "PaÃ­s",
+    allLanguages: "ğŸ—£ï¸ Todos os idiomas",
+    allCountries: "ğŸŒ Todos os paÃ­ses",
+    addPlaceTitle: "ğŸ“ Adicionar lugar",
     tapMap: "Toque no mapa para selecionar um local.",
-    locationSelected: "✅ Local selecionado",
+    locationSelected: "âœ… Local selecionado",
     placeName: "Nome do lugar",
-    description: "Descrição",
-    save: "💾 Salvar",
+    description: "DescriÃ§Ã£o",
+    save: "ğŸ’¾ Salvar",
     cancel: "Cancelar",
-    selectedLocation: "📍 Local selecionado",
-    details: "📋 Ver detalhes",
+    selectedLocation: "ğŸ“ Local selecionado",
+    details: "ğŸ“‹ Ver detalhes",
     detailsTitle: "Detalhes",
-    map: "🗺️ Mostrar no mapa",
-    delete: "🗑️ Excluir lugar",
+    map: "ğŸ—ºï¸ Mostrar no mapa",
+    delete: "ğŸ—‘ï¸ Excluir lugar",
     close: "Fechar",
-    distance: "km de distância",
-    places: "🌍 Lugares Pi Economy",
+    distance: "km de distÃ¢ncia",
+    places: "ğŸŒ Lugares Pi Economy",
     nearbyPlaces:
-      "📍 Lugares em até 50 km — mais próximos primeiro",
+      "ğŸ“ Lugares em atÃ© 50 km â€” mais prÃ³ximos primeiro",
     results: "resultados",
-    searchingLocation: "📍 Obtendo sua localização...",
-    locationNotSupported: "❌ Localização não suportada.",
-    locationDenied: "❌ Permissão de localização negada.",
-    signInFirst: "❌ Entre com Pi primeiro.",
+    searchingLocation: "ğŸ“ Obtendo sua localizaÃ§Ã£o...",
+    locationNotSupported: "âŒ LocalizaÃ§Ã£o nÃ£o suportada.",
+    locationDenied: "âŒ PermissÃ£o de localizaÃ§Ã£o negada.",
+    signInFirst: "âŒ Entre com Pi primeiro.",
     deleteLogin:
-      "❌ Você precisa entrar com Pi para excluir.",
-    saving: "⏳ Salvando lugar...",
-    deleting: "⏳ Excluindo lugar...",
-    deleted: "excluído.",
+      "âŒ VocÃª precisa entrar com Pi para excluir.",
+    saving: "â³ Salvando lugar...",
+    deleting: "â³ Excluindo lugar...",
+    deleted: "excluÃ­do.",
     saved: "salvo.",
-    nameRequired: "❌ Digite o nome do lugar.",
-    descriptionTitle: "DESCRIÇÃO",
-    languageSelector: "🌐 Idioma do aplicativo",
+    nameRequired: "âŒ Digite o nome do lugar.",
+    descriptionTitle: "DESCRIÃ‡ÃƒO",
+    languageSelector: "ğŸŒ Idioma do aplicativo",
     confirmDelete:
       "Tem certeza de que deseja excluir este lugar?",
-    piSdkError: "❌ Não foi possível carregar o Pi SDK.",
+    piSdkError: "âŒ NÃ£o foi possÃ­vel carregar o Pi SDK.",
     piUserError:
-      "Não foi possível obter os dados do usuário Pi.",
+      "NÃ£o foi possÃ­vel obter os dados do usuÃ¡rio Pi.",
     backendError: "Falha no login do backend.",
-    loginFailed: "❌ Falha no login com Pi.",
+    loginFailed: "âŒ Falha no login com Pi.",
     locationChosen:
-      "📍 Local selecionado. Digite as informações.",
-    location: "📍 Localização",
-    anonymous: "Usuário",
+      "ğŸ“ Local selecionado. Digite as informaÃ§Ãµes.",
+    location: "ğŸ“ LocalizaÃ§Ã£o",
+    anonymous: "UsuÃ¡rio",
   },
 
   Russian: {
     appDescription:
-      "Открывайте магазины, товары, услуги и компании на базе Pi рядом с вами.",
-    signIn: "π Войти через Pi",
-    connected: "Pi подключён",
-    search: "🔎 Поиск мест, компаний или пользователей...",
-    nearby: "📍 Места рядом",
-    allPlaces: "🌍 Показать все места",
-    locationFound: "📍 Местоположение найдено",
-    nearestFirst: "📏 Сначала ближайшие места",
-    all: "Все",
-    stays: "Проживание",
-    shops: "Магазины",
-    food: "Еда",
-    services: "Услуги",
-    jobs: "Работа",
-    addPlace: "📍 Добавить место",
-    language: "Язык",
-    country: "Страна",
-    allLanguages: "🗣️ Все языки",
-    allCountries: "🌍 Все страны",
-    addPlaceTitle: "📍 Добавить место",
-    tapMap: "Нажмите на карту, чтобы выбрать место.",
-    locationSelected: "✅ Место выбрано",
-    placeName: "Название места",
-    description: "Описание",
-    save: "💾 Сохранить",
-    cancel: "Отмена",
-    selectedLocation: "📍 Выбранное место",
-    details: "📋 Подробнее",
-    detailsTitle: "Подробности",
-    map: "🗺️ Показать на карте",
-    delete: "🗑️ Удалить место",
-    close: "Закрыть",
-    distance: "км",
-    places: "🌍 Места Pi Economy",
+      "ĞÑ‚ĞºÑ€Ñ‹Ğ²Ğ°Ğ¹Ñ‚Ğµ Ğ¼Ğ°Ğ³Ğ°Ğ·Ğ¸Ğ½Ñ‹, Ñ‚Ğ¾Ğ²Ğ°Ñ€Ñ‹, ÑƒÑĞ»ÑƒĞ³Ğ¸ Ğ¸ ĞºĞ¾Ğ¼Ğ¿Ğ°Ğ½Ğ¸Ğ¸ Ğ½Ğ° Ğ±Ğ°Ğ·Ğµ Pi Ñ€ÑĞ´Ğ¾Ğ¼ Ñ Ğ²Ğ°Ğ¼Ğ¸.",
+    signIn: "Ï€ Ğ’Ğ¾Ğ¹Ñ‚Ğ¸ Ñ‡ĞµÑ€ĞµĞ· Pi",
+    connected: "Pi Ğ¿Ğ¾Ğ´ĞºĞ»ÑÑ‡Ñ‘Ğ½",
+    search: "ğŸ” ĞŸĞ¾Ğ¸ÑĞº Ğ¼ĞµÑÑ‚, ĞºĞ¾Ğ¼Ğ¿Ğ°Ğ½Ğ¸Ğ¹ Ğ¸Ğ»Ğ¸ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹...",
+    nearby: "ğŸ“ ĞœĞµÑÑ‚Ğ° Ñ€ÑĞ´Ğ¾Ğ¼",
+    allPlaces: "ğŸŒ ĞŸĞ¾ĞºĞ°Ğ·Ğ°Ñ‚ÑŒ Ğ²ÑĞµ Ğ¼ĞµÑÑ‚Ğ°",
+    locationFound: "ğŸ“ ĞœĞµÑÑ‚Ğ¾Ğ¿Ğ¾Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½Ğ¾",
+    nearestFirst: "ğŸ“ Ğ¡Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ° Ğ±Ğ»Ğ¸Ğ¶Ğ°Ğ¹ÑˆĞ¸Ğµ Ğ¼ĞµÑÑ‚Ğ°",
+    all: "Ğ’ÑĞµ",
+    stays: "ĞŸÑ€Ğ¾Ğ¶Ğ¸Ğ²Ğ°Ğ½Ğ¸Ğµ",
+    shops: "ĞœĞ°Ğ³Ğ°Ğ·Ğ¸Ğ½Ñ‹",
+    food: "Ğ•Ğ´Ğ°",
+    services: "Ğ£ÑĞ»ÑƒĞ³Ğ¸",
+    jobs: "Ğ Ğ°Ğ±Ğ¾Ñ‚Ğ°",
+    addPlace: "ğŸ“ Ğ”Ğ¾Ğ±Ğ°Ğ²Ğ¸Ñ‚ÑŒ Ğ¼ĞµÑÑ‚Ğ¾",
+    language: "Ğ¯Ğ·Ñ‹Ğº",
+    country: "Ğ¡Ñ‚Ñ€Ğ°Ğ½Ğ°",
+    allLanguages: "ğŸ—£ï¸ Ğ’ÑĞµ ÑĞ·Ñ‹ĞºĞ¸",
+    allCountries: "ğŸŒ Ğ’ÑĞµ ÑÑ‚Ñ€Ğ°Ğ½Ñ‹",
+    addPlaceTitle: "ğŸ“ Ğ”Ğ¾Ğ±Ğ°Ğ²Ğ¸Ñ‚ÑŒ Ğ¼ĞµÑÑ‚Ğ¾",
+    tapMap: "ĞĞ°Ğ¶Ğ¼Ğ¸Ñ‚Ğµ Ğ½Ğ° ĞºĞ°Ñ€Ñ‚Ñƒ, Ñ‡Ñ‚Ğ¾Ğ±Ñ‹ Ğ²Ñ‹Ğ±Ñ€Ğ°Ñ‚ÑŒ Ğ¼ĞµÑÑ‚Ğ¾.",
+    locationSelected: "âœ… ĞœĞµÑÑ‚Ğ¾ Ğ²Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ¾",
+    placeName: "ĞĞ°Ğ·Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ¼ĞµÑÑ‚Ğ°",
+    description: "ĞĞ¿Ğ¸ÑĞ°Ğ½Ğ¸Ğµ",
+    save: "ğŸ’¾ Ğ¡Ğ¾Ñ…Ñ€Ğ°Ğ½Ğ¸Ñ‚ÑŒ",
+    cancel: "ĞÑ‚Ğ¼ĞµĞ½Ğ°",
+    selectedLocation: "ğŸ“ Ğ’Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ½Ğ¾Ğµ Ğ¼ĞµÑÑ‚Ğ¾",
+    details: "ğŸ“‹ ĞŸĞ¾Ğ´Ñ€Ğ¾Ğ±Ğ½ĞµĞµ",
+    detailsTitle: "ĞŸĞ¾Ğ´Ñ€Ğ¾Ğ±Ğ½Ğ¾ÑÑ‚Ğ¸",
+    map: "ğŸ—ºï¸ ĞŸĞ¾ĞºĞ°Ğ·Ğ°Ñ‚ÑŒ Ğ½Ğ° ĞºĞ°Ñ€Ñ‚Ğµ",
+    delete: "ğŸ—‘ï¸ Ğ£Ğ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ Ğ¼ĞµÑÑ‚Ğ¾",
+    close: "Ğ—Ğ°ĞºÑ€Ñ‹Ñ‚ÑŒ",
+    distance: "ĞºĞ¼",
+    places: "ğŸŒ ĞœĞµÑÑ‚Ğ° Pi Economy",
     nearbyPlaces:
-      "📍 Места в пределах 50 км — ближайшие первыми",
-    results: "результаты",
-    searchingLocation: "📍 Определяем местоположение...",
-    locationNotSupported: "❌ Геолокация не поддерживается.",
+      "ğŸ“ ĞœĞµÑÑ‚Ğ° Ğ² Ğ¿Ñ€ĞµĞ´ĞµĞ»Ğ°Ñ… 50 ĞºĞ¼ â€” Ğ±Ğ»Ğ¸Ğ¶Ğ°Ğ¹ÑˆĞ¸Ğµ Ğ¿ĞµÑ€Ğ²Ñ‹Ğ¼Ğ¸",
+    results: "Ñ€ĞµĞ·ÑƒĞ»ÑŒÑ‚Ğ°Ñ‚Ñ‹",
+    searchingLocation: "ğŸ“ ĞĞ¿Ñ€ĞµĞ´ĞµĞ»ÑĞµĞ¼ Ğ¼ĞµÑÑ‚Ğ¾Ğ¿Ğ¾Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ...",
+    locationNotSupported: "âŒ Ğ“ĞµĞ¾Ğ»Ğ¾ĞºĞ°Ñ†Ğ¸Ñ Ğ½Ğµ Ğ¿Ğ¾Ğ´Ğ´ĞµÑ€Ğ¶Ğ¸Ğ²Ğ°ĞµÑ‚ÑÑ.",
     locationDenied:
-      "❌ Доступ к местоположению запрещён.",
-    signInFirst: "❌ Сначала войдите через Pi.",
+      "âŒ Ğ”Ğ¾ÑÑ‚ÑƒĞ¿ Ğº Ğ¼ĞµÑÑ‚Ğ¾Ğ¿Ğ¾Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ Ğ·Ğ°Ğ¿Ñ€ĞµÑ‰Ñ‘Ğ½.",
+    signInFirst: "âŒ Ğ¡Ğ½Ğ°Ñ‡Ğ°Ğ»Ğ° Ğ²Ğ¾Ğ¹Ğ´Ğ¸Ñ‚Ğµ Ñ‡ĞµÑ€ĞµĞ· Pi.",
     deleteLogin:
-      "❌ Для удаления необходимо войти через Pi.",
-    saving: "⏳ Сохранение места...",
-    deleting: "⏳ Удаление места...",
-    deleted: "удалено.",
-    saved: "сохранено.",
-    nameRequired: "❌ Введите название места.",
-    descriptionTitle: "ОПИСАНИЕ",
-    languageSelector: "🌐 Язык приложения",
+      "âŒ Ğ”Ğ»Ñ ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¸Ñ Ğ½ĞµĞ¾Ğ±Ñ…Ğ¾Ğ´Ğ¸Ğ¼Ğ¾ Ğ²Ğ¾Ğ¹Ñ‚Ğ¸ Ñ‡ĞµÑ€ĞµĞ· Pi.",
+    saving: "â³ Ğ¡Ğ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ¸Ğµ Ğ¼ĞµÑÑ‚Ğ°...",
+    deleting: "â³ Ğ£Ğ´Ğ°Ğ»ĞµĞ½Ğ¸Ğµ Ğ¼ĞµÑÑ‚Ğ°...",
+    deleted: "ÑƒĞ´Ğ°Ğ»ĞµĞ½Ğ¾.",
+    saved: "ÑĞ¾Ñ…Ñ€Ğ°Ğ½ĞµĞ½Ğ¾.",
+    nameRequired: "âŒ Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ½Ğ°Ğ·Ğ²Ğ°Ğ½Ğ¸Ğµ Ğ¼ĞµÑÑ‚Ğ°.",
+    descriptionTitle: "ĞĞŸĞ˜Ğ¡ĞĞĞ˜Ğ•",
+    languageSelector: "ğŸŒ Ğ¯Ğ·Ñ‹Ğº Ğ¿Ñ€Ğ¸Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ñ",
     confirmDelete:
-      "Вы уверены, что хотите удалить это место?",
-    piSdkError: "❌ Не удалось загрузить Pi SDK.",
+      "Ğ’Ñ‹ ÑƒĞ²ĞµÑ€ĞµĞ½Ñ‹, Ñ‡Ñ‚Ğ¾ Ñ…Ğ¾Ñ‚Ğ¸Ñ‚Ğµ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ ÑÑ‚Ğ¾ Ğ¼ĞµÑÑ‚Ğ¾?",
+    piSdkError: "âŒ ĞĞµ ÑƒĞ´Ğ°Ğ»Ğ¾ÑÑŒ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·Ğ¸Ñ‚ÑŒ Pi SDK.",
     piUserError:
-      "Не удалось получить данные пользователя Pi.",
-    backendError: "Ошибка входа через backend.",
-    loginFailed: "❌ Ошибка входа через Pi.",
+      "ĞĞµ ÑƒĞ´Ğ°Ğ»Ğ¾ÑÑŒ Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚ÑŒ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ Pi.",
+    backendError: "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ²Ñ…Ğ¾Ğ´Ğ° Ñ‡ĞµÑ€ĞµĞ· backend.",
+    loginFailed: "âŒ ĞÑˆĞ¸Ğ±ĞºĞ° Ğ²Ñ…Ğ¾Ğ´Ğ° Ñ‡ĞµÑ€ĞµĞ· Pi.",
     locationChosen:
-      "📍 Место выбрано. Введите информацию.",
-    location: "📍 Местоположение",
-    anonymous: "Пользователь",
+      "ğŸ“ ĞœĞµÑÑ‚Ğ¾ Ğ²Ñ‹Ğ±Ñ€Ğ°Ğ½Ğ¾. Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¸Ğ½Ñ„Ğ¾Ñ€Ğ¼Ğ°Ñ†Ğ¸Ñ.",
+    location: "ğŸ“ ĞœĞµÑÑ‚Ğ¾Ğ¿Ğ¾Ğ»Ğ¾Ğ¶ĞµĞ½Ğ¸Ğµ",
+    anonymous: "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ",
   },
 
   Chinese: {
     appDescription:
-      "发现附近由 Pi 驱动的商店、产品、服务和企业。",
-    signIn: "π 使用 Pi 登录",
-    connected: "Pi 已连接",
-    search: "🔎 搜索地点、商家或用户...",
-    nearby: "📍 附近地点",
-    allPlaces: "🌍 显示所有地点",
-    locationFound: "📍 已找到位置",
-    nearestFirst: "📏 优先显示最近的地点",
-    all: "全部",
-    stays: "住宿",
-    shops: "商店",
-    food: "餐饮",
-    services: "服务",
-    jobs: "工作",
-    addPlace: "📍 添加地点",
-    language: "语言",
-    country: "国家",
-    allLanguages: "🗣️ 所有语言",
-    allCountries: "🌍 所有国家",
-    addPlaceTitle: "📍 添加地点",
-    tapMap: "点击地图选择位置。",
-    locationSelected: "✅ 已选择位置",
-    placeName: "地点名称",
-    description: "描述",
-    save: "💾 保存",
-    cancel: "取消",
-    selectedLocation: "📍 已选择的位置",
-    details: "📋 查看详情",
-    detailsTitle: "详情",
-    map: "🗺️ 在地图上显示",
-    delete: "🗑️ 删除地点",
-    close: "关闭",
-    distance: "公里",
-    places: "🌍 Pi Economy 地点",
+      "å‘ç°é™„è¿‘ç”± Pi é©±åŠ¨çš„å•†åº—ã€äº§å“ã€æœåŠ¡å’Œä¼ä¸šã€‚",
+    signIn: "Ï€ ä½¿ç”¨ Pi ç™»å½•",
+    connected: "Pi å·²è¿æ¥",
+    search: "ğŸ” æœç´¢åœ°ç‚¹ã€å•†å®¶æˆ–ç”¨æˆ·...",
+    nearby: "ğŸ“ é™„è¿‘åœ°ç‚¹",
+    allPlaces: "ğŸŒ æ˜¾ç¤ºæ‰€æœ‰åœ°ç‚¹",
+    locationFound: "ğŸ“ å·²æ‰¾åˆ°ä½ç½®",
+    nearestFirst: "ğŸ“ ä¼˜å…ˆæ˜¾ç¤ºæœ€è¿‘çš„åœ°ç‚¹",
+    all: "å…¨éƒ¨",
+    stays: "ä½å®¿",
+    shops: "å•†åº—",
+    food: "é¤é¥®",
+    services: "æœåŠ¡",
+    jobs: "å·¥ä½œ",
+    addPlace: "ğŸ“ æ·»åŠ åœ°ç‚¹",
+    language: "è¯­è¨€",
+    country: "å›½å®¶",
+    allLanguages: "ğŸ—£ï¸ æ‰€æœ‰è¯­è¨€",
+    allCountries: "ğŸŒ æ‰€æœ‰å›½å®¶",
+    addPlaceTitle: "ğŸ“ æ·»åŠ åœ°ç‚¹",
+    tapMap: "ç‚¹å‡»åœ°å›¾é€‰æ‹©ä½ç½®ã€‚",
+    locationSelected: "âœ… å·²é€‰æ‹©ä½ç½®",
+    placeName: "åœ°ç‚¹åç§°",
+    description: "æè¿°",
+    save: "ğŸ’¾ ä¿å­˜",
+    cancel: "å–æ¶ˆ",
+    selectedLocation: "ğŸ“ å·²é€‰æ‹©çš„ä½ç½®",
+    details: "ğŸ“‹ æŸ¥çœ‹è¯¦æƒ…",
+    detailsTitle: "è¯¦æƒ…",
+    map: "ğŸ—ºï¸ åœ¨åœ°å›¾ä¸Šæ˜¾ç¤º",
+    delete: "ğŸ—‘ï¸ åˆ é™¤åœ°ç‚¹",
+    close: "å…³é—­",
+    distance: "å…¬é‡Œ",
+    places: "ğŸŒ Pi Economy åœ°ç‚¹",
     nearbyPlaces:
-      "📍 50 公里内的地点 — 最近的优先",
-    results: "结果",
-    searchingLocation: "📍 正在获取位置...",
-    locationNotSupported: "❌ 不支持定位。",
-    locationDenied: "❌ 定位权限被拒绝。",
-    signInFirst: "❌ 请先使用 Pi 登录。",
-    deleteLogin: "❌ 删除前必须使用 Pi 登录。",
-    saving: "⏳ 正在保存地点...",
-    deleting: "⏳ 正在删除地点...",
-    deleted: "已删除。",
-    saved: "已保存。",
-    nameRequired: "❌ 请输入地点名称。",
-    descriptionTitle: "描述",
-    languageSelector: "🌐 应用语言",
-    confirmDelete: "确定要删除这个地点吗？",
-    piSdkError: "❌ Pi SDK 无法加载。",
-    piUserError: "无法获取 Pi 用户信息。",
-    backendError: "后台登录失败。",
-    loginFailed: "❌ Pi 登录失败。",
+      "ğŸ“ 50 å…¬é‡Œå†…çš„åœ°ç‚¹ â€” æœ€è¿‘çš„ä¼˜å…ˆ",
+    results: "ç»“æœ",
+    searchingLocation: "ğŸ“ æ­£åœ¨è·å–ä½ç½®...",
+    locationNotSupported: "âŒ ä¸æ”¯æŒå®šä½ã€‚",
+    locationDenied: "âŒ å®šä½æƒé™è¢«æ‹’ç»ã€‚",
+    signInFirst: "âŒ è¯·å…ˆä½¿ç”¨ Pi ç™»å½•ã€‚",
+    deleteLogin: "âŒ åˆ é™¤å‰å¿…é¡»ä½¿ç”¨ Pi ç™»å½•ã€‚",
+    saving: "â³ æ­£åœ¨ä¿å­˜åœ°ç‚¹...",
+    deleting: "â³ æ­£åœ¨åˆ é™¤åœ°ç‚¹...",
+    deleted: "å·²åˆ é™¤ã€‚",
+    saved: "å·²ä¿å­˜ã€‚",
+    nameRequired: "âŒ è¯·è¾“å…¥åœ°ç‚¹åç§°ã€‚",
+    descriptionTitle: "æè¿°",
+    languageSelector: "ğŸŒ åº”ç”¨è¯­è¨€",
+    confirmDelete: "ç¡®å®šè¦åˆ é™¤è¿™ä¸ªåœ°ç‚¹å—ï¼Ÿ",
+    piSdkError: "âŒ Pi SDK æ— æ³•åŠ è½½ã€‚",
+    piUserError: "æ— æ³•è·å– Pi ç”¨æˆ·ä¿¡æ¯ã€‚",
+    backendError: "åå°ç™»å½•å¤±è´¥ã€‚",
+    loginFailed: "âŒ Pi ç™»å½•å¤±è´¥ã€‚",
     locationChosen:
-      "📍 已选择位置。请输入地点信息。",
-    location: "📍 位置",
-    anonymous: "用户",
+      "ğŸ“ å·²é€‰æ‹©ä½ç½®ã€‚è¯·è¾“å…¥åœ°ç‚¹ä¿¡æ¯ã€‚",
+    location: "ğŸ“ ä½ç½®",
+    anonymous: "ç”¨æˆ·",
   },
 
   Hindi: {
     appDescription:
-      "अपने आसपास Pi द्वारा संचालित स्टोर, उत्पाद, सेवाएँ और व्यवसाय खोजें।",
-    signIn: "π Pi से साइन इन करें",
-    connected: "Pi कनेक्टेड",
-    search: "🔎 स्थान, व्यवसाय या उपयोगकर्ता खोजें...",
-    nearby: "📍 आस-पास के स्थान",
-    allPlaces: "🌍 सभी स्थान दिखाएँ",
-    locationFound: "📍 स्थान मिल गया",
-    nearestFirst: "📏 सबसे नज़दीकी स्थान पहले",
-    all: "सभी",
-    stays: "रहने की जगह",
-    shops: "दुकानें",
-    food: "भोजन",
-    services: "सेवाएँ",
-    jobs: "नौकरियाँ",
-    addPlace: "📍 स्थान जोड़ें",
-    language: "भाषा",
-    country: "देश",
-    allLanguages: "🗣️ सभी भाषाएँ",
-    allCountries: "🌍 सभी देश",
-    addPlaceTitle: "📍 स्थान जोड़ें",
-    tapMap: "स्थान चुनने के लिए मानचित्र पर टैप करें।",
-    locationSelected: "✅ स्थान चुना गया",
-    placeName: "स्थान का नाम",
-    description: "विवरण",
-    save: "💾 सहेजें",
-    cancel: "रद्द करें",
-    selectedLocation: "📍 चयनित स्थान",
-    details: "📋 विवरण देखें",
-    detailsTitle: "विवरण",
-    map: "🗺️ मानचित्र पर दिखाएँ",
-    delete: "🗑️ स्थान हटाएँ",
-    close: "बंद करें",
-    distance: "किमी दूर",
-    places: "🌍 Pi Economy स्थान",
+      "à¤…à¤ªà¤¨à¥‡ à¤†à¤¸à¤ªà¤¾à¤¸ Pi à¤¦à¥à¤µà¤¾à¤°à¤¾ à¤¸à¤‚à¤šà¤¾à¤²à¤¿à¤¤ à¤¸à¥à¤Ÿà¥‹à¤°, à¤‰à¤¤à¥à¤ªà¤¾à¤¦, à¤¸à¥‡à¤µà¤¾à¤à¤ à¤”à¤° à¤µà¥à¤¯à¤µà¤¸à¤¾à¤¯ à¤–à¥‹à¤œà¥‡à¤‚à¥¤",
+    signIn: "Ï€ Pi à¤¸à¥‡ à¤¸à¤¾à¤‡à¤¨ à¤‡à¤¨ à¤•à¤°à¥‡à¤‚",
+    connected: "Pi à¤•à¤¨à¥‡à¤•à¥à¤Ÿà¥‡à¤¡",
+    search: "ğŸ” à¤¸à¥à¤¥à¤¾à¤¨, à¤µà¥à¤¯à¤µà¤¸à¤¾à¤¯ à¤¯à¤¾ à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤–à¥‹à¤œà¥‡à¤‚...",
+    nearby: "ğŸ“ à¤†à¤¸-à¤ªà¤¾à¤¸ à¤•à¥‡ à¤¸à¥à¤¥à¤¾à¤¨",
+    allPlaces: "ğŸŒ à¤¸à¤­à¥€ à¤¸à¥à¤¥à¤¾à¤¨ à¤¦à¤¿à¤–à¤¾à¤à¤",
+    locationFound: "ğŸ“ à¤¸à¥à¤¥à¤¾à¤¨ à¤®à¤¿à¤² à¤—à¤¯à¤¾",
+    nearestFirst: "ğŸ“ à¤¸à¤¬à¤¸à¥‡ à¤¨à¤œà¤¼à¤¦à¥€à¤•à¥€ à¤¸à¥à¤¥à¤¾à¤¨ à¤ªà¤¹à¤²à¥‡",
+    all: "à¤¸à¤­à¥€",
+    stays: "à¤°à¤¹à¤¨à¥‡ à¤•à¥€ à¤œà¤—à¤¹",
+    shops: "à¤¦à¥à¤•à¤¾à¤¨à¥‡à¤‚",
+    food: "à¤­à¥‹à¤œà¤¨",
+    services: "à¤¸à¥‡à¤µà¤¾à¤à¤",
+    jobs: "à¤¨à¥Œà¤•à¤°à¤¿à¤¯à¤¾à¤",
+    addPlace: "ğŸ“ à¤¸à¥à¤¥à¤¾à¤¨ à¤œà¥‹à¤¡à¤¼à¥‡à¤‚",
+    language: "à¤­à¤¾à¤·à¤¾",
+    country: "à¤¦à¥‡à¤¶",
+    allLanguages: "ğŸ—£ï¸ à¤¸à¤­à¥€ à¤­à¤¾à¤·à¤¾à¤à¤",
+    allCountries: "ğŸŒ à¤¸à¤­à¥€ à¤¦à¥‡à¤¶",
+    addPlaceTitle: "ğŸ“ à¤¸à¥à¤¥à¤¾à¤¨ à¤œà¥‹à¤¡à¤¼à¥‡à¤‚",
+    tapMap: "à¤¸à¥à¤¥à¤¾à¤¨ à¤šà¥à¤¨à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ à¤®à¤¾à¤¨à¤šà¤¿à¤¤à¥à¤° à¤ªà¤° à¤Ÿà¥ˆà¤ª à¤•à¤°à¥‡à¤‚à¥¤",
+    locationSelected: "âœ… à¤¸à¥à¤¥à¤¾à¤¨ à¤šà¥à¤¨à¤¾ à¤—à¤¯à¤¾",
+    placeName: "à¤¸à¥à¤¥à¤¾à¤¨ à¤•à¤¾ à¤¨à¤¾à¤®",
+    description: "à¤µà¤¿à¤µà¤°à¤£",
+    save: "ğŸ’¾ à¤¸à¤¹à¥‡à¤œà¥‡à¤‚",
+    cancel: "à¤°à¤¦à¥à¤¦ à¤•à¤°à¥‡à¤‚",
+    selectedLocation: "ğŸ“ à¤šà¤¯à¤¨à¤¿à¤¤ à¤¸à¥à¤¥à¤¾à¤¨",
+    details: "ğŸ“‹ à¤µà¤¿à¤µà¤°à¤£ à¤¦à¥‡à¤–à¥‡à¤‚",
+    detailsTitle: "à¤µà¤¿à¤µà¤°à¤£",
+    map: "ğŸ—ºï¸ à¤®à¤¾à¤¨à¤šà¤¿à¤¤à¥à¤° à¤ªà¤° à¤¦à¤¿à¤–à¤¾à¤à¤",
+    delete: "ğŸ—‘ï¸ à¤¸à¥à¤¥à¤¾à¤¨ à¤¹à¤Ÿà¤¾à¤à¤",
+    close: "à¤¬à¤‚à¤¦ à¤•à¤°à¥‡à¤‚",
+    distance: "à¤•à¤¿à¤®à¥€ à¤¦à¥‚à¤°",
+    places: "ğŸŒ Pi Economy à¤¸à¥à¤¥à¤¾à¤¨",
     nearbyPlaces:
-      "📍 50 किमी के भीतर के स्थान — सबसे नज़दीकी पहले",
-    results: "परिणाम",
+      "ğŸ“ 50 à¤•à¤¿à¤®à¥€ à¤•à¥‡ à¤­à¥€à¤¤à¤° à¤•à¥‡ à¤¸à¥à¤¥à¤¾à¤¨ â€” à¤¸à¤¬à¤¸à¥‡ à¤¨à¤œà¤¼à¤¦à¥€à¤•à¥€ à¤ªà¤¹à¤²à¥‡",
+    results: "à¤ªà¤°à¤¿à¤£à¤¾à¤®",
     searchingLocation:
-      "📍 आपका स्थान प्राप्त किया जा रहा है...",
+      "ğŸ“ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤¥à¤¾à¤¨ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤•à¤¿à¤¯à¤¾ à¤œà¤¾ à¤°à¤¹à¤¾ à¤¹à¥ˆ...",
     locationNotSupported:
-      "❌ स्थान सुविधा समर्थित नहीं है।",
+      "âŒ à¤¸à¥à¤¥à¤¾à¤¨ à¤¸à¥à¤µà¤¿à¤§à¤¾ à¤¸à¤®à¤°à¥à¤¥à¤¿à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥ˆà¥¤",
     locationDenied:
-      "❌ स्थान की अनुमति नहीं दी गई।",
-    signInFirst: "❌ पहले Pi से साइन इन करें।",
+      "âŒ à¤¸à¥à¤¥à¤¾à¤¨ à¤•à¥€ à¤…à¤¨à¥à¤®à¤¤à¤¿ à¤¨à¤¹à¥€à¤‚ à¤¦à¥€ à¤—à¤ˆà¥¤",
+    signInFirst: "âŒ à¤ªà¤¹à¤²à¥‡ Pi à¤¸à¥‡ à¤¸à¤¾à¤‡à¤¨ à¤‡à¤¨ à¤•à¤°à¥‡à¤‚à¥¤",
     deleteLogin:
-      "❌ हटाने के लिए Pi से साइन इन करना आवश्यक है।",
-    saving: "⏳ स्थान सहेजा जा रहा है...",
-    deleting: "⏳ स्थान हटाया जा रहा है...",
-    deleted: "हटा दिया गया।",
-    saved: "सहेजा गया।",
-    nameRequired: "❌ स्थान का नाम दर्ज करें।",
-    descriptionTitle: "विवरण",
-    languageSelector: "🌐 ऐप की भाषा",
+      "âŒ à¤¹à¤Ÿà¤¾à¤¨à¥‡ à¤•à¥‡ à¤²à¤¿à¤ Pi à¤¸à¥‡ à¤¸à¤¾à¤‡à¤¨ à¤‡à¤¨ à¤•à¤°à¤¨à¤¾ à¤†à¤µà¤¶à¥à¤¯à¤• à¤¹à¥ˆà¥¤",
+    saving: "â³ à¤¸à¥à¤¥à¤¾à¤¨ à¤¸à¤¹à¥‡à¤œà¤¾ à¤œà¤¾ à¤°à¤¹à¤¾ à¤¹à¥ˆ...",
+    deleting: "â³ à¤¸à¥à¤¥à¤¾à¤¨ à¤¹à¤Ÿà¤¾à¤¯à¤¾ à¤œà¤¾ à¤°à¤¹à¤¾ à¤¹à¥ˆ...",
+    deleted: "à¤¹à¤Ÿà¤¾ à¤¦à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾à¥¤",
+    saved: "à¤¸à¤¹à¥‡à¤œà¤¾ à¤—à¤¯à¤¾à¥¤",
+    nameRequired: "âŒ à¤¸à¥à¤¥à¤¾à¤¨ à¤•à¤¾ à¤¨à¤¾à¤® à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚à¥¤",
+    descriptionTitle: "à¤µà¤¿à¤µà¤°à¤£",
+    languageSelector: "ğŸŒ à¤à¤ª à¤•à¥€ à¤­à¤¾à¤·à¤¾",
     confirmDelete:
-      "क्या आप वाकई इस स्थान को हटाना चाहते हैं?",
-    piSdkError: "❌ Pi SDK लोड नहीं हो सका।",
+      "à¤•à¥à¤¯à¤¾ à¤†à¤ª à¤µà¤¾à¤•à¤ˆ à¤‡à¤¸ à¤¸à¥à¤¥à¤¾à¤¨ à¤•à¥‹ à¤¹à¤Ÿà¤¾à¤¨à¤¾ à¤šà¤¾à¤¹à¤¤à¥‡ à¤¹à¥ˆà¤‚?",
+    piSdkError: "âŒ Pi SDK à¤²à¥‹à¤¡ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¤¾à¥¤",
     piUserError:
-      "Pi उपयोगकर्ता की जानकारी प्राप्त नहीं हो सकी।",
-    backendError: "Backend साइन-इन विफल हुआ।",
-    loginFailed: "❌ Pi साइन-इन विफल हुआ।",
+      "Pi à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤ªà¥à¤°à¤¾à¤ªà¥à¤¤ à¤¨à¤¹à¥€à¤‚ à¤¹à¥‹ à¤¸à¤•à¥€à¥¤",
+    backendError: "Backend à¤¸à¤¾à¤‡à¤¨-à¤‡à¤¨ à¤µà¤¿à¤«à¤² à¤¹à¥à¤†à¥¤",
+    loginFailed: "âŒ Pi à¤¸à¤¾à¤‡à¤¨-à¤‡à¤¨ à¤µà¤¿à¤«à¤² à¤¹à¥à¤†à¥¤",
     locationChosen:
-      "📍 स्थान चुना गया। स्थान की जानकारी दर्ज करें।",
-    location: "📍 स्थान",
-    anonymous: "उपयोगकर्ता",
+      "ğŸ“ à¤¸à¥à¤¥à¤¾à¤¨ à¤šà¥à¤¨à¤¾ à¤—à¤¯à¤¾à¥¤ à¤¸à¥à¤¥à¤¾à¤¨ à¤•à¥€ à¤œà¤¾à¤¨à¤•à¤¾à¤°à¥€ à¤¦à¤°à¥à¤œ à¤•à¤°à¥‡à¤‚à¥¤",
+    location: "ğŸ“ à¤¸à¥à¤¥à¤¾à¤¨",
+    anonymous: "à¤‰à¤ªà¤¯à¥‹à¤—à¤•à¤°à¥à¤¤à¤¾",
   },
 } as const;
 
@@ -944,7 +945,7 @@ const initialPlaces: Place[] = [
     lng: 32.8597,
     description: "Pi-powered accommodation",
     language: "Turkish",
-    country: "Türkiye",
+    country: "TÃ¼rkiye",
   },
   {
     name: "Pi Market",
@@ -953,7 +954,7 @@ const initialPlaces: Place[] = [
     lng: 32.85,
     description: "Pi-powered shop",
     language: "Turkish",
-    country: "Türkiye",
+    country: "TÃ¼rkiye",
   },
   {
     name: "Pi Food",
@@ -962,7 +963,7 @@ const initialPlaces: Place[] = [
     lng: 32.87,
     description: "Pi-powered food business",
     language: "Turkish",
-    country: "Türkiye",
+    country: "TÃ¼rkiye",
   },
 ];
 
@@ -1068,6 +1069,24 @@ function PioneerMapPage() {
   const [places, setPlaces] =
     useState<Place[]>(initialPlaces);
 
+  const [favorites, setFavorites] = useState<Place[]>(() => {
+    try {
+      const saved = localStorage.getItem("pioneerMapFavorites");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "pioneerMapFavorites",
+        JSON.stringify(favorites)
+      );
+    } catch {}
+  }, [favorites]);
+
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
@@ -1116,7 +1135,7 @@ function PioneerMapPage() {
     useState("Turkish");
 
   const [placeCountry, setPlaceCountry] =
-    useState("Türkiye");
+    useState("TÃ¼rkiye");
 
   const mapRef =
     useRef<HTMLDivElement | null>(
@@ -1200,11 +1219,11 @@ function PioneerMapPage() {
 
       const welcome =
         appLanguage === "Turkish"
-          ? "Hoş geldin"
+          ? "HoÅŸ geldin"
           : appLanguage === "English"
           ? "Welcome"
           : appLanguage === "Arabic"
-          ? "مرحباً"
+          ? "Ù…Ø±Ø­Ø¨Ø§Ù‹"
           : appLanguage === "Spanish"
           ? "Bienvenido"
           : appLanguage === "French"
@@ -1214,13 +1233,13 @@ function PioneerMapPage() {
           : appLanguage === "Portuguese"
           ? "Bem-vindo"
           : appLanguage === "Russian"
-          ? "Добро пожаловать"
+          ? "Ğ”Ğ¾Ğ±Ñ€Ğ¾ Ğ¿Ğ¾Ğ¶Ğ°Ğ»Ğ¾Ğ²Ğ°Ñ‚ÑŒ"
           : appLanguage === "Chinese"
-          ? "欢迎"
-          : "स्वागत है";
+          ? "æ¬¢è¿"
+          : "à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ";
 
       setStatus(
-        `✅ ${welcome} @${auth.user.username}`
+        `âœ… ${welcome} @${auth.user.username}`
       );
     } catch (error) {
       console.error(
@@ -1233,7 +1252,7 @@ function PioneerMapPage() {
 
       setStatus(
         error instanceof Error
-          ? `❌ ${error.message}`
+          ? `âŒ ${error.message}`
           : t("loginFailed")
       );
     }
@@ -1303,7 +1322,7 @@ function PioneerMapPage() {
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
         attribution:
-          "© OpenStreetMap contributors",
+          "Â© OpenStreetMap contributors",
       }
     ).addTo(map);
 
@@ -1437,7 +1456,7 @@ function PioneerMapPage() {
   ) => {
     if (!place._id) {
       setStatus(
-        "❌ Place ID not found."
+        "âŒ Place ID not found."
       );
       return;
     }
@@ -1493,15 +1512,15 @@ function PioneerMapPage() {
       setSelectedPlace(null);
 
       setStatus(
-        `✅ ${place.name} ${t(
+        `âœ… ${place.name} ${t(
           "deleted"
         )}`
       );
     } catch (error) {
       setStatus(
         error instanceof Error
-          ? `❌ ${error.message}`
-          : "❌ Place could not be deleted."
+          ? `âŒ ${error.message}`
+          : "âŒ Place could not be deleted."
       );
     }
   };
@@ -1671,7 +1690,7 @@ function PioneerMapPage() {
                     color:#7b1fa2;
                     font-weight:700;
                   ">
-                    👤 @${place.username}
+                    ğŸ‘¤ @${place.username}
                   </div>
                 `
                 : ""
@@ -1712,7 +1731,7 @@ function PioneerMapPage() {
                     margin-top:7px;
                     font-size:13px;
                   ">
-                    🗣️ ${place.language}
+                    ğŸ—£ï¸ ${place.language}
                   </div>
                 `
                 : ""
@@ -1725,7 +1744,7 @@ function PioneerMapPage() {
                     margin-top:5px;
                     font-size:13px;
                   ">
-                    🌍 ${place.country}
+                    ğŸŒ ${place.country}
                   </div>
                 `
                 : ""
@@ -1739,7 +1758,7 @@ function PioneerMapPage() {
                     color:#1976D2;
                     font-weight:700;
                   ">
-                    📍 ${distance.toFixed(
+                    ğŸ“ ${distance.toFixed(
                       1
                     )} km
                   </div>
@@ -1971,7 +1990,7 @@ function PioneerMapPage() {
         "Turkish"
       );
       setPlaceCountry(
-        "Türkiye"
+        "TÃ¼rkiye"
       );
       setSelectedLocation(
         null
@@ -1979,7 +1998,7 @@ function PioneerMapPage() {
       setShowForm(false);
 
       setStatus(
-        `✅ ${savedPlace.name} ${t(
+        `âœ… ${savedPlace.name} ${t(
           "saved"
         )}`
       );
@@ -1991,8 +2010,8 @@ function PioneerMapPage() {
 
       setStatus(
         error instanceof Error
-          ? `❌ ${error.message}`
-          : "❌ Place could not be saved."
+          ? `âŒ ${error.message}`
+          : "âŒ Place could not be saved."
       );
     }
   };
@@ -2007,27 +2026,27 @@ function PioneerMapPage() {
   }> = [
     {
       name: "All",
-      icon: "🌍",
+      icon: "ğŸŒ",
     },
     {
       name: "Stays",
-      icon: "🏠",
+      icon: "ğŸ ",
     },
     {
       name: "Shops",
-      icon: "🛍️",
+      icon: "ğŸ›ï¸",
     },
     {
       name: "Food",
-      icon: "🍔",
+      icon: "ğŸ”",
     },
     {
       name: "Services",
-      icon: "🔧",
+      icon: "ğŸ”§",
     },
     {
       name: "Jobs",
-      icon: "💼",
+      icon: "ğŸ’¼",
     },
   ];
 
@@ -2108,7 +2127,7 @@ function PioneerMapPage() {
             fontSize: "34px",
           }}
         >
-          🗺️ PioneerMap
+          ğŸ—ºï¸ PioneerMap
         </h1>
 
         <p
@@ -2223,7 +2242,7 @@ function PioneerMapPage() {
                 "700",
             }}
           >
-            ✅ {t("connected")} —
+            âœ… {t("connected")} â€”
             @{username}
           </div>
         )}
@@ -2589,19 +2608,19 @@ function PioneerMapPage() {
             }}
           >
             <option value="Stays">
-              🏠 {t("stays")}
+              ğŸ  {t("stays")}
             </option>
             <option value="Shops">
-              🛍️ {t("shops")}
+              ğŸ›ï¸ {t("shops")}
             </option>
             <option value="Food">
-              🍔 {t("food")}
+              ğŸ” {t("food")}
             </option>
             <option value="Services">
-              🔧 {t("services")}
+              ğŸ”§ {t("services")}
             </option>
             <option value="Jobs">
-              💼 {t("jobs")}
+              ğŸ’¼ {t("jobs")}
             </option>
           </select>
 
@@ -2883,7 +2902,7 @@ function PioneerMapPage() {
                         "22px",
                     }}
                   >
-                    ×
+                    Ã—
                   </button>
                 </div>
 
@@ -2969,7 +2988,7 @@ function PioneerMapPage() {
                         "#eef7ff",
                     }}
                   >
-                    🗣️{" "}
+                    ğŸ—£ï¸{" "}
                     <strong>
                       {t(
                         "language"
@@ -2992,7 +3011,7 @@ function PioneerMapPage() {
                         "#f5f0ff",
                     }}
                   >
-                    🌍{" "}
+                    ğŸŒ{" "}
                     <strong>
                       {t(
                         "country"
@@ -3001,7 +3020,7 @@ function PioneerMapPage() {
                     <br />
                     {
                       selectedPlace.country ||
-                      "Türkiye"
+                      "TÃ¼rkiye"
                     }
                   </div>
                 </div>
@@ -3024,7 +3043,7 @@ function PioneerMapPage() {
                         "700",
                     }}
                   >
-                    👤 @
+                    ğŸ‘¤ @
                     {
                       selectedPlace.username
                     }
@@ -3050,7 +3069,7 @@ function PioneerMapPage() {
                         "700",
                     }}
                   >
-                    📍{" "}
+                    ğŸ“{" "}
                     {selectedDistance.toFixed(
                       1
                     )}{" "}
@@ -3163,15 +3182,15 @@ function PioneerMapPage() {
                 "nearbyPlaces"
               )
             : searchText.trim()
-            ? `🔎 "${searchText}" ${t(
+            ? `ğŸ” "${searchText}" ${t(
                 "results"
               )}`
             : activeLanguage !==
               "All"
-            ? `🗣️ ${activeLanguage}`
+            ? `ğŸ—£ï¸ ${activeLanguage}`
             : activeCountry !==
               "All"
-            ? `🌍 ${activeCountry}`
+            ? `ğŸŒ ${activeCountry}`
             : activeCategory ===
               "All"
             ? t("places")
@@ -3184,6 +3203,45 @@ function PioneerMapPage() {
               )}`}
         </div>
       </main>
+
+      {activeNav === "favorites" && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: "82px",
+            zIndex: 9000,
+            overflowY: "auto",
+            background: "#f5f7fa",
+            paddingTop: "15px",
+          }}
+        >
+          <Favorites
+            favorites={favorites}
+            onRemove={(id) => {
+              setFavorites((current) =>
+                current.filter((place) => place._id !== id)
+              );
+            }}
+            onPlaceClick={(place) => {
+              const found = places.find(
+                (item) => item._id === place._id
+              );
+
+              if (found) {
+                setSelectedPlace(found);
+                setActiveNav("home");
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }
+            }}
+          />
+        </div>
+      )}
 
       {/* =====================================================
       BOTTOM NAVIGATION
@@ -3215,27 +3273,27 @@ function PioneerMapPage() {
       >
         {[
           [
-            "🏠",
+            "ğŸ ",
             "Ana Sayfa",
             "home",
           ],
           [
-            "📍",
-            "Yakınımda",
+            "ğŸ“",
+            "YakÄ±nÄ±mda",
             "nearby",
           ],
           [
-            "➕",
+            "â•",
             "Yer Ekle",
             "add",
           ],
           [
-            "⭐",
+            "â­",
             "Favoriler",
             "favorites",
           ],
           [
-            "👤",
+            "ğŸ‘¤",
             "Profil",
             "profile",
           ],
@@ -3313,12 +3371,11 @@ function PioneerMapPage() {
                   key ===
                   "favorites"
                 ) {
-                  setStatus(
-                    appLanguage ===
-                      "English"
-                      ? "⭐ Favorites will be added next."
-                      : "⭐ Favoriler özelliği sıradaki adım."
-                  );
+                  setStatus("");
+                  window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                  });
                 }
 
                 if (
@@ -3327,11 +3384,11 @@ function PioneerMapPage() {
                 ) {
                   setStatus(
                     signedIn
-                      ? `👤 @${username}`
+                      ? `ğŸ‘¤ @${username}`
                       : appLanguage ===
                         "English"
-                      ? "👤 Please sign in with Pi."
-                      : "👤 Pi ile giriş yapmalısın."
+                      ? "ğŸ‘¤ Please sign in with Pi."
+                      : "ğŸ‘¤ Pi ile giriÅŸ yapmalÄ±sÄ±n."
                   );
                 }
               }}
