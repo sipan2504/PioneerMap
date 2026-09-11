@@ -3,7 +3,6 @@ import L from "leaflet";
 import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
 import Favorites from "../components/Favorites";
-import PlaceDetails from "../components/PlaceDetails";
 import PlaceList from "../components/PlaceList";
 import AddPlaceForm from "../components/AddPlaceForm";
 type Category =
@@ -2733,20 +2732,248 @@ function PioneerMapPage() {
         />
 
         {selectedPlace && (
-          <PlaceDetails
-            place={selectedPlace}
-            onClose={() => setSelectedPlace(null)}
-            onShowOnMap={(place) => {
-              const map = mapInstance.current;
-              if (map) {
-                map.setView([place.lat, place.lng], 15);
-              }
+          <section
+            id="pioneer-detail-card"
+            style={{
+              marginTop: "16px",
+              background: "#fff",
+              borderRadius: "18px",
+              padding: "18px",
+              boxShadow: "0 5px 20px rgba(0,0,0,.15)",
+              border: "1px solid #e5e7eb",
             }}
-            onDelete={(place) => deletePlace(place)}
-            isFavorite={isFavorite(selectedPlace)}
-            onToggleFavorite={(place) => toggleFavorite(place as Place)}
-            onShare={(place) => sharePlace(place as Place)}
-          />
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: "10px",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: "46px",
+                    lineHeight: 1,
+                  }}
+                >
+                  {selectedCategory?.icon || "📍"}
+                </div>
+                <h2 style={{ margin: "8px 0 0", fontSize: "28px" }}>
+                  {selectedPlace.name}
+                </h2>
+              </div>
+
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <button
+                  type="button"
+                  onClick={() => toggleFavorite(selectedPlace)}
+                  aria-label={isFavorite(selectedPlace) ? "Favorilerden çıkar" : "Favorilere ekle"}
+                  style={{
+                    minWidth: "48px",
+                    height: "40px",
+                    padding: "0 10px",
+                    border: "none",
+                    borderRadius: "20px",
+                    background: isFavorite(selectedPlace) ? "#FFF3CD" : "#f1f3f5",
+                    color: isFavorite(selectedPlace) ? "#E6A700" : "#555",
+                    fontSize: "22px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isFavorite(selectedPlace) ? "⭐" : "☆"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPlace(null)}
+                  aria-label={t("close")}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "50%",
+                    border: "none",
+                    background: "#eee",
+                    fontSize: "22px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {selectedPlace.image && (
+              <img
+                src={selectedPlace.image}
+                alt={selectedPlace.name}
+                style={{
+                  width: "100%",
+                  maxHeight: "280px",
+                  objectFit: "cover",
+                  borderRadius: "14px",
+                  marginTop: "14px",
+                  display: "block",
+                }}
+              />
+            )}
+
+            <div
+              style={{
+                display: "inline-block",
+                marginTop: "12px",
+                padding: "8px 15px",
+                borderRadius: "20px",
+                background: selectedCategory?.color || "#1976D2",
+                color: "#fff",
+                fontWeight: "700",
+              }}
+            >
+              {selectedCategory?.icon || "📍"} {categoryLabel(selectedPlace.category)}
+            </div>
+
+            <div
+              style={{
+                marginTop: "15px",
+                padding: "15px",
+                borderRadius: "12px",
+                background: "#f7f7f7",
+              }}
+            >
+              <strong>{t("descriptionTitle")}</strong>
+              <div style={{ marginTop: "6px", lineHeight: "1.5" }}>
+                {selectedPlace.description || "Pi Economy place"}
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "10px",
+                marginTop: "10px",
+              }}
+            >
+              <div style={{ padding: "13px", borderRadius: "12px", background: "#eef7ff" }}>
+                🗣️ <strong>{t("language")}</strong>
+                <br />
+                {selectedPlace.language || "Turkish"}
+              </div>
+              <div style={{ padding: "13px", borderRadius: "12px", background: "#f5f0ff" }}>
+                🌍 <strong>{t("country")}</strong>
+                <br />
+                {selectedPlace.country || "Türkiye"}
+              </div>
+            </div>
+
+            {selectedPlace.username && (
+              <div
+                style={{
+                  marginTop: "10px",
+                  padding: "13px",
+                  borderRadius: "12px",
+                  background: "#f3e5f5",
+                  color: "#7b1fa2",
+                  fontWeight: "700",
+                }}
+              >
+                👤 @{selectedPlace.username.replace(/^@/, "")}
+              </div>
+            )}
+
+            {selectedDistance !== null && (
+              <div
+                style={{
+                  marginTop: "10px",
+                  padding: "13px",
+                  borderRadius: "12px",
+                  background: "#e3f2fd",
+                  color: "#1565c0",
+                  fontWeight: "700",
+                }}
+              >
+                📍 {selectedDistance.toFixed(1)} {t("distance")}
+              </div>
+            )}
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "15px" }}>
+              <button
+                type="button"
+                onClick={() => toggleFavorite(selectedPlace)}
+                style={{
+                  padding: "13px",
+                  border: "none",
+                  borderRadius: "10px",
+                  background: isFavorite(selectedPlace) ? "#FFF3CD" : "#FFD54F",
+                  color: "#5D4500",
+                  fontWeight: "800",
+                  fontSize: "15px",
+                  cursor: "pointer",
+                }}
+              >
+                {isFavorite(selectedPlace) ? "⭐ Favorilerden Çıkar" : "⭐ Favorilere Ekle"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => sharePlace(selectedPlace)}
+                style={{
+                  padding: "13px",
+                  border: "none",
+                  borderRadius: "10px",
+                  background: "#E3F2FD",
+                  color: "#1565C0",
+                  fontWeight: "800",
+                  fontSize: "15px",
+                  cursor: "pointer",
+                }}
+              >
+                📤 Yeri Paylaş
+              </button>
+            </div>
+
+            <div style={{ display: "flex", gap: "9px", flexWrap: "wrap", marginTop: "10px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const map = mapInstance.current;
+                  if (map) map.setView([selectedPlace.lat, selectedPlace.lng], 15);
+                }}
+                style={{
+                  flex: 1,
+                  minWidth: "160px",
+                  padding: "13px",
+                  border: "none",
+                  borderRadius: "10px",
+                  background: "#1976D2",
+                  color: "#fff",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                }}
+              >
+                {t("map")}
+              </button>
+
+              {signedIn && username && selectedPlace.username === username && selectedPlace._id && (
+                <button
+                  type="button"
+                  onClick={() => deletePlace(selectedPlace)}
+                  style={{
+                    padding: "13px 16px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background: "#d32f2f",
+                    color: "#fff",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("delete")}
+                </button>
+              )}
+            </div>
+          </section>
         )}
 
         <section style={{ marginTop: "16px" }}>
@@ -2767,6 +2994,8 @@ function PioneerMapPage() {
               const found = places.find((item) => item._id === place._id);
               if (found) deletePlace(found);
             }}
+            onToggleFavorite={(place) => toggleFavorite(place as Place)}
+            isFavorite={(place) => isFavorite(place as Place)}
           />
         </section>
 
