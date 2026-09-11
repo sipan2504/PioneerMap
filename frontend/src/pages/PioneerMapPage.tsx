@@ -1022,6 +1022,7 @@ function PioneerMapPage() {
   ======================================================= */
 
   const [appLanguage, setAppLanguage] =
+  const [mapInteractive, setMapInteractive] = useState(false);
     useState<AppLanguage>(() => {
       try {
         const saved =
