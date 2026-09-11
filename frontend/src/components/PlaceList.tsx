@@ -16,45 +16,16 @@ type PlaceListProps = {
 };
 
 const styles: Record<string, CSSProperties> = {
-  section: {
-    width: "100%",
-    boxSizing: "border-box",
-    marginTop: 18,
-  },
+  section: { width: "100%", boxSizing: "border-box", marginTop: 18 },
   header: {
-    display: "flex",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 14,
+    display: "flex", alignItems: "flex-end", justifyContent: "space-between",
+    gap: 12, marginBottom: 14,
   },
-  title: {
-    margin: 0,
-    color: "#111827",
-    fontSize: 21,
-    fontWeight: 850,
-    letterSpacing: "-0.03em",
-  },
-  count: {
-    color: "#64748b",
-    fontSize: 12,
-    fontWeight: 700,
-    whiteSpace: "nowrap",
-  },
-  list: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 0,
-  },
+  title: { margin: 0, fontSize: 20, fontWeight: 850, color: "#111827" },
+  count: { fontSize: 12, color: "#6b7280", fontWeight: 700 },
   empty: {
-    padding: "28px 18px",
-    textAlign: "center",
-    border: "1px dashed #cbd5e1",
-    borderRadius: 18,
-    background: "#f8fafc",
-    color: "#64748b",
-    fontSize: 14,
-    fontWeight: 650,
+    padding: 24, border: "1px dashed #cbd5e1", borderRadius: 16,
+    background: "#f8fafc", color: "#64748b", textAlign: "center",
   },
 };
 
@@ -65,44 +36,34 @@ const PlaceList = ({
   onDelete,
   onToggleFavorite,
   isFavorite,
-  labels,
+  labels = {},
 }: PlaceListProps) => {
-  const text = {
-    title: labels?.title ?? "Yerler",
-    empty: labels?.empty ?? "Henüz gösterilecek yer yok.",
-    results: labels?.results ?? "sonuç",
-  };
+  const title = labels.title ?? "Places";
+  const empty = labels.empty ?? "No places found.";
+  const results = labels.results ?? "results";
 
   return (
-    <section style={styles.section} aria-label={text.title}>
+    <section style={styles.section}>
       <div style={styles.header}>
-        <h2 style={styles.title}>{text.title}</h2>
-        <span style={styles.count}>
-          {places.length} {text.results}
-        </span>
+        <h2 style={styles.title}>{title}</h2>
+        <span style={styles.count}>{places.length} {results}</span>
       </div>
 
       {places.length === 0 ? (
-        <div style={styles.empty}>{text.empty}</div>
+        <div style={styles.empty}>{empty}</div>
       ) : (
-        <div style={styles.list}>
-          {places.map((place, index) => {
-            const key = place._id || `${place.name}-${index}`;
-
-            return (
-              <PlaceCard
-                key={key}
-                place={place}
-                icon={place.category ? categoryIcons[place.category] ?? "•" : "•"}
-                onSelect={onSelect}
-                onDelete={onDelete}
-                onToggleFavorite={onToggleFavorite}
-                isFavorite={isFavorite ? isFavorite(place) : false}
-                labels={labels}
-              />
-            );
-          })}
-        </div>
+        places.map((place) => (
+          <PlaceCard
+            key={place._id ?? `${place.name}-${place.country ?? ""}`}
+            place={place}
+            icon={categoryIcons[place.category ?? ""] ?? "📍"}
+            onSelect={onSelect}
+            onDelete={onDelete}
+            onToggleFavorite={onToggleFavorite}
+            isFavorite={isFavorite ? isFavorite(place) : false}
+            labels={labels}
+          />
+        ))
       )}
     </section>
   );
