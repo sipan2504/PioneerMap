@@ -882,22 +882,6 @@ const translations = {
     anonymous: "उपयोगकर्ता",
   },
 } as const;
-type ExtraTranslation = {
-  home:string; nearby:string; add:string; favorites:string; profile:string; share:string; removeFavorite:string; addFavorite:string; showOnMap:string; delete:string; close:string; emptyFavorites:string; noPlaces:string; viewDetails:string; placeImage:string; removeImage:string; preparingPhoto:string; photoAdded:string; choosePhoto:string; savePlace:string; cancel:string; location:string; category:string; language:string; country:string; photoTooLarge:string;
-};
-const extraTranslations: Record<AppLanguage, ExtraTranslation> = {
-  Turkish:{home:"Ana Sayfa",nearby:"Yakınımda",add:"Yer Ekle",favorites:"Favoriler",profile:"Profil",share:"Paylaş",removeFavorite:"Favorilerden çıkar",addFavorite:"Favorilere ekle",showOnMap:"Haritada Göster",delete:"Yeri Sil",close:"Kapat",emptyFavorites:"Henüz favori eklenmedi.",noPlaces:"Henüz yer bulunamadı.",viewDetails:"Detayları Gör",placeImage:"İşletme Fotoğrafı",removeImage:"Fotoğrafı kaldır",preparingPhoto:"Fotoğraf hazırlanıyor...",photoAdded:"Fotoğraf eklendi.",choosePhoto:"Fotoğraf seç",savePlace:"Yeri Kaydet",cancel:"İptal",location:"Konum",category:"Kategori",language:"Dil",country:"Ülke",photoTooLarge:"Fotoğraf en fazla 10 MB olabilir."},
-  English:{home:"Home",nearby:"Nearby",add:"Add Place",favorites:"Favorites",profile:"Profile",share:"Share",removeFavorite:"Remove from favorites",addFavorite:"Add to favorites",showOnMap:"Show on Map",delete:"Delete Place",close:"Close",emptyFavorites:"No favorites yet.",noPlaces:"No places found yet.",viewDetails:"View Details",placeImage:"Place Photo",removeImage:"Remove photo",preparingPhoto:"Preparing photo...",photoAdded:"Photo added.",choosePhoto:"Choose photo",savePlace:"Save Place",cancel:"Cancel",location:"Location",category:"Category",language:"Language",country:"Country",photoTooLarge:"Photo must be 10 MB or less."},
-  Arabic:{home:"الرئيسية",nearby:"بالقرب مني",add:"إضافة مكان",favorites:"المفضلة",profile:"الملف الشخصي",share:"مشاركة",removeFavorite:"إزالة من المفضلة",addFavorite:"إضافة إلى المفضلة",showOnMap:"عرض على الخريطة",delete:"حذف المكان",close:"إغلاق",emptyFavorites:"لا توجد مفضلات بعد.",noPlaces:"لا توجد أماكن بعد.",viewDetails:"عرض التفاصيل",placeImage:"صورة المكان",removeImage:"إزالة الصورة",preparingPhoto:"جارٍ تجهيز الصورة...",photoAdded:"تمت إضافة الصورة.",choosePhoto:"اختر صورة",savePlace:"حفظ المكان",cancel:"إلغاء",location:"الموقع",category:"الفئة",language:"اللغة",country:"الدولة",photoTooLarge:"يجب ألا تتجاوز الصورة 10 ميغابايت."},
-  Spanish:{home:"Inicio",nearby:"Cerca",add:"Añadir lugar",favorites:"Favoritos",profile:"Perfil",share:"Compartir",removeFavorite:"Quitar de favoritos",addFavorite:"Añadir a favoritos",showOnMap:"Mostrar en el mapa",delete:"Eliminar lugar",close:"Cerrar",emptyFavorites:"Aún no hay favoritos.",noPlaces:"Aún no hay lugares.",viewDetails:"Ver detalles",placeImage:"Foto del lugar",removeImage:"Quitar foto",preparingPhoto:"Preparando foto...",photoAdded:"Foto añadida.",choosePhoto:"Elegir foto",savePlace:"Guardar lugar",cancel:"Cancelar",location:"Ubicación",category:"Categoría",language:"Idioma",country:"País",photoTooLarge:"La foto debe tener 10 MB o menos."},
-  French:{home:"Accueil",nearby:"À proximité",add:"Ajouter un lieu",favorites:"Favoris",profile:"Profil",share:"Partager",removeFavorite:"Retirer des favoris",addFavorite:"Ajouter aux favoris",showOnMap:"Afficher sur la carte",delete:"Supprimer le lieu",close:"Fermer",emptyFavorites:"Aucun favori pour le moment.",noPlaces:"Aucun lieu pour le moment.",viewDetails:"Voir les détails",placeImage:"Photo du lieu",removeImage:"Supprimer la photo",preparingPhoto:"Préparation de la photo...",photoAdded:"Photo ajoutée.",choosePhoto:"Choisir une photo",savePlace:"Enregistrer",cancel:"Annuler",location:"Emplacement",category:"Catégorie",language:"Langue",country:"Pays",photoTooLarge:"La photo doit faire 10 Mo ou moins."},
-  German:{home:"Startseite",nearby:"In der Nähe",add:"Ort hinzufügen",favorites:"Favoriten",profile:"Profil",share:"Teilen",removeFavorite:"Aus Favoriten entfernen",addFavorite:"Zu Favoriten hinzufügen",showOnMap:"Auf Karte anzeigen",delete:"Ort löschen",close:"Schließen",emptyFavorites:"Noch keine Favoriten.",noPlaces:"Noch keine Orte.",viewDetails:"Details anzeigen",placeImage:"Ortsfoto",removeImage:"Foto entfernen",preparingPhoto:"Foto wird vorbereitet...",photoAdded:"Foto hinzugefügt.",choosePhoto:"Foto auswählen",savePlace:"Ort speichern",cancel:"Abbrechen",location:"Standort",category:"Kategorie",language:"Sprache",country:"Land",photoTooLarge:"Das Foto darf höchstens 10 MB groß sein."},
-  Portuguese:{home:"Início",nearby:"Perto de mim",add:"Adicionar lugar",favorites:"Favoritos",profile:"Perfil",share:"Compartilhar",removeFavorite:"Remover dos favoritos",addFavorite:"Adicionar aos favoritos",showOnMap:"Mostrar no mapa",delete:"Excluir lugar",close:"Fechar",emptyFavorites:"Ainda não há favoritos.",noPlaces:"Ainda não há lugares.",viewDetails:"Ver detalhes",placeImage:"Foto do lugar",removeImage:"Remover foto",preparingPhoto:"Preparando foto...",photoAdded:"Foto adicionada.",choosePhoto:"Escolher foto",savePlace:"Salvar lugar",cancel:"Cancelar",location:"Localização",category:"Categoria",language:"Idioma",country:"País",photoTooLarge:"La foto debe tener 10 MB o menos."},
-  Russian:{home:"Главная",nearby:"Рядом",add:"Добавить место",favorites:"Избранное",profile:"Профиль",share:"Поделиться",removeFavorite:"Удалить из избранного",addFavorite:"Добавить в избранное",showOnMap:"Показать на карте",delete:"Удалить место",close:"Закрыть",emptyFavorites:"Избранных мест пока нет.",noPlaces:"Мест пока нет.",viewDetails:"Подробнее",placeImage:"Фото места",removeImage:"Удалить фото",preparingPhoto:"Подготовка фото...",photoAdded:"Фото добавлено.",choosePhoto:"Выбрать фото",savePlace:"Сохранить место",cancel:"Отмена",location:"Местоположение",category:"Категория",language:"Язык",country:"Страна",photoTooLarge:"Фото должно быть не более 10 МБ."},
-  Chinese:{home:"首页",nearby:"附近",add:"添加地点",favorites:"收藏",profile:"个人资料",share:"分享",removeFavorite:"取消收藏",addFavorite:"加入收藏",showOnMap:"在地图上显示",delete:"删除地点",close:"关闭",emptyFavorites:"暂无收藏。",noPlaces:"暂无地点。",viewDetails:"查看详情",placeImage:"地点照片",removeImage:"删除照片",preparingPhoto:"正在准备照片...",photoAdded:"照片已添加。",choosePhoto:"选择照片",savePlace:"保存地点",cancel:"取消",location:"位置",category:"类别",language:"语言",country:"国家",photoTooLarge:"照片大小必须不超过 10 MB。"},
-  Hindi:{home:"होम",nearby:"पास में",add:"स्थान जोड़ें",favorites:"पसंदीदा",profile:"प्रोफ़ाइल",share:"साझा करें",removeFavorite:"पसंदीदा से हटाएँ",addFavorite:"पसंदीदा में जोड़ें",showOnMap:"मानचित्र पर दिखाएँ",delete:"स्थान हटाएँ",close:"बंद करें",emptyFavorites:"अभी कोई पसंदीदा नहीं।",noPlaces:"अभी कोई स्थान नहीं।",viewDetails:"विवरण देखें",placeImage:"स्थान की फोटो",removeImage:"फोटो हटाएँ",preparingPhoto:"फोटो तैयार हो रही है...",photoAdded:"फोटो जोड़ दी गई।",choosePhoto:"फोटो चुनें",savePlace:"स्थान सहेजें",cancel:"रद्द करें",location:"स्थान",category:"श्रेणी",language:"भाषा",country:"देश",photoTooLarge:"फ़ोटो 10 MB या उससे कम होनी चाहिए।"},
-};
-
 
 type TranslationKey = keyof typeof translations.Turkish;
 
@@ -1230,6 +1214,8 @@ function PioneerMapPage() {
       lng: number;
     } | null>(null);
 
+  const [mapInteractive, setMapInteractive] = useState(false);
+
   const [placeName, setPlaceName] =
     useState("");
 
@@ -1428,11 +1414,12 @@ function PioneerMapPage() {
       return;
     }
 
-    const map =
-      L.map(mapRef.current).setView(
-        [39.9334, 32.8597],
-        6
-      );
+    const map = L.map(mapRef.current, {
+      dragging: false,
+      touchZoom: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+    }).setView([39.9334, 32.8597], 6);
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -1468,6 +1455,23 @@ function PioneerMapPage() {
       mapInstance.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map) return;
+
+    if (mapInteractive) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.scrollWheelZoom.enable();
+      map.doubleClickZoom.enable();
+    } else {
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.doubleClickZoom.disable();
+    }
+  }, [mapInteractive]);
 
   /* =======================================================
   NEARBY
@@ -2201,19 +2205,6 @@ function PioneerMapPage() {
     return t("jobs");
   };
 
-
-  const handlePlaceCategoryChange = (value: string) => {
-    if (value === "Stays" || value === "Shops" || value === "Food" || value === "Services" || value === "Jobs") {
-      setPlaceCategory(value);
-    }
-  };
-
-  const handleMapSelect = (location: { lat: number; lng: number }) => {
-    if (Number.isFinite(location.lat) && Number.isFinite(location.lng)) {
-      setSelectedLocation(location);
-    }
-  };
-
   /* =======================================================
   UI
   ======================================================= */
@@ -2648,7 +2639,7 @@ function PioneerMapPage() {
               border: "1px solid #e0e0e0",
             }}
           >
-            <div style={{ fontWeight: 800, marginBottom: "8px" }}>{extraTranslations[appLanguage].placeImage}</div>
+            <div style={{ fontWeight: 800, marginBottom: "8px" }}>📷 İşletme Fotoğrafı</div>
             <input
               type="file"
               accept="image/*"
@@ -2656,33 +2647,33 @@ function PioneerMapPage() {
                 const file = e.target.files?.[0];
                 if (!file) return;
                 if (!file.type.startsWith("image/")) {
-                  setStatus(t("nameRequired"));
+                  setStatus("❌ Lütfen bir fotoğraf seç.");
                   return;
                 }
                 if (file.size > 10 * 1024 * 1024) {
-                  setStatus(extraTranslations[appLanguage].photoTooLarge);
+                  setStatus("❌ Fotoğraf en fazla 10 MB olabilir.");
                   return;
                 }
                 try {
                   setImageUploading(true);
                   const compressed = await compressPlaceImage(file);
                   setPlaceImage(compressed);
-                  setStatus(extraTranslations[appLanguage].photoAdded);
+                  setStatus("📷 Fotoğraf eklendi.");
                 } catch (error) {
                   console.error("Photo error:", error);
-                  setStatus(t("backendError"));
+                  setStatus("❌ Fotoğraf eklenemedi.");
                 } finally {
                   setImageUploading(false);
                 }
               }}
               style={{ width: "100%", boxSizing: "border-box" }}
             />
-            {imageUploading && <div style={{ marginTop: "8px", fontWeight: 700 }}>{extraTranslations[appLanguage].preparingPhoto}</div>}
+            {imageUploading && <div style={{ marginTop: "8px", fontWeight: 700 }}>⏳ Fotoğraf hazırlanıyor...</div>}
             {placeImage && (
               <div style={{ marginTop: "12px" }}>
                 <img
                   src={placeImage}
-                  alt={extraTranslations[appLanguage].placeImage}
+                  alt="İşletme önizleme"
                   style={{ width: "100%", maxHeight: "220px", objectFit: "cover", borderRadius: "10px", display: "block" }}
                 />
                 <button
@@ -2690,7 +2681,7 @@ function PioneerMapPage() {
                   onClick={() => setPlaceImage("")}
                   style={{ marginTop: "8px", padding: "8px 12px", border: "none", borderRadius: "8px", background: "#eee", cursor: "pointer", fontWeight: 700 }}
                 >
-                  {extraTranslations[appLanguage].removeImage}
+                  🗑️ Fotoğrafı kaldır
                 </button>
               </div>
             )}
@@ -2702,7 +2693,17 @@ function PioneerMapPage() {
           placeDescription={placeDescription}
           setPlaceDescription={setPlaceDescription}
           placeCategory={placeCategory}
-          setPlaceCategory={handlePlaceCategoryChange}
+          setPlaceCategory={(value) => {
+            if (
+              value === "Stays" ||
+              value === "Shops" ||
+              value === "Food" ||
+              value === "Services" ||
+              value === "Jobs"
+            ) {
+              setPlaceCategory(value);
+            }
+          }}
           placeLanguage={placeLanguage}
           setPlaceLanguage={setPlaceLanguage}
           placeCountry={placeCountry}
@@ -2711,7 +2712,7 @@ function PioneerMapPage() {
           languages={languages.map((item) => item.value)}
           countries={countries.map((item) => item.value)}
           selectedLocation={selectedLocation}
-          onMapSelect={handleMapSelect}
+          onMapSelect={() => setMapInteractive(true)}
           onSubmit={addPlace}
           onCancel={() => {
             setShowForm(false);
@@ -2729,31 +2730,79 @@ function PioneerMapPage() {
           padding: "15px",
         }}
       >
-        <div
-          ref={mapRef}
-          style={{
-            width: "100%",
-            height: "500px",
+        <div style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => setMapInteractive((current) => !current)}
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              zIndex: 1000,
+              padding: "8px 12px",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              background: "#fff",
+              color: "#222",
+              fontWeight: 800,
+              fontSize: "12px",
+              cursor: "pointer",
+            }}
+          >
+            MAP {mapInteractive ? "ON" : "OFF"}
+          </button>
+          <div
+            ref={mapRef}
+            style={{
+              width: "100%",
+              height: "360px",
             borderRadius:
               "14px",
             overflow:
               "hidden",
             background:
               "#ddd",
-          }}
-        />
+            }}
+          />
+          {!mapInteractive && (
+            <div style={{
+              position: "absolute",
+              left: "50%",
+              bottom: "12px",
+              transform: "translateX(-50%)",
+              zIndex: 1000,
+              padding: "8px 12px",
+              borderRadius: "8px",
+              background: "rgba(255,255,255,.94)",
+              fontWeight: 700,
+              fontSize: "12px",
+              boxShadow: "0 2px 8px rgba(0,0,0,.18)",
+              pointerEvents: "none",
+            }}>
+              MAP OFF — Haritayı etkinleştir
+            </div>
+          )}
+        </div>
 
         {selectedPlace && (
           <PlaceDetails
             place={selectedPlace}
             onClose={() => setSelectedPlace(null)}
-            onShowOnMap={(place) => {
+            onShowOnMap={() => {
               const map = mapInstance.current;
-              if (map) {
-                map.setView([place.lat, place.lng], 15);
+              if (
+                map &&
+                Number.isFinite(Number(selectedPlace.lat)) &&
+                Number.isFinite(Number(selectedPlace.lng))
+              ) {
+                map.setView(
+                  [Number(selectedPlace.lat), Number(selectedPlace.lng)],
+                  15
+                );
+                setMapInteractive(true);
               }
             }}
-            onDelete={(place) => deletePlace(place as any)}
+            onDelete={(place) => deletePlace(place)}
             isFavorite={isFavorite(selectedPlace)}
             onToggleFavorite={(place) => toggleFavorite(place as Place)}
             onShare={(place) => sharePlace(place as Place)}
