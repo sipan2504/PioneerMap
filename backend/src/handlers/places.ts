@@ -47,6 +47,7 @@ export default function mountPlaceEndpoints(router: Router) {
         lat,
         lng,
         description,
+        image,
       } = req.body;
 
       if (
@@ -62,6 +63,36 @@ export default function mountPlaceEndpoints(router: Router) {
         });
       }
 
+      // Optional business/place photo.
+      // The frontend sends a compressed image as a data URL.
+      let placeImage: string | undefined;
+
+      if (image !== undefined && image !== null && image !== "") {
+        if (typeof image !== "string") {
+          return res.status(400).json({
+            error: "invalid_image",
+            message: "Image must be a string",
+          });
+        }
+
+        if (!image.startsWith("data:image/")) {
+          return res.status(400).json({
+            error: "invalid_image",
+            message: "Invalid image format",
+          });
+        }
+
+        // Prevent accidentally storing extremely large payloads.
+        if (image.length > 2_500_000) {
+          return res.status(413).json({
+            error: "image_too_large",
+            message: "Image is too large",
+          });
+        }
+
+        placeImage = image;
+      }
+
       const user = req.session.currentUser;
 
       const place = {
@@ -74,6 +105,7 @@ export default function mountPlaceEndpoints(router: Router) {
           : "Pi Economy place",
         username: user?.username || "anonymous",
         user_id: user?.uid || null,
+        ...(placeImage ? { image: placeImage } : {}),
         created_at: new Date(),
       };
 
