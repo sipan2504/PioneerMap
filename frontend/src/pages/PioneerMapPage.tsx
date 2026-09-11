@@ -152,7 +152,7 @@ const countries = [
   { value: "Armenia", label: "🇦🇲 Ermenistan" },
   { value: "Azerbaijan", label: "🇦🇿 Azerbaycan" },
   { value: "Kazakhstan", label: "🇰🇿 Kazakistan" },
-  { value: "Uzbekistan", label: "🇺🇿 Özbekistan" },
+  { value: "Uzbekistan", label: "🇺🇿 Kazakistan" },
   { value: "China", label: "🇨🇳 Çin" },
   { value: "Japan", label: "🇯🇵 Japonya" },
   { value: "South Korea", label: "🇰🇷 Güney Kore" },
@@ -1079,42 +1079,6 @@ function PioneerMapPage() {
       );
     } catch {}
   }, [favorites]);
-
-  const getPlaceKey = (place: Place) =>
-    place._id ||
-    `${place.name}|${place.lat}|${place.lng}`;
-
-  const isFavorite = (place: Place) =>
-    favorites.some(
-      (favorite) =>
-        getPlaceKey(favorite) ===
-        getPlaceKey(place)
-    );
-
-  const toggleFavorite = (place: Place) => {
-    setFavorites((current) => {
-      const key = getPlaceKey(place);
-      const exists = current.some(
-        (favorite) =>
-          getPlaceKey(favorite) === key
-      );
-
-      if (exists) {
-        return current.filter(
-          (favorite) =>
-            getPlaceKey(favorite) !== key
-        );
-      }
-
-      return [...current, place];
-    });
-
-    setStatus(
-      isFavorite(place)
-        ? "⭐ Favorilerden çıkarıldı."
-        : "⭐ Favorilere eklendi."
-    );
-  };
 
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
@@ -2907,80 +2871,32 @@ function PioneerMapPage() {
                     </h2>
                   </div>
 
-                  <div
+                  <button
+                    onClick={() =>
+                      setSelectedPlace(
+                        null
+                      )
+                    }
+                    aria-label={t(
+                      "close"
+                    )}
                     style={{
-                      display: "flex",
-                      gap: "8px",
-                      alignItems: "center",
+                      width:
+                        "38px",
+                      height:
+                        "38px",
+                      borderRadius:
+                        "50%",
+                      border:
+                        "none",
+                      background:
+                        "#eee",
+                      fontSize:
+                        "22px",
                     }}
                   >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleFavorite(
-                          selectedPlace
-                        )
-                      }
-                      aria-label={
-                        isFavorite(
-                          selectedPlace
-                        )
-                          ? "Favorilerden çıkar"
-                          : "Favorilere ekle"
-                      }
-                      style={{
-                        minWidth: "48px",
-                        height: "38px",
-                        padding: "0 10px",
-                        border: "none",
-                        borderRadius: "19px",
-                        background:
-                          isFavorite(
-                            selectedPlace
-                          )
-                            ? "#FFF3CD"
-                            : "#f1f3f5",
-                        color:
-                          isFavorite(
-                            selectedPlace
-                          )
-                            ? "#E6A700"
-                            : "#555",
-                        fontSize: "22px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      ⭐
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setSelectedPlace(
-                          null
-                        )
-                      }
-                      aria-label={t(
-                        "close"
-                      )}
-                      style={{
-                        width:
-                          "38px",
-                        height:
-                          "38px",
-                        borderRadius:
-                          "50%",
-                        border:
-                          "none",
-                        background:
-                          "#eee",
-                        fontSize:
-                          "22px",
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
+                    ×
+                  </button>
                 </div>
 
                 {/* CATEGORY */}
@@ -3155,39 +3071,6 @@ function PioneerMapPage() {
                     )}
                   </div>
                 )}
-
-                {/* FAVORITE */}
-                <button
-                  type="button"
-                  onClick={() =>
-                    toggleFavorite(
-                      selectedPlace
-                    )
-                  }
-                  style={{
-                    width: "100%",
-                    marginTop: "15px",
-                    padding: "13px",
-                    border: "none",
-                    borderRadius: "10px",
-                    background:
-                      isFavorite(
-                        selectedPlace
-                      )
-                        ? "#FFF3CD"
-                        : "#FFD54F",
-                    color: "#5D4500",
-                    fontWeight: "800",
-                    fontSize: "15px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {isFavorite(
-                    selectedPlace
-                  )
-                    ? "⭐ Favorilerden Çıkar"
-                    : "⭐ Favorilere Ekle"}
-                </button>
 
                 {/* ACTIONS */}
                 <div
