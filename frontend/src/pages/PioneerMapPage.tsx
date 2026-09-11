@@ -1,1 +1,3552 @@
-import { useEffect, useRef, useState } from "react"; import L from "leaflet"; import Toast from "../components/Toast"; import "leaflet/dist/leaflet.css"; import MapView from "../components/MapView"; import PlaceCard from "../components/PlaceCard"; import PlaceFilters from "../components/PlaceFilters"; import AddPlaceForm from "../components/AddPlaceForm"; import PlaceList from "../components/PlaceList"; import BottomNav from "../components/BottomNav"; import PlaceDetails from "../components/PlaceDetails"; import Favorites from "../components/Favorites"; type Category = | "All" | "Stays" | "Shops" | "Food" | "Services" | "Jobs"; type Place = { _id?: string; name: string; category: Exclude<Category, "All">; lat: number; lng: number; description: string; username?: string; user_id?: string | null; language?: string; country?: string; }; type AppLanguage = | "Turkish" | "English" | "Arabic" | "Spanish" | "French" | "German" | "Portuguese" | "Russian" | "Chinese" | "Hindi"; const categoryIcons: Record< Exclude<Category, "All">, { icon: string; color: string } > = { Stays: { icon: "ÄŸÅ¸ï¿½Â ", color: "#1976D2" }, Shops: { icon: "ÄŸÅ¸â€ºï¿½Ã¯Â¸ï¿½", color: "#E91E63" }, Food: { icon: "ÄŸÅ¸ï¿½â€�", color: "#FF9800" }, Services: { icon: "ÄŸÅ¸â€�Â§", color: "#009688" }, Jobs: { icon: "ÄŸÅ¸â€™Â¼", color: "#673AB7" }, }; /* ========================================================= FEATURE #4 PLACE LANGUAGE + COUNTRY DATA ========================================================= */ const languages = [ { value: "Turkish", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â· TÃƒÂ¼rkÃƒÂ§e" }, { value: "English", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Â§ English" }, { value: "Arabic", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â¦ Ã˜Â§Ã™â€žÃ˜Â¹Ã˜Â±Ã˜Â¨Ã™Å Ã˜Â©" }, { value: "Chinese", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â³ Ã¤Â¸Â­Ã¦â€“â€¡" }, { value: "Hindi", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â¤Â¹Ã Â¤Â¿Ã Â¤Â¨Ã Â¥ï¿½Ã Â¤Â¦Ã Â¥â‚¬" }, { value: "Spanish", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Â¸ EspaÃƒÂ±ol" }, { value: "French", label: "ÄŸÅ¸â€¡Â«ÄŸÅ¸â€¡Â· FranÃƒÂ§ais" }, { value: "Portuguese", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â¹ PortuguÃƒÂªs" }, { value: "Russian", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Âº ÄžÂ Ã‘Æ’Ã‘ï¿½Ã‘ï¿½ÄžÂºÄžÂ¸ÄžÂ¹" }, { value: "Bengali", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â© Ã Â¦Â¬Ã Â¦Â¾Ã Â¦â€šÃ Â¦Â²Ã Â¦Â¾" }, { value: "German", label: "ÄŸÅ¸â€¡Â©ÄŸÅ¸â€¡Âª Deutsch" }, { value: "Japanese", label: "ÄŸÅ¸â€¡Â¯ÄŸÅ¸â€¡Âµ Ã¦â€”Â¥Ã¦Å“Â¬Ã¨ÂªÅ¾" }, { value: "Korean", label: "ÄŸÅ¸â€¡Â°ÄŸÅ¸â€¡Â· Ã­â€¢Å“ÃªÂµÂ­Ã¬â€“Â´" }, { value: "Persian", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â· Ã™ï¿½Ã˜Â§Ã˜Â±Ã˜Â³Ã›Å’" }, { value: "Italian", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â¹ Italiano" }, { value: "Urdu", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â° Ã˜Â§Ã˜Â±Ã˜Â¯Ã™Ë†" }, { value: "Vietnamese", label: "ÄŸÅ¸â€¡Â»ÄŸÅ¸â€¡Â³ TiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t" }, { value: "Telugu", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â°Â¤Ã Â±â€ Ã Â°Â²Ã Â±ï¿½Ã Â°â€”Ã Â±ï¿½" }, { value: "Marathi", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â¤Â®Ã Â¤Â°Ã Â¤Â¾Ã Â¤Â Ã Â¥â‚¬" }, { value: "Tamil", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â®Â¤Ã Â®Â®Ã Â®Â¿Ã Â®Â´Ã Â¯ï¿½" }, { value: "Yue Chinese", label: "ÄŸÅ¸â€¡Â­ÄŸÅ¸â€¡Â° Ã§Â²ÂµÃ¨ÂªÅ¾" }, { value: "Wu Chinese", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â³ Ã¥ï¿½Â´Ã¨Â¯Â­" }, { value: "Gujarati", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Âªâ€”Ã Â«ï¿½Ã ÂªÅ“Ã ÂªÂ°Ã ÂªÂ¾Ã ÂªÂ¤Ã Â«â‚¬" }, { value: "Kannada", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â²â€¢Ã Â²Â¨Ã Â³ï¿½Ã Â²Â¨Ã Â²Â¡" }, { value: "Polish", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â± Polski" }, { value: "Ukrainian", label: "ÄŸÅ¸â€¡ÂºÄŸÅ¸â€¡Â¦ ÄžÂ£ÄžÂºÃ‘â‚¬ÄžÂ°Ã‘â€”ÄžÂ½Ã‘ï¿½Ã‘Å’ÄžÂºÄžÂ°" }, { value: "Malay", label: "ÄŸÅ¸â€¡Â²ÄŸÅ¸â€¡Â¾ Bahasa Melayu" }, { value: "Malayalam", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â´Â®Ã Â´Â²Ã Â´Â¯Ã Â´Â¾Ã Â´Â³Ã Â´â€š" }, { value: "Odia", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â¬â€œÃ Â¬Â¡Ã Â¬Â¼Ã Â¬Â¿Ã Â¬â€ " }, { value: "Punjabi", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â¨ÂªÃ Â©Â°Ã Â¨Å“Ã Â¨Â¾Ã Â¨Â¬Ã Â©â‚¬" }, { value: "Romanian", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Â´ RomÃƒÂ¢nÃ„Æ’" }, { value: "Dutch", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Â± Nederlands" }, { value: "Greek", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Â· ÃŽâ€¢ÃŽÂ»ÃŽÂ»ÃŽÂ·ÃŽÂ½ÃŽÂ¹ÃŽÂºÃŽÂ¬" }, { value: "Czech", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â¿ Ã„Å’eÃ…Â¡tina" }, { value: "Swedish", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Âª Svenska" }, { value: "Hungarian", label: "ÄŸÅ¸â€¡Â­ÄŸÅ¸â€¡Âº Magyar" }, { value: "Hebrew", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â± Ã—Â¢Ã—â€˜Ã—Â¨Ã—â„¢Ã—Âª" }, { value: "Finnish", label: "ÄŸÅ¸â€¡Â«ÄŸÅ¸â€¡Â® Suomi" }, { value: "Norwegian", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Â´ Norsk" }, { value: "Danish", label: "ÄŸÅ¸â€¡Â©ÄŸÅ¸â€¡Â° Dansk" }, { value: "Bulgarian", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â¬ Äžâ€˜Ã‘Å ÄžÂ»ÄžÂ³ÄžÂ°Ã‘â‚¬Ã‘ï¿½ÄžÂºÄžÂ¸" }, { value: "Serbian", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Â¸ ÄžÂ¡Ã‘â‚¬ÄžÂ¿Ã‘ï¿½ÄžÂºÄžÂ¸" }, { value: "Croatian", label: "ÄŸÅ¸â€¡Â­ÄŸÅ¸â€¡Â· Hrvatski" }, { value: "Slovak", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â° SlovenÃ„ï¿½ina" }, { value: "Lithuanian", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â¹ LietuviÃ…Â³" }, { value: "Slovenian", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â® SlovenÃ…Â¡Ã„ï¿½ina" }, { value: "Latvian", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â» LatvieÃ…Â¡u" }, { value: "Estonian", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Âª Eesti" }, { value: "Thai", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â­ Ã Â¹â€žÃ Â¸â€”Ã Â¸Â¢" }, { value: "Indonesian", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â© Bahasa Indonesia" }, ]; const countries = [ { value: "TÃƒÂ¼rkiye", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â· TÃƒÂ¼rkiye" }, { value: "United States", label: "ÄŸÅ¸â€¡ÂºÄŸÅ¸â€¡Â¸ ABD" }, { value: "Canada", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â¦ Kanada" }, { value: "Mexico", label: "ÄŸÅ¸â€¡Â²ÄŸÅ¸â€¡Â½ Meksika" }, { value: "Brazil", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â· Brezilya" }, { value: "Argentina", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Â· Arjantin" }, { value: "Chile", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â± Ã…Å¾ili" }, { value: "Colombia", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â´ Kolombiya" }, { value: "Peru", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Âª Peru" }, { value: "United Kingdom", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Â§ Ã„Â°ngiltere" }, { value: "Ireland", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Âª Ã„Â°rlanda" }, { value: "France", label: "ÄŸÅ¸â€¡Â«ÄŸÅ¸â€¡Â· Fransa" }, { value: "Germany", label: "ÄŸÅ¸â€¡Â©ÄŸÅ¸â€¡Âª Almanya" }, { value: "Italy", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â¹ Ã„Â°talya" }, { value: "Spain", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Â¸ Ã„Â°spanya" }, { value: "Portugal", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â¹ Portekiz" }, { value: "Netherlands", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Â± Hollanda" }, { value: "Belgium", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Âª BelÃƒÂ§ika" }, { value: "Switzerland", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â­ Ã„Â°sviÃƒÂ§re" }, { value: "Austria", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Â¹ Avusturya" }, { value: "Sweden", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Âª Ã„Â°sveÃƒÂ§" }, { value: "Norway", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Â´ NorveÃƒÂ§" }, { value: "Denmark", label: "ÄŸÅ¸â€¡Â©ÄŸÅ¸â€¡Â° Danimarka" }, { value: "Finland", label: "ÄŸÅ¸â€¡Â«ÄŸÅ¸â€¡Â® Finlandiya" }, { value: "Iceland", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â¸ Ã„Â°zlanda" }, { value: "Poland", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â± Polonya" }, { value: "Czechia", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â¿ Ãƒâ€¡ekya" }, { value: "Slovakia", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â° Slovakya" }, { value: "Hungary", label: "ÄŸÅ¸â€¡Â­ÄŸÅ¸â€¡Âº Macaristan" }, { value: "Romania", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Â´ Romanya" }, { value: "Bulgaria", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â¬ Bulgaristan" }, { value: "Greece", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Â· Yunanistan" }, { value: "Ukraine", label: "ÄŸÅ¸â€¡ÂºÄŸÅ¸â€¡Â¦ Ukrayna" }, { value: "Serbia", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Â¸ SÃ„Â±rbistan" }, { value: "Croatia", label: "ÄŸÅ¸â€¡Â­ÄŸÅ¸â€¡Â· HÃ„Â±rvatistan" }, { value: "Slovenia", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â® Slovenya" }, { value: "Bosnia and Herzegovina", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â¦ Bosna-Hersek" }, { value: "Albania", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Â± Arnavutluk" }, { value: "Lithuania", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â¹ Litvanya" }, { value: "Latvia", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â» Letonya" }, { value: "Estonia", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Âª Estonya" }, { value: "Russia", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Âº Rusya" }, { value: "Georgia", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Âª GÃƒÂ¼rcistan" }, { value: "Armenia", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Â² Ermenistan" }, { value: "Azerbaijan", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Â¿ Azerbaycan" }, { value: "Kazakhstan", label: "ÄŸÅ¸â€¡Â°ÄŸÅ¸â€¡Â¿ Kazakistan" }, { value: "Uzbekistan", label: "ÄŸÅ¸â€¡ÂºÄŸÅ¸â€¡Â¿ Kazakistan" }, { value: "China", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â³ Ãƒâ€¡in" }, { value: "Japan", label: "ÄŸÅ¸â€¡Â¯ÄŸÅ¸â€¡Âµ Japonya" }, { value: "South Korea", label: "ÄŸÅ¸â€¡Â°ÄŸÅ¸â€¡Â· GÃƒÂ¼ney Kore" }, { value: "India", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Hindistan" }, { value: "Pakistan", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â° Pakistan" }, { value: "Bangladesh", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â© BangladeÃ…Å¸" }, { value: "Nepal", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Âµ Nepal" }, { value: "Sri Lanka", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â° Sri Lanka" }, { value: "Thailand", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â­ Tayland" }, { value: "Vietnam", label: "ÄŸÅ¸â€¡Â»ÄŸÅ¸â€¡Â³ Vietnam" }, { value: "Malaysia", label: "ÄŸÅ¸â€¡Â²ÄŸÅ¸â€¡Â¾ Malezya" }, { value: "Singapore", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â¬ Singapur" }, { value: "Indonesia", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â© Endonezya" }, { value: "Philippines", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â­ Filipinler" }, { value: "Australia", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Âº Avustralya" }, { value: "New Zealand", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Â¿ Yeni Zelanda" }, { value: "Saudi Arabia", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â¦ Suudi Arabistan" }, { value: "United Arab Emirates", label: "ÄŸÅ¸â€¡Â¦ÄŸÅ¸â€¡Âª BAE" }, { value: "Qatar", label: "ÄŸÅ¸â€¡Â¶ÄŸÅ¸â€¡Â¦ Katar" }, { value: "Kuwait", label: "ÄŸÅ¸â€¡Â°ÄŸÅ¸â€¡Â¼ Kuveyt" }, { value: "Bahrain", label: "ÄŸÅ¸â€¡Â§ÄŸÅ¸â€¡Â­ Bahreyn" }, { value: "Oman", label: "ÄŸÅ¸â€¡Â´ÄŸÅ¸â€¡Â² Umman" }, { value: "Jordan", label: "ÄŸÅ¸â€¡Â¯ÄŸÅ¸â€¡Â´ ÃƒÅ“rdÃƒÂ¼n" }, { value: "Lebanon", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â§ LÃƒÂ¼bnan" }, { value: "Israel", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â± Ã„Â°srail" }, { value: "Iraq", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â¶ Irak" }, { value: "Iran", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â· Ã„Â°ran" }, { value: "Egypt", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Â¬ MÃ„Â±sÃ„Â±r" }, { value: "Morocco", label: "ÄŸÅ¸â€¡Â²ÄŸÅ¸â€¡Â¦ Fas" }, { value: "Algeria", label: "ÄŸÅ¸â€¡Â©ÄŸÅ¸â€¡Â¿ Cezayir" }, { value: "Tunisia", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â³ Tunus" }, { value: "Libya", label: "ÄŸÅ¸â€¡Â±ÄŸÅ¸â€¡Â¾ Libya" }, { value: "South Africa", label: "ÄŸÅ¸â€¡Â¿ÄŸÅ¸â€¡Â¦ GÃƒÂ¼ney Afrika" }, { value: "Nigeria", label: "ÄŸÅ¸â€¡Â³ÄŸÅ¸â€¡Â¬ Nijerya" }, { value: "Ghana", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Â­ Gana" }, { value: "Kenya", label: "ÄŸÅ¸â€¡Â°ÄŸÅ¸â€¡Âª Kenya" }, { value: "Ethiopia", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Â¹ Etiyopya" }, { value: "Tanzania", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â¿ Tanzanya" }, ]; /* ========================================================= FEATURE #5 APP LANGUAGE ========================================================= */ const appLanguages: Array<{ value: AppLanguage; label: string; }> = [ { value: "Turkish", label: "ÄŸÅ¸â€¡Â¹ÄŸÅ¸â€¡Â· TÃƒÂ¼rkÃƒÂ§e" }, { value: "English", label: "ÄŸÅ¸â€¡Â¬ÄŸÅ¸â€¡Â§ English" }, { value: "Arabic", label: "ÄŸÅ¸â€¡Â¸ÄŸÅ¸â€¡Â¦ Ã˜Â§Ã™â€žÃ˜Â¹Ã˜Â±Ã˜Â¨Ã™Å Ã˜Â©" }, { value: "Spanish", label: "ÄŸÅ¸â€¡ÂªÄŸÅ¸â€¡Â¸ EspaÃƒÂ±ol" }, { value: "French", label: "ÄŸÅ¸â€¡Â«ÄŸÅ¸â€¡Â· FranÃƒÂ§ais" }, { value: "German", label: "ÄŸÅ¸â€¡Â©ÄŸÅ¸â€¡Âª Deutsch" }, { value: "Portuguese", label: "ÄŸÅ¸â€¡ÂµÄŸÅ¸â€¡Â¹ PortuguÃƒÂªs" }, { value: "Russian", label: "ÄŸÅ¸â€¡Â·ÄŸÅ¸â€¡Âº ÄžÂ Ã‘Æ’Ã‘ï¿½Ã‘ï¿½ÄžÂºÄžÂ¸ÄžÂ¹" }, { value: "Chinese", label: "ÄŸÅ¸â€¡Â¨ÄŸÅ¸â€¡Â³ Ã¤Â¸Â­Ã¦â€“â€¡" }, { value: "Hindi", label: "ÄŸÅ¸â€¡Â®ÄŸÅ¸â€¡Â³ Ã Â¤Â¹Ã Â¤Â¿Ã Â¤Â¨Ã Â¥ï¿½Ã Â¤Â¦Ã Â¥â‚¬" }, ]; const translations = { Turkish: { appDescription: "Pi destekli maÃ„Å¸azalarÃ„Â±, ÃƒÂ¼rÃƒÂ¼nleri, hizmetleri ve iÃ…Å¸letmeleri yakÃ„Â±nÃ„Â±nda keÃ…Å¸fet.", signIn: "Ã�â‚¬ Pi ile GiriÃ…Å¸ Yap", connected: "Pi BaÃ„Å¸landÃ„Â±", search: "ÄŸÅ¸â€�Å½ Yer, iÃ…Å¸letme veya kullanÃ„Â±cÃ„Â± ara...", nearby: "ÄŸÅ¸â€œï¿½ YakÃ„Â±nÃ„Â±mdaki Yerler", allPlaces: "ÄŸÅ¸Å’ï¿½ TÃƒÂ¼m Yerleri GÃƒÂ¶ster", locationFound: "ÄŸÅ¸â€œï¿½ Konumun bulundu", nearestFirst: "ÄŸÅ¸â€œï¿½ En yakÃ„Â±n yerler ÃƒÂ¶nce gÃƒÂ¶steriliyor", all: "TÃƒÂ¼mÃƒÂ¼", stays: "Konaklama", shops: "MaÃ„Å¸azalar", food: "Yemek", services: "Hizmetler", jobs: "Ã„Â°Ã…Å¸ler", addPlace: "ÄŸÅ¸â€œï¿½ Yer Ekle", language: "Dil", country: "ÃƒÅ“lke", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ TÃƒÂ¼m Diller", allCountries: "ÄŸÅ¸Å’ï¿½ TÃƒÂ¼m ÃƒÅ“lkeler", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Yer Ekle", tapMap: "Konum seÃƒÂ§mek iÃƒÂ§in haritaya dokunabilirsin.", locationSelected: "Ã¢Å“â€¦ Konum seÃƒÂ§ildi", placeName: "Yer adÃ„Â±", description: "AÃƒÂ§Ã„Â±klama", save: "ÄŸÅ¸â€™Â¾ Kaydet", cancel: "Ã„Â°ptal", selectedLocation: "ÄŸÅ¸â€œï¿½ SeÃƒÂ§ilen konum", details: "ÄŸÅ¸â€œâ€¹ DetaylarÃ„Â± GÃƒÂ¶r", detailsTitle: "Detaylar", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Haritada GÃƒÂ¶ster", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Yeri Sil", close: "Kapat", distance: "km uzaklÃ„Â±kta", places: "ÄŸÅ¸Å’ï¿½ Pi Economy Yerleri", nearbyPlaces: "ÄŸÅ¸â€œï¿½ 50 km iÃƒÂ§indeki yerler Ã¢â‚¬â€� en yakÃ„Â±ndan uzaÃ„Å¸a", results: "sonuÃƒÂ§larÃ„Â±", searchingLocation: "ÄŸÅ¸â€œï¿½ Konumun alÃ„Â±nÃ„Â±yor...", locationNotSupported: "Ã¢ï¿½Å’ Konum ÃƒÂ¶zelliÃ„Å¸i desteklenmiyor.", locationDenied: "Ã¢ï¿½Å’ Konum izni verilmedi.", signInFirst: "Ã¢ï¿½Å’ Ãƒâ€“nce Pi ile giriÃ…Å¸ yapmalÃ„Â±sÃ„Â±n.", deleteLogin: "Ã¢ï¿½Å’ Silmek iÃƒÂ§in Pi ile giriÃ…Å¸ yapmalÃ„Â±sÃ„Â±n.", saving: "Ã¢ï¿½Â³ Yer kaydediliyor...", deleting: "Ã¢ï¿½Â³ Yer siliniyor...", deleted: "silindi.", saved: "kaydedildi.", nameRequired: "Ã¢ï¿½Å’ Yer adÃ„Â±nÃ„Â± yaz.", descriptionTitle: "AÃƒâ€¡IKLAMA", languageSelector: "ÄŸÅ¸Å’ï¿½ Uygulama Dili", confirmDelete: "yerini silmek istediÃ„Å¸ine emin misin?", piSdkError: "Ã¢ï¿½Å’ Pi SDK yÃƒÂ¼klenemedi.", piUserError: "Pi kullanÃ„Â±cÃ„Â± bilgisi alÃ„Â±namadÃ„Â±.", backendError: "Backend giriÃ…Å¸ iÃ…Å¸lemi baÃ…Å¸arÃ„Â±sÃ„Â±z.", loginFailed: "Ã¢ï¿½Å’ Pi Sign-In baÃ…Å¸arÃ„Â±sÃ„Â±z.", locationChosen: "ÄŸÅ¸â€œï¿½ Konum seÃƒÂ§ildi. Yer bilgilerini gir.", location: "ÄŸÅ¸â€œï¿½ Konum", anonymous: "KullanÃ„Â±cÃ„Â±", }, English: { appDescription: "Discover Pi-powered stores, products, services, and businesses near you.", signIn: "Ã�â‚¬ Sign in with Pi", connected: "Pi Connected", search: "ÄŸÅ¸â€�Å½ Search places, businesses or users...", nearby: "ÄŸÅ¸â€œï¿½ Nearby Places", allPlaces: "ÄŸÅ¸Å’ï¿½ Show All Places", locationFound: "ÄŸÅ¸â€œï¿½ Location found", nearestFirst: "ÄŸÅ¸â€œï¿½ Nearest places shown first", all: "All", stays: "Stays", shops: "Shops", food: "Food", services: "Services", jobs: "Jobs", addPlace: "ÄŸÅ¸â€œï¿½ Add Place", language: "Language", country: "Country", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ All Languages", allCountries: "ÄŸÅ¸Å’ï¿½ All Countries", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Add Place", tapMap: "Tap the map to select a location.", locationSelected: "Ã¢Å“â€¦ Location selected", placeName: "Place name", description: "Description", save: "ÄŸÅ¸â€™Â¾ Save", cancel: "Cancel", selectedLocation: "ÄŸÅ¸â€œï¿½ Selected location", details: "ÄŸÅ¸â€œâ€¹ View Details", detailsTitle: "Details", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Show on Map", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Delete Place", close: "Close", distance: "km away", places: "ÄŸÅ¸Å’ï¿½ Pi Economy Places", nearbyPlaces: "ÄŸÅ¸â€œï¿½ Places within 50 km Ã¢â‚¬â€� nearest first", results: "results", searchingLocation: "ÄŸÅ¸â€œï¿½ Getting your location...", locationNotSupported: "Ã¢ï¿½Å’ Location is not supported.", locationDenied: "Ã¢ï¿½Å’ Location permission denied.", signInFirst: "Ã¢ï¿½Å’ Please sign in with Pi first.", deleteLogin: "Ã¢ï¿½Å’ You must sign in with Pi to delete.", saving: "Ã¢ï¿½Â³ Saving place...", deleting: "Ã¢ï¿½Â³ Deleting place...", deleted: "deleted.", saved: "saved.", nameRequired: "Ã¢ï¿½Å’ Enter a place name.", descriptionTitle: "DESCRIPTION", languageSelector: "ÄŸÅ¸Å’ï¿½ App Language", confirmDelete: "Are you sure you want to delete this place?", piSdkError: "Ã¢ï¿½Å’ Pi SDK could not be loaded.", piUserError: "Pi user information could not be obtained.", backendError: "Backend sign-in failed.", loginFailed: "Ã¢ï¿½Å’ Pi Sign-In failed.", locationChosen: "ÄŸÅ¸â€œï¿½ Location selected. Enter the place information.", location: "ÄŸÅ¸â€œï¿½ Location", anonymous: "User", }, Arabic: { appDescription: "Ã˜Â§Ã™Æ’Ã˜ÂªÃ˜Â´Ã™ï¿½ Ã˜Â§Ã™â€žÃ™â€¦Ã˜ÂªÃ˜Â§Ã˜Â¬Ã˜Â± Ã™Ë†Ã˜Â§Ã™â€žÃ™â€¦Ã™â€ Ã˜ÂªÃ˜Â¬Ã˜Â§Ã˜Âª Ã™Ë†Ã˜Â§Ã™â€žÃ˜Â®Ã˜Â¯Ã™â€¦Ã˜Â§Ã˜Âª Ã™Ë†Ã˜Â§Ã™â€žÃ˜Â£Ã˜Â¹Ã™â€¦Ã˜Â§Ã™â€ž Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â¯Ã˜Â¹Ã™Ë†Ã™â€¦Ã˜Â© Ã™â€¦Ã™â€  Pi Ã˜Â¨Ã˜Â§Ã™â€žÃ™â€šÃ˜Â±Ã˜Â¨ Ã™â€¦Ã™â€ Ã™Æ’.", signIn: "Ã�â‚¬ Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž Ã˜Â¨Ã˜Â§Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã˜Â§Ã™â€¦ Pi", connected: "Pi Ã™â€¦Ã˜ÂªÃ˜ÂµÃ™â€ž", search: "ÄŸÅ¸â€�Å½ Ã˜Â§Ã˜Â¨Ã˜Â­Ã˜Â« Ã˜Â¹Ã™â€  Ã˜Â§Ã™â€žÃ˜Â£Ã™â€¦Ã˜Â§Ã™Æ’Ã™â€  Ã˜Â£Ã™Ë† Ã˜Â§Ã™â€žÃ˜Â£Ã˜Â¹Ã™â€¦Ã˜Â§Ã™â€ž Ã˜Â£Ã™Ë† Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã™â€¦Ã™Å Ã™â€ ...", nearby: "ÄŸÅ¸â€œï¿½ Ã˜Â§Ã™â€žÃ˜Â£Ã™â€¦Ã˜Â§Ã™Æ’Ã™â€  Ã˜Â§Ã™â€žÃ™â€šÃ˜Â±Ã™Å Ã˜Â¨Ã˜Â©", allPlaces: "ÄŸÅ¸Å’ï¿½ Ã˜Â¹Ã˜Â±Ã˜Â¶ Ã˜Â¬Ã™â€¦Ã™Å Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â£Ã™â€¦Ã˜Â§Ã™Æ’Ã™â€ ", locationFound: "ÄŸÅ¸â€œï¿½ Ã˜ÂªÃ™â€¦ Ã˜Â§Ã™â€žÃ˜Â¹Ã˜Â«Ã™Ë†Ã˜Â± Ã˜Â¹Ã™â€žÃ™â€° Ã™â€¦Ã™Ë†Ã™â€šÃ˜Â¹Ã™Æ’", nearestFirst: "ÄŸÅ¸â€œï¿½ Ã˜Â¹Ã˜Â±Ã˜Â¶ Ã˜Â§Ã™â€žÃ˜Â£Ã™â€¦Ã˜Â§Ã™Æ’Ã™â€  Ã˜Â§Ã™â€žÃ˜Â£Ã™â€šÃ˜Â±Ã˜Â¨ Ã˜Â£Ã™Ë†Ã™â€žÃ˜Â§Ã™â€¹", all: "Ã˜Â§Ã™â€žÃ™Æ’Ã™â€ž", stays: "Ã˜Â§Ã™â€žÃ˜Â¥Ã™â€šÃ˜Â§Ã™â€¦Ã˜Â§Ã˜Âª", shops: "Ã˜Â§Ã™â€žÃ™â€¦Ã˜ÂªÃ˜Â§Ã˜Â¬Ã˜Â±", food: "Ã˜Â§Ã™â€žÃ˜Â·Ã˜Â¹Ã˜Â§Ã™â€¦", services: "Ã˜Â§Ã™â€žÃ˜Â®Ã˜Â¯Ã™â€¦Ã˜Â§Ã˜Âª", jobs: "Ã˜Â§Ã™â€žÃ™Ë†Ã˜Â¸Ã˜Â§Ã˜Â¦Ã™ï¿½", addPlace: "ÄŸÅ¸â€œï¿½ Ã˜Â¥Ã˜Â¶Ã˜Â§Ã™ï¿½Ã˜Â© Ã™â€¦Ã™Æ’Ã˜Â§Ã™â€ ", language: "Ã˜Â§Ã™â€žÃ™â€žÃ˜ÂºÃ˜Â©", country: "Ã˜Â§Ã™â€žÃ˜Â¯Ã™Ë†Ã™â€žÃ˜Â©", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Ã˜Â¬Ã™â€¦Ã™Å Ã˜Â¹ Ã˜Â§Ã™â€žÃ™â€žÃ˜ÂºÃ˜Â§Ã˜Âª", allCountries: "ÄŸÅ¸Å’ï¿½ Ã˜Â¬Ã™â€¦Ã™Å Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â¯Ã™Ë†Ã™â€ž", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Ã˜Â¥Ã˜Â¶Ã˜Â§Ã™ï¿½Ã˜Â© Ã™â€¦Ã™Æ’Ã˜Â§Ã™â€ ", tapMap: "Ã˜Â§Ã˜Â¶Ã˜ÂºÃ˜Â· Ã˜Â¹Ã™â€žÃ™â€° Ã˜Â§Ã™â€žÃ˜Â®Ã˜Â±Ã™Å Ã˜Â·Ã˜Â© Ã™â€žÃ˜Â§Ã˜Â®Ã˜ÂªÃ™Å Ã˜Â§Ã˜Â± Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹.", locationSelected: "Ã¢Å“â€¦ Ã˜ÂªÃ™â€¦ Ã˜Â§Ã˜Â®Ã˜ÂªÃ™Å Ã˜Â§Ã˜Â± Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹", placeName: "Ã˜Â§Ã˜Â³Ã™â€¦ Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ ", description: "Ã˜Â§Ã™â€žÃ™Ë†Ã˜ÂµÃ™ï¿½", save: "ÄŸÅ¸â€™Â¾ Ã˜Â­Ã™ï¿½Ã˜Â¸", cancel: "Ã˜Â¥Ã™â€žÃ˜ÂºÃ˜Â§Ã˜Â¡", selectedLocation: "ÄŸÅ¸â€œï¿½ Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹ Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â­Ã˜Â¯Ã˜Â¯", details: "ÄŸÅ¸â€œâ€¹ Ã˜Â¹Ã˜Â±Ã˜Â¶ Ã˜Â§Ã™â€žÃ˜ÂªÃ™ï¿½Ã˜Â§Ã˜ÂµÃ™Å Ã™â€ž", detailsTitle: "Ã˜Â§Ã™â€žÃ˜ÂªÃ™ï¿½Ã˜Â§Ã˜ÂµÃ™Å Ã™â€ž", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Ã˜Â¹Ã˜Â±Ã˜Â¶ Ã˜Â¹Ã™â€žÃ™â€° Ã˜Â§Ã™â€žÃ˜Â®Ã˜Â±Ã™Å Ã˜Â·Ã˜Â©", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Ã˜Â­Ã˜Â°Ã™ï¿½ Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ ", close: "Ã˜Â¥Ã˜ÂºÃ™â€žÃ˜Â§Ã™â€š", distance: "Ã™Æ’Ã™â€¦", places: "ÄŸÅ¸Å’ï¿½ Ã˜Â£Ã™â€¦Ã˜Â§Ã™Æ’Ã™â€  Pi Economy", nearbyPlaces: "ÄŸÅ¸â€œï¿½ Ã˜Â§Ã™â€žÃ˜Â£Ã™â€¦Ã˜Â§Ã™Æ’Ã™â€  Ã˜Â¶Ã™â€¦Ã™â€  50 Ã™Æ’Ã™â€¦ Ã¢â‚¬â€� Ã˜Â§Ã™â€žÃ˜Â£Ã™â€šÃ˜Â±Ã˜Â¨ Ã˜Â£Ã™Ë†Ã™â€žÃ˜Â§Ã™â€¹", results: "Ã˜Â§Ã™â€žÃ™â€ Ã˜ÂªÃ˜Â§Ã˜Â¦Ã˜Â¬", searchingLocation: "ÄŸÅ¸â€œï¿½ Ã˜Â¬Ã˜Â§Ã˜Â±Ã™ï¿½ Ã˜ÂªÃ˜Â­Ã˜Â¯Ã™Å Ã˜Â¯ Ã™â€¦Ã™Ë†Ã™â€šÃ˜Â¹Ã™Æ’...", locationNotSupported: "Ã¢ï¿½Å’ Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹ Ã˜ÂºÃ™Å Ã˜Â± Ã™â€¦Ã˜Â¯Ã˜Â¹Ã™Ë†Ã™â€¦.", locationDenied: "Ã¢ï¿½Å’ Ã˜ÂªÃ™â€¦ Ã˜Â±Ã™ï¿½Ã˜Â¶ Ã˜Â¥Ã˜Â°Ã™â€  Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹.", signInFirst: "Ã¢ï¿½Å’ Ã™Å Ã˜Â±Ã˜Â¬Ã™â€° Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž Ã˜Â¨Ã˜Â§Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã˜Â§Ã™â€¦ Pi Ã˜Â£Ã™Ë†Ã™â€žÃ˜Â§Ã™â€¹.", deleteLogin: "Ã¢ï¿½Å’ Ã™Å Ã˜Â¬Ã˜Â¨ Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž Ã˜Â¨Ã˜Â§Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã˜Â§Ã™â€¦ Pi Ã™â€žÃ™â€žÃ˜Â­Ã˜Â°Ã™ï¿½.", saving: "Ã¢ï¿½Â³ Ã˜Â¬Ã˜Â§Ã˜Â±Ã™ï¿½ Ã˜Â­Ã™ï¿½Ã˜Â¸ Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ ...", deleting: "Ã¢ï¿½Â³ Ã˜Â¬Ã˜Â§Ã˜Â±Ã™ï¿½ Ã˜Â­Ã˜Â°Ã™ï¿½ Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ ...", deleted: "Ã˜ÂªÃ™â€¦ Ã˜Â­Ã˜Â°Ã™ï¿½Ã™â€¡.", saved: "Ã˜ÂªÃ™â€¦ Ã˜Â­Ã™ï¿½Ã˜Â¸Ã™â€¡.", nameRequired: "Ã¢ï¿½Å’ Ã˜Â£Ã˜Â¯Ã˜Â®Ã™â€ž Ã˜Â§Ã˜Â³Ã™â€¦ Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ .", descriptionTitle: "Ã˜Â§Ã™â€žÃ™Ë†Ã˜ÂµÃ™ï¿½", languageSelector: "ÄŸÅ¸Å’ï¿½ Ã™â€žÃ˜ÂºÃ˜Â© Ã˜Â§Ã™â€žÃ˜ÂªÃ˜Â·Ã˜Â¨Ã™Å Ã™â€š", confirmDelete: "Ã™â€¡Ã™â€ž Ã˜Â£Ã™â€ Ã˜Âª Ã™â€¦Ã˜ÂªÃ˜Â£Ã™Æ’Ã˜Â¯ Ã™â€¦Ã™â€  Ã˜Â­Ã˜Â°Ã™ï¿½ Ã™â€¡Ã˜Â°Ã˜Â§ Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ Ã˜Å¸", piSdkError: "Ã¢ï¿½Å’ Ã˜ÂªÃ˜Â¹Ã˜Â°Ã˜Â± Ã˜ÂªÃ˜Â­Ã™â€¦Ã™Å Ã™â€ž Pi SDK.", piUserError: "Ã˜ÂªÃ˜Â¹Ã˜Â°Ã˜Â± Ã˜Â§Ã™â€žÃ˜Â­Ã˜ÂµÃ™Ë†Ã™â€ž Ã˜Â¹Ã™â€žÃ™â€° Ã™â€¦Ã˜Â¹Ã™â€žÃ™Ë†Ã™â€¦Ã˜Â§Ã˜Âª Ã™â€¦Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã™â€¦ Pi.", backendError: "Ã™ï¿½Ã˜Â´Ã™â€ž Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž Ã˜Â¥Ã™â€žÃ™â€° Ã˜Â§Ã™â€žÃ˜Â®Ã˜Â§Ã˜Â¯Ã™â€¦.", loginFailed: "Ã¢ï¿½Å’ Ã™ï¿½Ã˜Â´Ã™â€ž Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž Ã˜Â¨Ã˜Â§Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã˜Â§Ã™â€¦ Pi.", locationChosen: "ÄŸÅ¸â€œï¿½ Ã˜ÂªÃ™â€¦ Ã˜Â§Ã˜Â®Ã˜ÂªÃ™Å Ã˜Â§Ã˜Â± Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹. Ã˜Â£Ã˜Â¯Ã˜Â®Ã™â€ž Ã™â€¦Ã˜Â¹Ã™â€žÃ™Ë†Ã™â€¦Ã˜Â§Ã˜Âª Ã˜Â§Ã™â€žÃ™â€¦Ã™Æ’Ã˜Â§Ã™â€ .", location: "ÄŸÅ¸â€œï¿½ Ã˜Â§Ã™â€žÃ™â€¦Ã™Ë†Ã™â€šÃ˜Â¹", anonymous: "Ã™â€¦Ã˜Â³Ã˜ÂªÃ˜Â®Ã˜Â¯Ã™â€¦", }, Spanish: { appDescription: "Descubre tiendas, productos, servicios y negocios impulsados por Pi cerca de ti.", signIn: "Ã�â‚¬ Iniciar sesiÃƒÂ³n con Pi", connected: "Pi conectado", search: "ÄŸÅ¸â€�Å½ Buscar lugares, negocios o usuarios...", nearby: "ÄŸÅ¸â€œï¿½ Lugares cercanos", allPlaces: "ÄŸÅ¸Å’ï¿½ Mostrar todos los lugares", locationFound: "ÄŸÅ¸â€œï¿½ UbicaciÃƒÂ³n encontrada", nearestFirst: "ÄŸÅ¸â€œï¿½ Los lugares mÃƒÂ¡s cercanos aparecen primero", all: "Todos", stays: "Alojamientos", shops: "Tiendas", food: "Comida", services: "Servicios", jobs: "Empleos", addPlace: "ÄŸÅ¸â€œï¿½ AÃƒÂ±adir lugar", language: "Idioma", country: "PaÃƒÂ­s", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Todos los idiomas", allCountries: "ÄŸÅ¸Å’ï¿½ Todos los paÃƒÂ­ses", addPlaceTitle: "ÄŸÅ¸â€œï¿½ AÃƒÂ±adir lugar", tapMap: "Toca el mapa para seleccionar una ubicaciÃƒÂ³n.", locationSelected: "Ã¢Å“â€¦ UbicaciÃƒÂ³n seleccionada", placeName: "Nombre del lugar", description: "DescripciÃƒÂ³n", save: "ÄŸÅ¸â€™Â¾ Guardar", cancel: "Cancelar", selectedLocation: "ÄŸÅ¸â€œï¿½ UbicaciÃƒÂ³n seleccionada", details: "ÄŸÅ¸â€œâ€¹ Ver detalles", detailsTitle: "Detalles", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Mostrar en el mapa", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Eliminar lugar", close: "Cerrar", distance: "km de distancia", places: "ÄŸÅ¸Å’ï¿½ Lugares de Pi Economy", nearbyPlaces: "ÄŸÅ¸â€œï¿½ Lugares en 50 km Ã¢â‚¬â€� mÃƒÂ¡s cercanos primero", results: "resultados", searchingLocation: "ÄŸÅ¸â€œï¿½ Obteniendo tu ubicaciÃƒÂ³n...", locationNotSupported: "Ã¢ï¿½Å’ La ubicaciÃƒÂ³n no es compatible.", locationDenied: "Ã¢ï¿½Å’ Permiso de ubicaciÃƒÂ³n denegado.", signInFirst: "Ã¢ï¿½Å’ Inicia sesiÃƒÂ³n con Pi primero.", deleteLogin: "Ã¢ï¿½Å’ Debes iniciar sesiÃƒÂ³n con Pi para eliminar.", saving: "Ã¢ï¿½Â³ Guardando lugar...", deleting: "Ã¢ï¿½Â³ Eliminando lugar...", deleted: "eliminado.", saved: "guardado.", nameRequired: "Ã¢ï¿½Å’ Introduce un nombre.", descriptionTitle: "DESCRIPCIÃƒâ€œN", languageSelector: "ÄŸÅ¸Å’ï¿½ Idioma de la aplicaciÃƒÂ³n", confirmDelete: "Ã‚Â¿Seguro que quieres eliminar este lugar?", piSdkError: "Ã¢ï¿½Å’ No se pudo cargar Pi SDK.", piUserError: "No se pudo obtener la informaciÃƒÂ³n del usuario Pi.", backendError: "Error al iniciar sesiÃƒÂ³n en el backend.", loginFailed: "Ã¢ï¿½Å’ FallÃƒÂ³ el inicio de sesiÃƒÂ³n con Pi.", locationChosen: "ÄŸÅ¸â€œï¿½ UbicaciÃƒÂ³n seleccionada. Introduce la informaciÃƒÂ³n.", location: "ÄŸÅ¸â€œï¿½ UbicaciÃƒÂ³n", anonymous: "Usuario", }, French: { appDescription: "DÃƒÂ©couvrez les magasins, produits, services et entreprises propulsÃƒÂ©s par Pi prÃƒÂ¨s de chez vous.", signIn: "Ã�â‚¬ Se connecter avec Pi", connected: "Pi connectÃƒÂ©", search: "ÄŸÅ¸â€�Å½ Rechercher des lieux, entreprises ou utilisateurs...", nearby: "ÄŸÅ¸â€œï¿½ Lieux ÃƒÂ  proximitÃƒÂ©", allPlaces: "ÄŸÅ¸Å’ï¿½ Afficher tous les lieux", locationFound: "ÄŸÅ¸â€œï¿½ Position trouvÃƒÂ©e", nearestFirst: "ÄŸÅ¸â€œï¿½ Les lieux les plus proches en premier", all: "Tous", stays: "HÃƒÂ©bergements", shops: "Boutiques", food: "Restaurants", services: "Services", jobs: "Emplois", addPlace: "ÄŸÅ¸â€œï¿½ Ajouter un lieu", language: "Langue", country: "Pays", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Toutes les langues", allCountries: "ÄŸÅ¸Å’ï¿½ Tous les pays", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Ajouter un lieu", tapMap: "Touchez la carte pour sÃƒÂ©lectionner un emplacement.", locationSelected: "Ã¢Å“â€¦ Emplacement sÃƒÂ©lectionnÃƒÂ©", placeName: "Nom du lieu", description: "Description", save: "ÄŸÅ¸â€™Â¾ Enregistrer", cancel: "Annuler", selectedLocation: "ÄŸÅ¸â€œï¿½ Emplacement sÃƒÂ©lectionnÃƒÂ©", details: "ÄŸÅ¸â€œâ€¹ Voir les dÃƒÂ©tails", detailsTitle: "DÃƒÂ©tails", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Afficher sur la carte", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Supprimer le lieu", close: "Fermer", distance: "km", places: "ÄŸÅ¸Å’ï¿½ Lieux Pi Economy", nearbyPlaces: "ÄŸÅ¸â€œï¿½ Lieux dans un rayon de 50 km Ã¢â‚¬â€� plus proches en premier", results: "rÃƒÂ©sultats", searchingLocation: "ÄŸÅ¸â€œï¿½ Obtention de votre position...", locationNotSupported: "Ã¢ï¿½Å’ La localisation n'est pas prise en charge.", locationDenied: "Ã¢ï¿½Å’ Autorisation de localisation refusÃƒÂ©e.", signInFirst: "Ã¢ï¿½Å’ Connectez-vous d'abord avec Pi.", deleteLogin: "Ã¢ï¿½Å’ Vous devez ÃƒÂªtre connectÃƒÂ© avec Pi pour supprimer.", saving: "Ã¢ï¿½Â³ Enregistrement...", deleting: "Ã¢ï¿½Â³ Suppression...", deleted: "supprimÃƒÂ©.", saved: "enregistrÃƒÂ©.", nameRequired: "Ã¢ï¿½Å’ Entrez le nom du lieu.", descriptionTitle: "DESCRIPTION", languageSelector: "ÄŸÅ¸Å’ï¿½ Langue de l'application", confirmDelete: "Voulez-vous vraiment supprimer ce lieu ?", piSdkError: "Ã¢ï¿½Å’ Pi SDK n'a pas pu ÃƒÂªtre chargÃƒÂ©.", piUserError: "Impossible d'obtenir les informations utilisateur Pi.", backendError: "Ãƒâ€°chec de la connexion au backend.", loginFailed: "Ã¢ï¿½Å’ Ãƒâ€°chec de la connexion Pi.", locationChosen: "ÄŸÅ¸â€œï¿½ Emplacement sÃƒÂ©lectionnÃƒÂ©. Saisissez les informations.", location: "ÄŸÅ¸â€œï¿½ Emplacement", anonymous: "Utilisateur", }, German: { appDescription: "Entdecke Pi-betriebene GeschÃƒÂ¤fte, Produkte, Dienstleistungen und Unternehmen in deiner NÃƒÂ¤he.", signIn: "Ã�â‚¬ Mit Pi anmelden", connected: "Pi verbunden", search: "ÄŸÅ¸â€�Å½ Orte, Unternehmen oder Nutzer suchen...", nearby: "ÄŸÅ¸â€œï¿½ Orte in der NÃƒÂ¤he", allPlaces: "ÄŸÅ¸Å’ï¿½ Alle Orte anzeigen", locationFound: "ÄŸÅ¸â€œï¿½ Standort gefunden", nearestFirst: "ÄŸÅ¸â€œï¿½ NÃƒÂ¤chste Orte zuerst", all: "Alle", stays: "UnterkÃƒÂ¼nfte", shops: "GeschÃƒÂ¤fte", food: "Essen", services: "Dienstleistungen", jobs: "Jobs", addPlace: "ÄŸÅ¸â€œï¿½ Ort hinzufÃƒÂ¼gen", language: "Sprache", country: "Land", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Alle Sprachen", allCountries: "ÄŸÅ¸Å’ï¿½ Alle LÃƒÂ¤nder", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Ort hinzufÃƒÂ¼gen", tapMap: "Tippe auf die Karte, um einen Standort auszuwÃƒÂ¤hlen.", locationSelected: "Ã¢Å“â€¦ Standort ausgewÃƒÂ¤hlt", placeName: "Name des Ortes", description: "Beschreibung", save: "ÄŸÅ¸â€™Â¾ Speichern", cancel: "Abbrechen", selectedLocation: "ÄŸÅ¸â€œï¿½ AusgewÃƒÂ¤hlter Standort", details: "ÄŸÅ¸â€œâ€¹ Details anzeigen", detailsTitle: "Details", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Auf Karte anzeigen", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Ort lÃƒÂ¶schen", close: "SchlieÃƒÅ¸en", distance: "km entfernt", places: "ÄŸÅ¸Å’ï¿½ Pi Economy Orte", nearbyPlaces: "ÄŸÅ¸â€œï¿½ Orte innerhalb von 50 km Ã¢â‚¬â€� nÃƒÂ¤chste zuerst", results: "Ergebnisse", searchingLocation: "ÄŸÅ¸â€œï¿½ Standort wird ermittelt...", locationNotSupported: "Ã¢ï¿½Å’ Standort wird nicht unterstÃƒÂ¼tzt.", locationDenied: "Ã¢ï¿½Å’ Standortberechtigung verweigert.", signInFirst: "Ã¢ï¿½Å’ Bitte zuerst mit Pi anmelden.", deleteLogin: "Ã¢ï¿½Å’ Zum LÃƒÂ¶schen musst du mit Pi angemeldet sein.", saving: "Ã¢ï¿½Â³ Ort wird gespeichert...", deleting: "Ã¢ï¿½Â³ Ort wird gelÃƒÂ¶scht...", deleted: "gelÃƒÂ¶scht.", saved: "gespeichert.", nameRequired: "Ã¢ï¿½Å’ Bitte einen Namen eingeben.", descriptionTitle: "BESCHREIBUNG", languageSelector: "ÄŸÅ¸Å’ï¿½ App-Sprache", confirmDelete: "MÃƒÂ¶chtest du diesen Ort wirklich lÃƒÂ¶schen?", piSdkError: "Ã¢ï¿½Å’ Pi SDK konnte nicht geladen werden.", piUserError: "Pi-Benutzerinformationen konnten nicht abgerufen werden.", backendError: "Backend-Anmeldung fehlgeschlagen.", loginFailed: "Ã¢ï¿½Å’ Pi-Anmeldung fehlgeschlagen.", locationChosen: "ÄŸÅ¸â€œï¿½ Standort ausgewÃƒÂ¤hlt. Gib die Informationen ein.", location: "ÄŸÅ¸â€œï¿½ Standort", anonymous: "Benutzer", }, Portuguese: { appDescription: "Descubra lojas, produtos, serviÃƒÂ§os e empresas com tecnologia Pi perto de vocÃƒÂª.", signIn: "Ã�â‚¬ Entrar com Pi", connected: "Pi conectado", search: "ÄŸÅ¸â€�Å½ Pesquisar lugares, empresas ou usuÃƒÂ¡rios...", nearby: "ÄŸÅ¸â€œï¿½ Lugares prÃƒÂ³ximos", allPlaces: "ÄŸÅ¸Å’ï¿½ Mostrar todos os lugares", locationFound: "ÄŸÅ¸â€œï¿½ LocalizaÃƒÂ§ÃƒÂ£o encontrada", nearestFirst: "ÄŸÅ¸â€œï¿½ Lugares mais prÃƒÂ³ximos primeiro", all: "Todos", stays: "Hospedagens", shops: "Lojas", food: "Comida", services: "ServiÃƒÂ§os", jobs: "Empregos", addPlace: "ÄŸÅ¸â€œï¿½ Adicionar lugar", language: "Idioma", country: "PaÃƒÂ­s", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Todos os idiomas", allCountries: "ÄŸÅ¸Å’ï¿½ Todos os paÃƒÂ­ses", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Adicionar lugar", tapMap: "Toque no mapa para selecionar um local.", locationSelected: "Ã¢Å“â€¦ Local selecionado", placeName: "Nome do lugar", description: "DescriÃƒÂ§ÃƒÂ£o", save: "ÄŸÅ¸â€™Â¾ Salvar", cancel: "Cancelar", selectedLocation: "ÄŸÅ¸â€œï¿½ Local selecionado", details: "ÄŸÅ¸â€œâ€¹ Ver detalhes", detailsTitle: "Detalhes", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Mostrar no mapa", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Excluir lugar", close: "Fechar", distance: "km de distÃƒÂ¢ncia", places: "ÄŸÅ¸Å’ï¿½ Lugares Pi Economy", nearbyPlaces: "ÄŸÅ¸â€œï¿½ Lugares em atÃƒÂ© 50 km Ã¢â‚¬â€� mais prÃƒÂ³ximos primeiro", results: "resultados", searchingLocation: "ÄŸÅ¸â€œï¿½ Obtendo sua localizaÃƒÂ§ÃƒÂ£o...", locationNotSupported: "Ã¢ï¿½Å’ LocalizaÃƒÂ§ÃƒÂ£o nÃƒÂ£o suportada.", locationDenied: "Ã¢ï¿½Å’ PermissÃƒÂ£o de localizaÃƒÂ§ÃƒÂ£o negada.", signInFirst: "Ã¢ï¿½Å’ Entre com Pi primeiro.", deleteLogin: "Ã¢ï¿½Å’ VocÃƒÂª precisa entrar com Pi para excluir.", saving: "Ã¢ï¿½Â³ Salvando lugar...", deleting: "Ã¢ï¿½Â³ Excluindo lugar...", deleted: "excluÃƒÂ­do.", saved: "salvo.", nameRequired: "Ã¢ï¿½Å’ Digite o nome do lugar.", descriptionTitle: "DESCRIÃƒâ€¡ÃƒÆ’O", languageSelector: "ÄŸÅ¸Å’ï¿½ Idioma do aplicativo", confirmDelete: "Tem certeza de que deseja excluir este lugar?", piSdkError: "Ã¢ï¿½Å’ NÃƒÂ£o foi possÃƒÂ­vel carregar o Pi SDK.", piUserError: "NÃƒÂ£o foi possÃƒÂ­vel obter os dados do usuÃƒÂ¡rio Pi.", backendError: "Falha no login do backend.", loginFailed: "Ã¢ï¿½Å’ Falha no login com Pi.", locationChosen: "ÄŸÅ¸â€œï¿½ Local selecionado. Digite as informaÃƒÂ§ÃƒÂµes.", location: "ÄŸÅ¸â€œï¿½ LocalizaÃƒÂ§ÃƒÂ£o", anonymous: "UsuÃƒÂ¡rio", }, Russian: { appDescription: "ÄžÅ¾Ã‘â€šÄžÂºÃ‘â‚¬Ã‘â€¹ÄžÂ²ÄžÂ°ÄžÂ¹Ã‘â€šÄžÂµ ÄžÂ¼ÄžÂ°ÄžÂ³ÄžÂ°ÄžÂ·ÄžÂ¸ÄžÂ½Ã‘â€¹, Ã‘â€šÄžÂ¾ÄžÂ²ÄžÂ°Ã‘â‚¬Ã‘â€¹, Ã‘Æ’Ã‘ï¿½ÄžÂ»Ã‘Æ’ÄžÂ³ÄžÂ¸ ÄžÂ¸ ÄžÂºÄžÂ¾ÄžÂ¼ÄžÂ¿ÄžÂ°ÄžÂ½ÄžÂ¸ÄžÂ¸ ÄžÂ½ÄžÂ° ÄžÂ±ÄžÂ°ÄžÂ·ÄžÂµ Pi Ã‘â‚¬Ã‘ï¿½ÄžÂ´ÄžÂ¾ÄžÂ¼ Ã‘ï¿½ ÄžÂ²ÄžÂ°ÄžÂ¼ÄžÂ¸.", signIn: "Ã�â‚¬ Äžâ€™ÄžÂ¾ÄžÂ¹Ã‘â€šÄžÂ¸ Ã‘â€¡ÄžÂµÃ‘â‚¬ÄžÂµÄžÂ· Pi", connected: "Pi ÄžÂ¿ÄžÂ¾ÄžÂ´ÄžÂºÄžÂ»Ã‘Å½Ã‘â€¡Ã‘â€˜ÄžÂ½", search: "ÄŸÅ¸â€�Å½ ÄžÅ¸ÄžÂ¾ÄžÂ¸Ã‘ï¿½ÄžÂº ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€š, ÄžÂºÄžÂ¾ÄžÂ¼ÄžÂ¿ÄžÂ°ÄžÂ½ÄžÂ¸ÄžÂ¹ ÄžÂ¸ÄžÂ»ÄžÂ¸ ÄžÂ¿ÄžÂ¾ÄžÂ»Ã‘Å’ÄžÂ·ÄžÂ¾ÄžÂ²ÄžÂ°Ã‘â€šÄžÂµÄžÂ»ÄžÂµÄžÂ¹...", nearby: "ÄŸÅ¸â€œï¿½ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ° Ã‘â‚¬Ã‘ï¿½ÄžÂ´ÄžÂ¾ÄžÂ¼", allPlaces: "ÄŸÅ¸Å’ï¿½ ÄžÅ¸ÄžÂ¾ÄžÂºÄžÂ°ÄžÂ·ÄžÂ°Ã‘â€šÃ‘Å’ ÄžÂ²Ã‘ï¿½ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ°", locationFound: "ÄŸÅ¸â€œï¿½ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾ÄžÂ¿ÄžÂ¾ÄžÂ»ÄžÂ¾ÄžÂ¶ÄžÂµÄžÂ½ÄžÂ¸ÄžÂµ ÄžÂ½ÄžÂ°ÄžÂ¹ÄžÂ´ÄžÂµÄžÂ½ÄžÂ¾", nearestFirst: "ÄŸÅ¸â€œï¿½ ÄžÂ¡ÄžÂ½ÄžÂ°Ã‘â€¡ÄžÂ°ÄžÂ»ÄžÂ° ÄžÂ±ÄžÂ»ÄžÂ¸ÄžÂ¶ÄžÂ°ÄžÂ¹Ã‘Ë†ÄžÂ¸ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ°", all: "Äžâ€™Ã‘ï¿½ÄžÂµ", stays: "ÄžÅ¸Ã‘â‚¬ÄžÂ¾ÄžÂ¶ÄžÂ¸ÄžÂ²ÄžÂ°ÄžÂ½ÄžÂ¸ÄžÂµ", shops: "ÄžÅ“ÄžÂ°ÄžÂ³ÄžÂ°ÄžÂ·ÄžÂ¸ÄžÂ½Ã‘â€¹", food: "Äžâ€¢ÄžÂ´ÄžÂ°", services: "ÄžÂ£Ã‘ï¿½ÄžÂ»Ã‘Æ’ÄžÂ³ÄžÂ¸", jobs: "ÄžÂ ÄžÂ°ÄžÂ±ÄžÂ¾Ã‘â€šÄžÂ°", addPlace: "ÄŸÅ¸â€œï¿½ Äžâ€�ÄžÂ¾ÄžÂ±ÄžÂ°ÄžÂ²ÄžÂ¸Ã‘â€šÃ‘Å’ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾", language: "ÄžÂ¯ÄžÂ·Ã‘â€¹ÄžÂº", country: "ÄžÂ¡Ã‘â€šÃ‘â‚¬ÄžÂ°ÄžÂ½ÄžÂ°", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Äžâ€™Ã‘ï¿½ÄžÂµ Ã‘ï¿½ÄžÂ·Ã‘â€¹ÄžÂºÄžÂ¸", allCountries: "ÄŸÅ¸Å’ï¿½ Äžâ€™Ã‘ï¿½ÄžÂµ Ã‘ï¿½Ã‘â€šÃ‘â‚¬ÄžÂ°ÄžÂ½Ã‘â€¹", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Äžâ€�ÄžÂ¾ÄžÂ±ÄžÂ°ÄžÂ²ÄžÂ¸Ã‘â€šÃ‘Å’ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾", tapMap: "Äžï¿½ÄžÂ°ÄžÂ¶ÄžÂ¼ÄžÂ¸Ã‘â€šÄžÂµ ÄžÂ½ÄžÂ° ÄžÂºÄžÂ°Ã‘â‚¬Ã‘â€šÃ‘Æ’, Ã‘â€¡Ã‘â€šÄžÂ¾ÄžÂ±Ã‘â€¹ ÄžÂ²Ã‘â€¹ÄžÂ±Ã‘â‚¬ÄžÂ°Ã‘â€šÃ‘Å’ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾.", locationSelected: "Ã¢Å“â€¦ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾ ÄžÂ²Ã‘â€¹ÄžÂ±Ã‘â‚¬ÄžÂ°ÄžÂ½ÄžÂ¾", placeName: "Äžï¿½ÄžÂ°ÄžÂ·ÄžÂ²ÄžÂ°ÄžÂ½ÄžÂ¸ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ°", description: "ÄžÅ¾ÄžÂ¿ÄžÂ¸Ã‘ï¿½ÄžÂ°ÄžÂ½ÄžÂ¸ÄžÂµ", save: "ÄŸÅ¸â€™Â¾ ÄžÂ¡ÄžÂ¾Ã‘â€¦Ã‘â‚¬ÄžÂ°ÄžÂ½ÄžÂ¸Ã‘â€šÃ‘Å’", cancel: "ÄžÅ¾Ã‘â€šÄžÂ¼ÄžÂµÄžÂ½ÄžÂ°", selectedLocation: "ÄŸÅ¸â€œï¿½ Äžâ€™Ã‘â€¹ÄžÂ±Ã‘â‚¬ÄžÂ°ÄžÂ½ÄžÂ½ÄžÂ¾ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾", details: "ÄŸÅ¸â€œâ€¹ ÄžÅ¸ÄžÂ¾ÄžÂ´Ã‘â‚¬ÄžÂ¾ÄžÂ±ÄžÂ½ÄžÂµÄžÂµ", detailsTitle: "ÄžÅ¸ÄžÂ¾ÄžÂ´Ã‘â‚¬ÄžÂ¾ÄžÂ±ÄžÂ½ÄžÂ¾Ã‘ï¿½Ã‘â€šÄžÂ¸", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ ÄžÅ¸ÄžÂ¾ÄžÂºÄžÂ°ÄžÂ·ÄžÂ°Ã‘â€šÃ‘Å’ ÄžÂ½ÄžÂ° ÄžÂºÄžÂ°Ã‘â‚¬Ã‘â€šÄžÂµ", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ ÄžÂ£ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂ¸Ã‘â€šÃ‘Å’ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾", close: "Äžâ€”ÄžÂ°ÄžÂºÃ‘â‚¬Ã‘â€¹Ã‘â€šÃ‘Å’", distance: "ÄžÂºÄžÂ¼", places: "ÄŸÅ¸Å’ï¿½ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ° Pi Economy", nearbyPlaces: "ÄŸÅ¸â€œï¿½ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ° ÄžÂ² ÄžÂ¿Ã‘â‚¬ÄžÂµÄžÂ´ÄžÂµÄžÂ»ÄžÂ°Ã‘â€¦ 50 ÄžÂºÄžÂ¼ Ã¢â‚¬â€� ÄžÂ±ÄžÂ»ÄžÂ¸ÄžÂ¶ÄžÂ°ÄžÂ¹Ã‘Ë†ÄžÂ¸ÄžÂµ ÄžÂ¿ÄžÂµÃ‘â‚¬ÄžÂ²Ã‘â€¹ÄžÂ¼ÄžÂ¸", results: "Ã‘â‚¬ÄžÂµÄžÂ·Ã‘Æ’ÄžÂ»Ã‘Å’Ã‘â€šÄžÂ°Ã‘â€šÃ‘â€¹", searchingLocation: "ÄŸÅ¸â€œï¿½ ÄžÅ¾ÄžÂ¿Ã‘â‚¬ÄžÂµÄžÂ´ÄžÂµÄžÂ»Ã‘ï¿½ÄžÂµÄžÂ¼ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾ÄžÂ¿ÄžÂ¾ÄžÂ»ÄžÂ¾ÄžÂ¶ÄžÂµÄžÂ½ÄžÂ¸ÄžÂµ...", locationNotSupported: "Ã¢ï¿½Å’ Äžâ€œÄžÂµÄžÂ¾ÄžÂ»ÄžÂ¾ÄžÂºÄžÂ°Ã‘â€ ÄžÂ¸Ã‘ï¿½ ÄžÂ½ÄžÂµ ÄžÂ¿ÄžÂ¾ÄžÂ´ÄžÂ´ÄžÂµÃ‘â‚¬ÄžÂ¶ÄžÂ¸ÄžÂ²ÄžÂ°ÄžÂµÃ‘â€šÃ‘ï¿½Ã‘ï¿½.", locationDenied: "Ã¢ï¿½Å’ Äžâ€�ÄžÂ¾Ã‘ï¿½Ã‘â€šÃ‘Æ’ÄžÂ¿ ÄžÂº ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾ÄžÂ¿ÄžÂ¾ÄžÂ»ÄžÂ¾ÄžÂ¶ÄžÂµÄžÂ½ÄžÂ¸Ã‘Å½ ÄžÂ·ÄžÂ°ÄžÂ¿Ã‘â‚¬ÄžÂµÃ‘â€°Ã‘â€˜ÄžÂ½.", signInFirst: "Ã¢ï¿½Å’ ÄžÂ¡ÄžÂ½ÄžÂ°Ã‘â€¡ÄžÂ°ÄžÂ»ÄžÂ° ÄžÂ²ÄžÂ¾ÄžÂ¹ÄžÂ´ÄžÂ¸Ã‘â€šÄžÂµ Ã‘â€¡ÄžÂµÃ‘â‚¬ÄžÂµÄžÂ· Pi.", deleteLogin: "Ã¢ï¿½Å’ Äžâ€�ÄžÂ»Ã‘ï¿½ Ã‘Æ’ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂµÄžÂ½ÄžÂ¸Ã‘ï¿½ ÄžÂ½ÄžÂµÄžÂ¾ÄžÂ±Ã‘â€¦ÄžÂ¾ÄžÂ´ÄžÂ¸ÄžÂ¼ÄžÂ¾ ÄžÂ²ÄžÂ¾ÄžÂ¹Ã‘â€šÄžÂ¸ Ã‘â€¡ÄžÂµÃ‘â‚¬ÄžÂµÄžÂ· Pi.", saving: "Ã¢ï¿½Â³ ÄžÂ¡ÄžÂ¾Ã‘â€¦Ã‘â‚¬ÄžÂ°ÄžÂ½ÄžÂµÄžÂ½ÄžÂ¸ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ°...", deleting: "Ã¢ï¿½Â³ ÄžÂ£ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂµÄžÂ½ÄžÂ¸ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ°...", deleted: "Ã‘Æ’ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂµÄžÂ½ÄžÂ¾.", saved: "Ã‘ï¿½ÄžÂ¾Ã‘â€¦Ã‘â‚¬ÄžÂ°ÄžÂ½ÄžÂµÄžÂ½ÄžÂ¾.", nameRequired: "Ã¢ï¿½Å’ Äžâ€™ÄžÂ²ÄžÂµÄžÂ´ÄžÂ¸Ã‘â€šÄžÂµ ÄžÂ½ÄžÂ°ÄžÂ·ÄžÂ²ÄžÂ°ÄžÂ½ÄžÂ¸ÄžÂµ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ°.", descriptionTitle: "ÄžÅ¾ÄžÅ¸ÄžËœÄžÂ¡Äžï¿½Äžï¿½ÄžËœÄžâ€¢", languageSelector: "ÄŸÅ¸Å’ï¿½ ÄžÂ¯ÄžÂ·Ã‘â€¹ÄžÂº ÄžÂ¿Ã‘â‚¬ÄžÂ¸ÄžÂ»ÄžÂ¾ÄžÂ¶ÄžÂµÄžÂ½ÄžÂ¸Ã‘ï¿½", confirmDelete: "Äžâ€™Ã‘â€¹ Ã‘Æ’ÄžÂ²ÄžÂµÃ‘â‚¬ÄžÂµÄžÂ½Ã‘â€¹, Ã‘â€¡Ã‘â€šÄžÂ¾ Ã‘â€¦ÄžÂ¾Ã‘â€šÄžÂ¸Ã‘â€šÄžÂµ Ã‘Æ’ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂ¸Ã‘â€šÃ‘Å’ Ã‘ï¿½Ã‘â€šÄžÂ¾ ÄžÂ¼ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾?", piSdkError: "Ã¢ï¿½Å’ Äžï¿½ÄžÂµ Ã‘Æ’ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂ¾Ã‘ï¿½Ã‘Å’ ÄžÂ·ÄžÂ°ÄžÂ³Ã‘â‚¬Ã‘Æ’ÄžÂ·ÄžÂ¸Ã‘â€šÃ‘Å’ Pi SDK.", piUserError: "Äžï¿½ÄžÂµ Ã‘Æ’ÄžÂ´ÄžÂ°ÄžÂ»ÄžÂ¾Ã‘ï¿½Ã‘Å’ ÄžÂ¿ÄžÂ¾ÄžÂ»Ã‘Æ’Ã‘â€¡ÄžÂ¸Ã‘â€šÃ‘Å’ ÄžÂ´ÄžÂ°ÄžÂ½ÄžÂ½Ã‘â€¹ÄžÂµ ÄžÂ¿ÄžÂ¾ÄžÂ»Ã‘Å’ÄžÂ·ÄžÂ¾ÄžÂ²ÄžÂ°Ã‘â€šÄžÂµÄžÂ»Ã‘ï¿½ Pi.", backendError: "ÄžÅ¾Ã‘Ë†ÄžÂ¸ÄžÂ±ÄžÂºÄžÂ° ÄžÂ²Ã‘â€¦ÄžÂ¾ÄžÂ´ÄžÂ° Ã‘â€¡ÄžÂµÃ‘â‚¬ÄžÂµÄžÂ· backend.", loginFailed: "Ã¢ï¿½Å’ ÄžÅ¾Ã‘Ë†ÄžÂ¸ÄžÂ±ÄžÂºÄžÂ° ÄžÂ²Ã‘â€¦ÄžÂ¾ÄžÂ´ÄžÂ° Ã‘â€¡ÄžÂµÃ‘â‚¬ÄžÂµÄžÂ· Pi.", locationChosen: "ÄŸÅ¸â€œï¿½ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾ ÄžÂ²Ã‘â€¹ÄžÂ±Ã‘â‚¬ÄžÂ°ÄžÂ½ÄžÂ¾. Äžâ€™ÄžÂ²ÄžÂµÄžÂ´ÄžÂ¸Ã‘â€šÄžÂµ ÄžÂ¸ÄžÂ½Ã‘â€žÄžÂ¾Ã‘â‚¬ÄžÂ¼ÄžÂ°Ã‘â€ ÄžÂ¸Ã‘Å½.", location: "ÄŸÅ¸â€œï¿½ ÄžÅ“ÄžÂµÃ‘ï¿½Ã‘â€šÄžÂ¾ÄžÂ¿ÄžÂ¾ÄžÂ»ÄžÂ¾ÄžÂ¶ÄžÂµÄžÂ½ÄžÂ¸ÄžÂµ", anonymous: "ÄžÅ¸ÄžÂ¾ÄžÂ»Ã‘Å’ÄžÂ·ÄžÂ¾ÄžÂ²ÄžÂ°Ã‘â€šÄžÂµÄžÂ»Ã‘Å’", }, Chinese: { appDescription: "Ã¥ï¿½â€˜Ã§Å½Â°Ã©â„¢â€žÃ¨Â¿â€˜Ã§â€�Â± Pi Ã©Â©Â±Ã¥Å Â¨Ã§Å¡â€žÃ¥â€¢â€ Ã¥Âºâ€”Ã£â‚¬ï¿½Ã¤ÂºÂ§Ã¥â€œï¿½Ã£â‚¬ï¿½Ã¦Å“ï¿½Ã¥Å Â¡Ã¥â€™Å’Ã¤Â¼ï¿½Ã¤Â¸Å¡Ã£â‚¬â€š", signIn: "Ã�â‚¬ Ã¤Â½Â¿Ã§â€�Â¨ Pi Ã§â„¢Â»Ã¥Â½â€¢", connected: "Pi Ã¥Â·Â²Ã¨Â¿Å¾Ã¦Å½Â¥", search: "ÄŸÅ¸â€�Å½ Ã¦ï¿½Å“Ã§Â´Â¢Ã¥Å“Â°Ã§â€šÂ¹Ã£â‚¬ï¿½Ã¥â€¢â€ Ã¥Â®Â¶Ã¦Ë†â€“Ã§â€�Â¨Ã¦Ë†Â·...", nearby: "ÄŸÅ¸â€œï¿½ Ã©â„¢â€žÃ¨Â¿â€˜Ã¥Å“Â°Ã§â€šÂ¹", allPlaces: "ÄŸÅ¸Å’ï¿½ Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¥Å“Â°Ã§â€šÂ¹", locationFound: "ÄŸÅ¸â€œï¿½ Ã¥Â·Â²Ã¦â€°Â¾Ã¥Ë†Â°Ã¤Â½ï¿½Ã§Â½Â®", nearestFirst: "ÄŸÅ¸â€œï¿½ Ã¤Â¼ËœÃ¥â€¦Ë†Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦Å“â‚¬Ã¨Â¿â€˜Ã§Å¡â€žÃ¥Å“Â°Ã§â€šÂ¹", all: "Ã¥â€¦Â¨Ã©Æ’Â¨", stays: "Ã¤Â½ï¿½Ã¥Â®Â¿", shops: "Ã¥â€¢â€ Ã¥Âºâ€”", food: "Ã©Â¤ï¿½Ã©Â¥Â®", services: "Ã¦Å“ï¿½Ã¥Å Â¡", jobs: "Ã¥Â·Â¥Ã¤Â½Å“", addPlace: "ÄŸÅ¸â€œï¿½ Ã¦Â·Â»Ã¥Å Â Ã¥Å“Â°Ã§â€šÂ¹", language: "Ã¨Â¯Â­Ã¨Â¨â‚¬", country: "Ã¥â€ºÂ½Ã¥Â®Â¶", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Ã¦â€°â‚¬Ã¦Å“â€°Ã¨Â¯Â­Ã¨Â¨â‚¬", allCountries: "ÄŸÅ¸Å’ï¿½ Ã¦â€°â‚¬Ã¦Å“â€°Ã¥â€ºÂ½Ã¥Â®Â¶", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Ã¦Â·Â»Ã¥Å Â Ã¥Å“Â°Ã§â€šÂ¹", tapMap: "Ã§â€šÂ¹Ã¥â€¡Â»Ã¥Å“Â°Ã¥â€ºÂ¾Ã©â‚¬â€°Ã¦â€¹Â©Ã¤Â½ï¿½Ã§Â½Â®Ã£â‚¬â€š", locationSelected: "Ã¢Å“â€¦ Ã¥Â·Â²Ã©â‚¬â€°Ã¦â€¹Â©Ã¤Â½ï¿½Ã§Â½Â®", placeName: "Ã¥Å“Â°Ã§â€šÂ¹Ã¥ï¿½ï¿½Ã§Â§Â°", description: "Ã¦ï¿½ï¿½Ã¨Â¿Â°", save: "ÄŸÅ¸â€™Â¾ Ã¤Â¿ï¿½Ã¥Â­Ëœ", cancel: "Ã¥ï¿½â€“Ã¦Â¶Ë†", selectedLocation: "ÄŸÅ¸â€œï¿½ Ã¥Â·Â²Ã©â‚¬â€°Ã¦â€¹Â©Ã§Å¡â€žÃ¤Â½ï¿½Ã§Â½Â®", details: "ÄŸÅ¸â€œâ€¹ Ã¦Å¸Â¥Ã§Å“â€¹Ã¨Â¯Â¦Ã¦Æ’â€¦", detailsTitle: "Ã¨Â¯Â¦Ã¦Æ’â€¦", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Ã¥Å“Â¨Ã¥Å“Â°Ã¥â€ºÂ¾Ã¤Â¸Å Ã¦ËœÂ¾Ã§Â¤Âº", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Ã¥Ë†Â Ã©â„¢Â¤Ã¥Å“Â°Ã§â€šÂ¹", close: "Ã¥â€¦Â³Ã©â€”Â­", distance: "Ã¥â€¦Â¬Ã©â€¡Å’", places: "ÄŸÅ¸Å’ï¿½ Pi Economy Ã¥Å“Â°Ã§â€šÂ¹", nearbyPlaces: "ÄŸÅ¸â€œï¿½ 50 Ã¥â€¦Â¬Ã©â€¡Å’Ã¥â€ â€¦Ã§Å¡â€žÃ¥Å“Â°Ã§â€šÂ¹ Ã¢â‚¬â€� Ã¦Å“â‚¬Ã¨Â¿â€˜Ã§Å¡â€žÃ¤Â¼ËœÃ¥â€¦Ë†", results: "Ã§Â»â€œÃ¦Å¾Å“", searchingLocation: "ÄŸÅ¸â€œï¿½ Ã¦Â­Â£Ã¥Å“Â¨Ã¨Å½Â·Ã¥ï¿½â€“Ã¤Â½ï¿½Ã§Â½Â®...", locationNotSupported: "Ã¢ï¿½Å’ Ã¤Â¸ï¿½Ã¦â€�Â¯Ã¦Å’ï¿½Ã¥Â®Å¡Ã¤Â½ï¿½Ã£â‚¬â€š", locationDenied: "Ã¢ï¿½Å’ Ã¥Â®Å¡Ã¤Â½ï¿½Ã¦ï¿½Æ’Ã©â„¢ï¿½Ã¨Â¢Â«Ã¦â€¹â€™Ã§Â»ï¿½Ã£â‚¬â€š", signInFirst: "Ã¢ï¿½Å’ Ã¨Â¯Â·Ã¥â€¦Ë†Ã¤Â½Â¿Ã§â€�Â¨ Pi Ã§â„¢Â»Ã¥Â½â€¢Ã£â‚¬â€š", deleteLogin: "Ã¢ï¿½Å’ Ã¥Ë†Â Ã©â„¢Â¤Ã¥â€°ï¿½Ã¥Â¿â€¦Ã©Â¡Â»Ã¤Â½Â¿Ã§â€�Â¨ Pi Ã§â„¢Â»Ã¥Â½â€¢Ã£â‚¬â€š", saving: "Ã¢ï¿½Â³ Ã¦Â­Â£Ã¥Å“Â¨Ã¤Â¿ï¿½Ã¥Â­ËœÃ¥Å“Â°Ã§â€šÂ¹...", deleting: "Ã¢ï¿½Â³ Ã¦Â­Â£Ã¥Å“Â¨Ã¥Ë†Â Ã©â„¢Â¤Ã¥Å“Â°Ã§â€šÂ¹...", deleted: "Ã¥Â·Â²Ã¥Ë†Â Ã©â„¢Â¤Ã£â‚¬â€š", saved: "Ã¥Â·Â²Ã¤Â¿ï¿½Ã¥Â­ËœÃ£â‚¬â€š", nameRequired: "Ã¢ï¿½Å’ Ã¨Â¯Â·Ã¨Â¾â€œÃ¥â€¦Â¥Ã¥Å“Â°Ã§â€šÂ¹Ã¥ï¿½ï¿½Ã§Â§Â°Ã£â‚¬â€š", descriptionTitle: "Ã¦ï¿½ï¿½Ã¨Â¿Â°", languageSelector: "ÄŸÅ¸Å’ï¿½ Ã¥Âºâ€�Ã§â€�Â¨Ã¨Â¯Â­Ã¨Â¨â‚¬", confirmDelete: "Ã§Â¡Â®Ã¥Â®Å¡Ã¨Â¦ï¿½Ã¥Ë†Â Ã©â„¢Â¤Ã¨Â¿â„¢Ã¤Â¸ÂªÃ¥Å“Â°Ã§â€šÂ¹Ã¥ï¿½â€”Ã¯Â¼Å¸", piSdkError: "Ã¢ï¿½Å’ Pi SDK Ã¦â€”Â Ã¦Â³â€¢Ã¥Å Â Ã¨Â½Â½Ã£â‚¬â€š", piUserError: "Ã¦â€”Â Ã¦Â³â€¢Ã¨Å½Â·Ã¥ï¿½â€“ Pi Ã§â€�Â¨Ã¦Ë†Â·Ã¤Â¿Â¡Ã¦ï¿½Â¯Ã£â‚¬â€š", backendError: "Ã¥ï¿½Å½Ã¥ï¿½Â°Ã§â„¢Â»Ã¥Â½â€¢Ã¥Â¤Â±Ã¨Â´Â¥Ã£â‚¬â€š", loginFailed: "Ã¢ï¿½Å’ Pi Ã§â„¢Â»Ã¥Â½â€¢Ã¥Â¤Â±Ã¨Â´Â¥Ã£â‚¬â€š", locationChosen: "ÄŸÅ¸â€œï¿½ Ã¥Â·Â²Ã©â‚¬â€°Ã¦â€¹Â©Ã¤Â½ï¿½Ã§Â½Â®Ã£â‚¬â€šÃ¨Â¯Â·Ã¨Â¾â€œÃ¥â€¦Â¥Ã¥Å“Â°Ã§â€šÂ¹Ã¤Â¿Â¡Ã¦ï¿½Â¯Ã£â‚¬â€š", location: "ÄŸÅ¸â€œï¿½ Ã¤Â½ï¿½Ã§Â½Â®", anonymous: "Ã§â€�Â¨Ã¦Ë†Â·", }, Hindi: { appDescription: "Ã Â¤â€¦Ã Â¤ÂªÃ Â¤Â¨Ã Â¥â€¡ Ã Â¤â€ Ã Â¤Â¸Ã Â¤ÂªÃ Â¤Â¾Ã Â¤Â¸ Pi Ã Â¤Â¦Ã Â¥ï¿½Ã Â¤ÂµÃ Â¤Â¾Ã Â¤Â°Ã Â¤Â¾ Ã Â¤Â¸Ã Â¤â€šÃ Â¤Å¡Ã Â¤Â¾Ã Â¤Â²Ã Â¤Â¿Ã Â¤Â¤ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Å¸Ã Â¥â€¹Ã Â¤Â°, Ã Â¤â€°Ã Â¤Â¤Ã Â¥ï¿½Ã Â¤ÂªÃ Â¤Â¾Ã Â¤Â¦, Ã Â¤Â¸Ã Â¥â€¡Ã Â¤ÂµÃ Â¤Â¾Ã Â¤ï¿½Ã Â¤ï¿½ Ã Â¤â€�Ã Â¤Â° Ã Â¤ÂµÃ Â¥ï¿½Ã Â¤Â¯Ã Â¤ÂµÃ Â¤Â¸Ã Â¤Â¾Ã Â¤Â¯ Ã Â¤â€“Ã Â¥â€¹Ã Â¤Å“Ã Â¥â€¡Ã Â¤â€šÃ Â¥Â¤", signIn: "Ã�â‚¬ Pi Ã Â¤Â¸Ã Â¥â€¡ Ã Â¤Â¸Ã Â¤Â¾Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€š", connected: "Pi Ã Â¤â€¢Ã Â¤Â¨Ã Â¥â€¡Ã Â¤â€¢Ã Â¥ï¿½Ã Â¤Å¸Ã Â¥â€¡Ã Â¤Â¡", search: "ÄŸÅ¸â€�Å½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨, Ã Â¤ÂµÃ Â¥ï¿½Ã Â¤Â¯Ã Â¤ÂµÃ Â¤Â¸Ã Â¤Â¾Ã Â¤Â¯ Ã Â¤Â¯Ã Â¤Â¾ Ã Â¤â€°Ã Â¤ÂªÃ Â¤Â¯Ã Â¥â€¹Ã Â¤â€”Ã Â¤â€¢Ã Â¤Â°Ã Â¥ï¿½Ã Â¤Â¤Ã Â¤Â¾ Ã Â¤â€“Ã Â¥â€¹Ã Â¤Å“Ã Â¥â€¡Ã Â¤â€š...", nearby: "ÄŸÅ¸â€œï¿½ Ã Â¤â€ Ã Â¤Â¸-Ã Â¤ÂªÃ Â¤Â¾Ã Â¤Â¸ Ã Â¤â€¢Ã Â¥â€¡ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨", allPlaces: "ÄŸÅ¸Å’ï¿½ Ã Â¤Â¸Ã Â¤Â­Ã Â¥â‚¬ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Â¦Ã Â¤Â¿Ã Â¤â€“Ã Â¤Â¾Ã Â¤ï¿½Ã Â¤ï¿½", locationFound: "ÄŸÅ¸â€œï¿½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Â®Ã Â¤Â¿Ã Â¤Â² Ã Â¤â€”Ã Â¤Â¯Ã Â¤Â¾", nearestFirst: "ÄŸÅ¸â€œï¿½ Ã Â¤Â¸Ã Â¤Â¬Ã Â¤Â¸Ã Â¥â€¡ Ã Â¤Â¨Ã Â¤Å“Ã Â¤Â¼Ã Â¤Â¦Ã Â¥â‚¬Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤ÂªÃ Â¤Â¹Ã Â¤Â²Ã Â¥â€¡", all: "Ã Â¤Â¸Ã Â¤Â­Ã Â¥â‚¬", stays: "Ã Â¤Â°Ã Â¤Â¹Ã Â¤Â¨Ã Â¥â€¡ Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤Å“Ã Â¤â€”Ã Â¤Â¹", shops: "Ã Â¤Â¦Ã Â¥ï¿½Ã Â¤â€¢Ã Â¤Â¾Ã Â¤Â¨Ã Â¥â€¡Ã Â¤â€š", food: "Ã Â¤Â­Ã Â¥â€¹Ã Â¤Å“Ã Â¤Â¨", services: "Ã Â¤Â¸Ã Â¥â€¡Ã Â¤ÂµÃ Â¤Â¾Ã Â¤ï¿½Ã Â¤ï¿½", jobs: "Ã Â¤Â¨Ã Â¥Å’Ã Â¤â€¢Ã Â¤Â°Ã Â¤Â¿Ã Â¤Â¯Ã Â¤Â¾Ã Â¤ï¿½", addPlace: "ÄŸÅ¸â€œï¿½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Å“Ã Â¥â€¹Ã Â¤Â¡Ã Â¤Â¼Ã Â¥â€¡Ã Â¤â€š", language: "Ã Â¤Â­Ã Â¤Â¾Ã Â¤Â·Ã Â¤Â¾", country: "Ã Â¤Â¦Ã Â¥â€¡Ã Â¤Â¶", allLanguages: "ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ Ã Â¤Â¸Ã Â¤Â­Ã Â¥â‚¬ Ã Â¤Â­Ã Â¤Â¾Ã Â¤Â·Ã Â¤Â¾Ã Â¤ï¿½Ã Â¤ï¿½", allCountries: "ÄŸÅ¸Å’ï¿½ Ã Â¤Â¸Ã Â¤Â­Ã Â¥â‚¬ Ã Â¤Â¦Ã Â¥â€¡Ã Â¤Â¶", addPlaceTitle: "ÄŸÅ¸â€œï¿½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Å“Ã Â¥â€¹Ã Â¤Â¡Ã Â¤Â¼Ã Â¥â€¡Ã Â¤â€š", tapMap: "Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Å¡Ã Â¥ï¿½Ã Â¤Â¨Ã Â¤Â¨Ã Â¥â€¡ Ã Â¤â€¢Ã Â¥â€¡ Ã Â¤Â²Ã Â¤Â¿Ã Â¤ï¿½ Ã Â¤Â®Ã Â¤Â¾Ã Â¤Â¨Ã Â¤Å¡Ã Â¤Â¿Ã Â¤Â¤Ã Â¥ï¿½Ã Â¤Â° Ã Â¤ÂªÃ Â¤Â° Ã Â¤Å¸Ã Â¥Ë†Ã Â¤Âª Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€šÃ Â¥Â¤", locationSelected: "Ã¢Å“â€¦ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Å¡Ã Â¥ï¿½Ã Â¤Â¨Ã Â¤Â¾ Ã Â¤â€”Ã Â¤Â¯Ã Â¤Â¾", placeName: "Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤â€¢Ã Â¤Â¾ Ã Â¤Â¨Ã Â¤Â¾Ã Â¤Â®", description: "Ã Â¤ÂµÃ Â¤Â¿Ã Â¤ÂµÃ Â¤Â°Ã Â¤Â£", save: "ÄŸÅ¸â€™Â¾ Ã Â¤Â¸Ã Â¤Â¹Ã Â¥â€¡Ã Â¤Å“Ã Â¥â€¡Ã Â¤â€š", cancel: "Ã Â¤Â°Ã Â¤Â¦Ã Â¥ï¿½Ã Â¤Â¦ Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€š", selectedLocation: "ÄŸÅ¸â€œï¿½ Ã Â¤Å¡Ã Â¤Â¯Ã Â¤Â¨Ã Â¤Â¿Ã Â¤Â¤ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨", details: "ÄŸÅ¸â€œâ€¹ Ã Â¤ÂµÃ Â¤Â¿Ã Â¤ÂµÃ Â¤Â°Ã Â¤Â£ Ã Â¤Â¦Ã Â¥â€¡Ã Â¤â€“Ã Â¥â€¡Ã Â¤â€š", detailsTitle: "Ã Â¤ÂµÃ Â¤Â¿Ã Â¤ÂµÃ Â¤Â°Ã Â¤Â£", map: "ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ Ã Â¤Â®Ã Â¤Â¾Ã Â¤Â¨Ã Â¤Å¡Ã Â¤Â¿Ã Â¤Â¤Ã Â¥ï¿½Ã Â¤Â° Ã Â¤ÂªÃ Â¤Â° Ã Â¤Â¦Ã Â¤Â¿Ã Â¤â€“Ã Â¤Â¾Ã Â¤ï¿½Ã Â¤ï¿½", delete: "ÄŸÅ¸â€”â€˜Ã¯Â¸ï¿½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Â¹Ã Â¤Å¸Ã Â¤Â¾Ã Â¤ï¿½Ã Â¤ï¿½", close: "Ã Â¤Â¬Ã Â¤â€šÃ Â¤Â¦ Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€š", distance: "Ã Â¤â€¢Ã Â¤Â¿Ã Â¤Â®Ã Â¥â‚¬ Ã Â¤Â¦Ã Â¥â€šÃ Â¤Â°", places: "ÄŸÅ¸Å’ï¿½ Pi Economy Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨", nearbyPlaces: "ÄŸÅ¸â€œï¿½ 50 Ã Â¤â€¢Ã Â¤Â¿Ã Â¤Â®Ã Â¥â‚¬ Ã Â¤â€¢Ã Â¥â€¡ Ã Â¤Â­Ã Â¥â‚¬Ã Â¤Â¤Ã Â¤Â° Ã Â¤â€¢Ã Â¥â€¡ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã¢â‚¬â€� Ã Â¤Â¸Ã Â¤Â¬Ã Â¤Â¸Ã Â¥â€¡ Ã Â¤Â¨Ã Â¤Å“Ã Â¤Â¼Ã Â¤Â¦Ã Â¥â‚¬Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤ÂªÃ Â¤Â¹Ã Â¤Â²Ã Â¥â€¡", results: "Ã Â¤ÂªÃ Â¤Â°Ã Â¤Â¿Ã Â¤Â£Ã Â¤Â¾Ã Â¤Â®", searchingLocation: "ÄŸÅ¸â€œï¿½ Ã Â¤â€ Ã Â¤ÂªÃ Â¤â€¢Ã Â¤Â¾ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤ÂªÃ Â¥ï¿½Ã Â¤Â°Ã Â¤Â¾Ã Â¤ÂªÃ Â¥ï¿½Ã Â¤Â¤ Ã Â¤â€¢Ã Â¤Â¿Ã Â¤Â¯Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾ Ã Â¤Â°Ã Â¤Â¹Ã Â¤Â¾ Ã Â¤Â¹Ã Â¥Ë†...", locationNotSupported: "Ã¢ï¿½Å’ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤ÂµÃ Â¤Â¿Ã Â¤Â§Ã Â¤Â¾ Ã Â¤Â¸Ã Â¤Â®Ã Â¤Â°Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¿Ã Â¤Â¤ Ã Â¤Â¨Ã Â¤Â¹Ã Â¥â‚¬Ã Â¤â€š Ã Â¤Â¹Ã Â¥Ë†Ã Â¥Â¤", locationDenied: "Ã¢ï¿½Å’ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤â€¦Ã Â¤Â¨Ã Â¥ï¿½Ã Â¤Â®Ã Â¤Â¤Ã Â¤Â¿ Ã Â¤Â¨Ã Â¤Â¹Ã Â¥â‚¬Ã Â¤â€š Ã Â¤Â¦Ã Â¥â‚¬ Ã Â¤â€”Ã Â¤Ë†Ã Â¥Â¤", signInFirst: "Ã¢ï¿½Å’ Ã Â¤ÂªÃ Â¤Â¹Ã Â¤Â²Ã Â¥â€¡ Pi Ã Â¤Â¸Ã Â¥â€¡ Ã Â¤Â¸Ã Â¤Â¾Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€šÃ Â¥Â¤", deleteLogin: "Ã¢ï¿½Å’ Ã Â¤Â¹Ã Â¤Å¸Ã Â¤Â¾Ã Â¤Â¨Ã Â¥â€¡ Ã Â¤â€¢Ã Â¥â€¡ Ã Â¤Â²Ã Â¤Â¿Ã Â¤ï¿½ Pi Ã Â¤Â¸Ã Â¥â€¡ Ã Â¤Â¸Ã Â¤Â¾Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤â€¢Ã Â¤Â°Ã Â¤Â¨Ã Â¤Â¾ Ã Â¤â€ Ã Â¤ÂµÃ Â¤Â¶Ã Â¥ï¿½Ã Â¤Â¯Ã Â¤â€¢ Ã Â¤Â¹Ã Â¥Ë†Ã Â¥Â¤", saving: "Ã¢ï¿½Â³ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Â¸Ã Â¤Â¹Ã Â¥â€¡Ã Â¤Å“Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾ Ã Â¤Â°Ã Â¤Â¹Ã Â¤Â¾ Ã Â¤Â¹Ã Â¥Ë†...", deleting: "Ã¢ï¿½Â³ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Â¹Ã Â¤Å¸Ã Â¤Â¾Ã Â¤Â¯Ã Â¤Â¾ Ã Â¤Å“Ã Â¤Â¾ Ã Â¤Â°Ã Â¤Â¹Ã Â¤Â¾ Ã Â¤Â¹Ã Â¥Ë†...", deleted: "Ã Â¤Â¹Ã Â¤Å¸Ã Â¤Â¾ Ã Â¤Â¦Ã Â¤Â¿Ã Â¤Â¯Ã Â¤Â¾ Ã Â¤â€”Ã Â¤Â¯Ã Â¤Â¾Ã Â¥Â¤", saved: "Ã Â¤Â¸Ã Â¤Â¹Ã Â¥â€¡Ã Â¤Å“Ã Â¤Â¾ Ã Â¤â€”Ã Â¤Â¯Ã Â¤Â¾Ã Â¥Â¤", nameRequired: "Ã¢ï¿½Å’ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤â€¢Ã Â¤Â¾ Ã Â¤Â¨Ã Â¤Â¾Ã Â¤Â® Ã Â¤Â¦Ã Â¤Â°Ã Â¥ï¿½Ã Â¤Å“ Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€šÃ Â¥Â¤", descriptionTitle: "Ã Â¤ÂµÃ Â¤Â¿Ã Â¤ÂµÃ Â¤Â°Ã Â¤Â£", languageSelector: "ÄŸÅ¸Å’ï¿½ Ã Â¤ï¿½Ã Â¤Âª Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤Â­Ã Â¤Â¾Ã Â¤Â·Ã Â¤Â¾", confirmDelete: "Ã Â¤â€¢Ã Â¥ï¿½Ã Â¤Â¯Ã Â¤Â¾ Ã Â¤â€ Ã Â¤Âª Ã Â¤ÂµÃ Â¤Â¾Ã Â¤â€¢Ã Â¤Ë† Ã Â¤â€¡Ã Â¤Â¸ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤â€¢Ã Â¥â€¹ Ã Â¤Â¹Ã Â¤Å¸Ã Â¤Â¾Ã Â¤Â¨Ã Â¤Â¾ Ã Â¤Å¡Ã Â¤Â¾Ã Â¤Â¹Ã Â¤Â¤Ã Â¥â€¡ Ã Â¤Â¹Ã Â¥Ë†Ã Â¤â€š?", piSdkError: "Ã¢ï¿½Å’ Pi SDK Ã Â¤Â²Ã Â¥â€¹Ã Â¤Â¡ Ã Â¤Â¨Ã Â¤Â¹Ã Â¥â‚¬Ã Â¤â€š Ã Â¤Â¹Ã Â¥â€¹ Ã Â¤Â¸Ã Â¤â€¢Ã Â¤Â¾Ã Â¥Â¤", piUserError: "Pi Ã Â¤â€°Ã Â¤ÂªÃ Â¤Â¯Ã Â¥â€¹Ã Â¤â€”Ã Â¤â€¢Ã Â¤Â°Ã Â¥ï¿½Ã Â¤Â¤Ã Â¤Â¾ Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤Å“Ã Â¤Â¾Ã Â¤Â¨Ã Â¤â€¢Ã Â¤Â¾Ã Â¤Â°Ã Â¥â‚¬ Ã Â¤ÂªÃ Â¥ï¿½Ã Â¤Â°Ã Â¤Â¾Ã Â¤ÂªÃ Â¥ï¿½Ã Â¤Â¤ Ã Â¤Â¨Ã Â¤Â¹Ã Â¥â‚¬Ã Â¤â€š Ã Â¤Â¹Ã Â¥â€¹ Ã Â¤Â¸Ã Â¤â€¢Ã Â¥â‚¬Ã Â¥Â¤", backendError: "Backend Ã Â¤Â¸Ã Â¤Â¾Ã Â¤â€¡Ã Â¤Â¨-Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤ÂµÃ Â¤Â¿Ã Â¤Â«Ã Â¤Â² Ã Â¤Â¹Ã Â¥ï¿½Ã Â¤â€ Ã Â¥Â¤", loginFailed: "Ã¢ï¿½Å’ Pi Ã Â¤Â¸Ã Â¤Â¾Ã Â¤â€¡Ã Â¤Â¨-Ã Â¤â€¡Ã Â¤Â¨ Ã Â¤ÂµÃ Â¤Â¿Ã Â¤Â«Ã Â¤Â² Ã Â¤Â¹Ã Â¥ï¿½Ã Â¤â€ Ã Â¥Â¤", locationChosen: "ÄŸÅ¸â€œï¿½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤Å¡Ã Â¥ï¿½Ã Â¤Â¨Ã Â¤Â¾ Ã Â¤â€”Ã Â¤Â¯Ã Â¤Â¾Ã Â¥Â¤ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨ Ã Â¤â€¢Ã Â¥â‚¬ Ã Â¤Å“Ã Â¤Â¾Ã Â¤Â¨Ã Â¤â€¢Ã Â¤Â¾Ã Â¤Â°Ã Â¥â‚¬ Ã Â¤Â¦Ã Â¤Â°Ã Â¥ï¿½Ã Â¤Å“ Ã Â¤â€¢Ã Â¤Â°Ã Â¥â€¡Ã Â¤â€šÃ Â¥Â¤", location: "ÄŸÅ¸â€œï¿½ Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤Â¥Ã Â¤Â¾Ã Â¤Â¨", anonymous: "Ã Â¤â€°Ã Â¤ÂªÃ Â¤Â¯Ã Â¥â€¹Ã Â¤â€”Ã Â¤â€¢Ã Â¤Â°Ã Â¥ï¿½Ã Â¤Â¤Ã Â¤Â¾", }, } as const; type TranslationKey = keyof typeof translations.Turkish; function distanceInKm( lat1: number, lng1: number, lat2: number, lng2: number ) { const R = 6371; const dLat = ((lat2 - lat1) * Math.PI) / 180; const dLng = ((lng2 - lng1) * Math.PI) / 180; const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2; return ( R * 2 * Math.atan2( Math.sqrt(a), Math.sqrt(1 - a) ) ); } function createCategoryIcon( category: Exclude<Category, "All"> ) { const item = categoryIcons[category]; return L.divIcon({ className: "pioneer-place-marker", html: ` <div style=" width:48px; height:48px; background:${item.color}; border:4px solid white; border-radius:50% 50% 50% 0; transform:rotate(-45deg); box-shadow:0 4px 12px rgba(0,0,0,.35); display:flex; align-items:center; justify-content:center; "> <span style=" transform:rotate(45deg); font-size:23px; "> ${item.icon} </span> </div> `, iconSize: [56, 56], iconAnchor: [28, 56], popupAnchor: [0, -55], }); } function createUserIcon() { return L.divIcon({ className: "pioneer-user-marker", html: ` <div style=" width:22px; height:22px; background:#1976D2; border:4px solid white; border-radius:50%; box-shadow: 0 0 0 8px rgba(25,118,210,.20), 0 3px 10px rgba(0,0,0,.35); "></div> `, iconSize: [30, 30], iconAnchor: [15, 15], }); } const initialPlaces: Place[] = [ { name: "Pi Stay Ankara", category: "Stays", lat: 39.9334, lng: 32.8597, description: "Pi-powered accommodation", language: "Turkish", country: "TÃƒÂ¼rkiye", }, { name: "Pi Market", category: "Shops", lat: 39.925, lng: 32.85, description: "Pi-powered shop", language: "Turkish", country: "TÃƒÂ¼rkiye", }, { name: "Pi Food", category: "Food", lat: 39.94, lng: 32.87, description: "Pi-powered food business", language: "Turkish", country: "TÃƒÂ¼rkiye", }, ]; function PioneerMapPage() { const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://pioneermap-2.onrender.com"; /* ======================================================= APP LANGUAGE ======================================================= */ const [appLanguage, setAppLanguage] = useState<AppLanguage>(() => { try { const saved = localStorage.getItem( "pioneerMapAppLanguage" ); if ( saved && [ "Turkish", "English", "Arabic", "Spanish", "French", "German", "Portuguese", "Russian", "Chinese", "Hindi", ].includes(saved) ) { return saved as AppLanguage; } } catch {} return "Turkish"; }); const t = (key: TranslationKey) => translations[appLanguage][key]; useEffect(() => { try { localStorage.setItem( "pioneerMapAppLanguage", appLanguage ); } catch {} document.documentElement.lang = appLanguage === "Turkish" ? "tr" : appLanguage === "English" ? "en" : appLanguage === "Arabic" ? "ar" : appLanguage === "Spanish" ? "es" : appLanguage === "French" ? "fr" : appLanguage === "German" ? "de" : appLanguage === "Portuguese" ? "pt" : appLanguage === "Russian" ? "ru" : appLanguage === "Chinese" ? "zh" : "hi"; document.documentElement.dir = appLanguage === "Arabic" ? "rtl" : "ltr"; }, [appLanguage]); /* ======================================================= STATE ======================================================= */ const [status, setStatus] = useState(""); const [activeNav, setActiveNav] = useState< "home" | "nearby" | "add" | "favorites" | "profile" >("home"); const [signedIn, setSignedIn] = useState(false); const [username, setUsername] = useState(""); const [places, setPlaces] = useState<Place[]>(initialPlaces); const [favorites, setFavorites] = useState<Place[]>(() => { try { const saved = localStorage.getItem("pioneerMapFavorites"); return saved ? JSON.parse(saved) : []; } catch { return []; } }); useEffect(() => { try { localStorage.setItem( "pioneerMapFavorites", JSON.stringify(favorites) ); } catch {} }, [favorites]); const [activeCategory, setActiveCategory] = useState<Category>("All"); const [activeLanguage, setActiveLanguage] = useState("All"); const [activeCountry, setActiveCountry] = useState("All"); const [searchText, setSearchText] = useState(""); const [nearbyOnly, setNearbyOnly] = useState(false); const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; } | null>(null); const [selectedPlace, setSelectedPlace] = useState<Place | null>(null); const [showForm, setShowForm] = useState(false); const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number; } | null>(null); const [placeName, setPlaceName] = useState(""); const [placeDescription, setPlaceDescription] = useState(""); const [placeCategory, setPlaceCategory] = useState< Exclude<Category, "All"> >("Stays"); const [placeLanguage, setPlaceLanguage] = useState("Turkish"); const [placeCountry, setPlaceCountry] = useState("TÃƒÂ¼rkiye"); const mapRef = useRef<HTMLDivElement | null>( null ); const mapInstance = useRef<L.Map | null>(null); const markersRef = useRef<L.Marker[]>([]); const userMarkerRef = useRef<L.Marker | null>(null); /* ======================================================= PI LOGIN ======================================================= */ const loginWithPi = async () => { try { const pi = (window as any).Pi; if (!pi) { setStatus(t("piSdkError")); return; } await pi.init({ version: "2.0", sandbox: false, }); const auth = await pi.authenticate( ["username"], () => true ); if ( !auth?.user?.username || !auth?.accessToken ) { throw new Error( t("piUserError") ); } const response = await fetch( `${backendUrl}/user/signin`, { method: "POST", headers: { "Content-Type": "application/json", }, credentials: "include", body: JSON.stringify({ authResult: auth, }), } ); const data = await response .json() .catch(() => ({})); if (!response.ok) { throw new Error( data?.message || t("backendError") ); } setSignedIn(true); setUsername( auth.user.username ); const welcome = appLanguage === "Turkish" ? "HoÃ…Å¸ geldin" : appLanguage === "English" ? "Welcome" : appLanguage === "Arabic" ? "Ã™â€¦Ã˜Â±Ã˜Â­Ã˜Â¨Ã˜Â§Ã™â€¹" : appLanguage === "Spanish" ? "Bienvenido" : appLanguage === "French" ? "Bienvenue" : appLanguage === "German" ? "Willkommen" : appLanguage === "Portuguese" ? "Bem-vindo" : appLanguage === "Russian" ? "Äžâ€�ÄžÂ¾ÄžÂ±Ã‘â‚¬ÄžÂ¾ ÄžÂ¿ÄžÂ¾ÄžÂ¶ÄžÂ°ÄžÂ»ÄžÂ¾ÄžÂ²ÄžÂ°Ã‘â€šÃ‘Å’" : appLanguage === "Chinese" ? "Ã¦Â¬Â¢Ã¨Â¿Å½" : "Ã Â¤Â¸Ã Â¥ï¿½Ã Â¤ÂµÃ Â¤Â¾Ã Â¤â€”Ã Â¤Â¤ Ã Â¤Â¹Ã Â¥Ë†"; setStatus( `Ã¢Å“â€¦ ${welcome} @${auth.user.username}` ); } catch (error) { console.error( "Pi login error:", error ); setSignedIn(false); setUsername(""); setStatus( error instanceof Error ? `Ã¢ï¿½Å’ ${error.message}` : t("loginFailed") ); } }; /* ======================================================= LOAD PLACES ======================================================= */ useEffect(() => { const loadPlaces = async () => { try { const response = await fetch( `${backendUrl}/api/places`, { credentials: "include", } ); if (!response.ok) { throw new Error( `HTTP ${response.status}` ); } const data = await response.json(); if (Array.isArray(data)) { setPlaces( data.length > 0 ? data : initialPlaces ); } } catch (error) { console.error( "Places load error:", error ); } }; loadPlaces(); }, [backendUrl]); /* ======================================================= MAP INITIALIZATION ======================================================= */ useEffect(() => { if ( !mapRef.current || mapInstance.current ) { return; } const map = L.map(mapRef.current).setView( [39.9334, 32.8597], 6 ); L.tileLayer( "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "Ã‚Â© OpenStreetMap contributors", } ).addTo(map); map.on( "click", (event) => { setSelectedLocation({ lat: event.latlng.lat, lng: event.latlng.lng, }); setShowForm(true); setStatus( t("locationChosen") ); } ); mapInstance.current = map; setTimeout(() => { map.invalidateSize(); }, 300); return () => { map.remove(); mapInstance.current = null; }; }, []); /* ======================================================= NEARBY ======================================================= */ const findNearbyPlaces = () => { if (!navigator.geolocation) { setStatus( t("locationNotSupported") ); return; } setStatus( t("searchingLocation") ); navigator.geolocation.getCurrentPosition( (position) => { const location = { lat: position.coords.latitude, lng: position.coords.longitude, }; setUserLocation(location); setNearbyOnly(true); const map = mapInstance.current; if (map) { map.setView( [ location.lat, location.lng, ], 12 ); } if (userMarkerRef.current) { userMarkerRef.current.remove(); } if (map) { userMarkerRef.current = L.marker( [ location.lat, location.lng, ], { icon: createUserIcon(), zIndexOffset: 1000, } ) .addTo(map) .bindPopup( t("location") ); } setStatus( t("nearestFirst") ); }, () => { setStatus( t("locationDenied") ); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000, } ); }; const showAllPlaces = () => { setNearbyOnly(false); setUserLocation(null); setSelectedPlace(null); if (userMarkerRef.current) { userMarkerRef.current.remove(); userMarkerRef.current = null; } setStatus(t("allPlaces")); }; /* ======================================================= DELETE PLACE ======================================================= */ const deletePlace = async ( place: Place ) => { if (!place._id) { setStatus( "Ã¢ï¿½Å’ Place ID not found." ); return; } if (!signedIn) { setStatus( t("deleteLogin") ); return; } const confirmed = window.confirm( `"${place.name}" ${t( "confirmDelete" )}` ); if (!confirmed) return; try { setStatus( t("deleting") ); const response = await fetch( `${backendUrl}/api/places/${place._id}`, { method: "DELETE", credentials: "include", } ); const data = await response.json(); if (!response.ok) { throw new Error( data?.message || "Place could not be deleted." ); } setPlaces( (current) => current.filter( (item) => item._id !== place._id ) ); setSelectedPlace(null); setStatus( `Ã¢Å“â€¦ ${place.name} ${t( "deleted" )}` ); } catch (error) { setStatus( error instanceof Error ? `Ã¢ï¿½Å’ ${error.message}` : "Ã¢ï¿½Å’ Place could not be deleted." ); } }; /* ======================================================= MARKERS ======================================================= */ useEffect(() => { const map = mapInstance.current; if (!map) return; markersRef.current.forEach( (marker) => marker.remove() ); markersRef.current = []; const query = searchText .trim() .toLowerCase(); let filteredPlaces = places.filter((place) => { const categoryMatch = activeCategory === "All" || place.category === activeCategory; const languageMatch = activeLanguage === "All" || (place.language || "") === activeLanguage; const countryMatch = activeCountry === "All" || (place.country || "") === activeCountry; const text = [ place.name, place.description, place.username || "", place.category, place.language || "", place.country || "", ] .join(" ") .toLowerCase(); const searchMatch = query === "" || text.includes(query); let nearbyMatch = true; if ( nearbyOnly && userLocation ) { nearbyMatch = distanceInKm( userLocation.lat, userLocation.lng, place.lat, place.lng ) <= 50; } return ( categoryMatch && languageMatch && countryMatch && searchMatch && nearbyMatch ); }); if (userLocation) { filteredPlaces = [ ...filteredPlaces, ].sort( (a, b) => distanceInKm( userLocation.lat, userLocation.lng, a.lat, a.lng ) - distanceInKm( userLocation.lat, userLocation.lng, b.lat, b.lng ) ); } filteredPlaces.forEach( (place) => { const category = categoryIcons[ place.category ]; const distance = userLocation ? distanceInKm( userLocation.lat, userLocation.lng, place.lat, place.lng ) : null; const marker = L.marker( [ place.lat, place.lng, ], { icon: createCategoryIcon( place.category ), } ).addTo(map); marker.bindPopup(` <div style=" min-width:230px; text-align:center; font-family:Arial,sans-serif; "> <div style=" font-size:34px; "> ${category.icon} </div> <div style=" font-size:19px; font-weight:700; margin:6px 0; "> ${place.name} </div> <div style=" color:#666; font-size:14px; line-height:1.4; "> ${place.description} </div> ${ place.username ? ` <div style=" margin-top:8px; color:#7b1fa2; font-weight:700; "> ÄŸÅ¸â€˜Â¤ @${place.username} </div> ` : "" } <div style=" display:inline-block; margin-top:8px; padding:5px 12px; border-radius:20px; background:${category.color}; color:white; font-weight:700; font-size:12px; "> ${category.icon} ${ place.category === "Stays" ? t("stays") : place.category === "Shops" ? t("shops") : place.category === "Food" ? t("food") : place.category === "Services" ? t("services") : t("jobs") } </div> ${ place.language ? ` <div style=" margin-top:7px; font-size:13px; "> ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ ${place.language} </div> ` : "" } ${ place.country ? ` <div style=" margin-top:5px; font-size:13px; "> ÄŸÅ¸Å’ï¿½ ${place.country} </div> ` : "" } ${ distance !== null ? ` <div style=" margin-top:8px; color:#1976D2; font-weight:700; "> ÄŸÅ¸â€œï¿½ ${distance.toFixed( 1 )} km </div> ` : "" } <button class="pioneer-details-button" type="button" style=" width:100%; margin-top:12px; padding:10px; border:0; border-radius:9px; background:#1976D2; color:white; font-size:14px; font-weight:700; cursor:pointer; " > ${t("details")} </button> </div> `); marker.on( "click", () => { setSelectedPlace(place); } ); marker.on( "popupopen", (event) => { const popupElement = event.popup.getElement(); if (!popupElement) return; const button = popupElement.querySelector( ".pioneer-details-button" ) as HTMLButtonElement | null; if (!button) return; L.DomEvent.off( button ); L.DomEvent.on( button, "click", (clickEvent) => { L.DomEvent.stopPropagation( clickEvent ); setSelectedPlace( place ); map.closePopup(); setTimeout(() => { document .getElementById( "pioneer-detail-card" ) ?.scrollIntoView({ behavior: "smooth", block: "start", }); }, 100); } ); } ); markersRef.current.push( marker ); } ); }, [ places, activeCategory, activeLanguage, activeCountry, searchText, nearbyOnly, userLocation, appLanguage, ]); /* ======================================================= ADD PLACE ======================================================= */ const addPlace = async () => { if (!signedIn) { setStatus( t("signInFirst") ); return; } if (!placeName.trim()) { setStatus( t("nameRequired") ); return; } const map = mapInstance.current; const location = selectedLocation || (map ? map.getCenter() : { lat: 39.9334, lng: 32.8597, }); const newPlace = { name: placeName.trim(), category: placeCategory, lat: location.lat, lng: location.lng, description: placeDescription.trim() || "Pi Economy place", language: placeLanguage, country: placeCountry, username: username || undefined, }; try { setStatus( t("saving") ); const response = await fetch( `${backendUrl}/api/places`, { method: "POST", headers: { "Content-Type": "application/json", }, credentials: "include", body: JSON.stringify( newPlace ), } ); const data = await response.json(); if (!response.ok) { throw new Error( data?.message || "Place could not be saved." ); } const savedPlace: Place = { _id: data._id, name: data.name || newPlace.name, category: data.category || newPlace.category, lat: typeof data.lat === "number" ? data.lat : newPlace.lat, lng: typeof data.lng === "number" ? data.lng : newPlace.lng, description: data.description || newPlace.description, username: data.username || newPlace.username, user_id: data.user_id || null, language: data.language || newPlace.language, country: data.country || newPlace.country, }; setPlaces( (current) => [ ...current, savedPlace, ] ); setSelectedPlace( savedPlace ); setPlaceName(""); setPlaceDescription(""); setPlaceCategory( "Stays" ); setPlaceLanguage( "Turkish" ); setPlaceCountry( "TÃƒÂ¼rkiye" ); setSelectedLocation( null ); setShowForm(false); setStatus( `Ã¢Å“â€¦ ${savedPlace.name} ${t( "saved" )}` ); } catch (error) { console.error( "Add place error:", error ); setStatus( error instanceof Error ? `Ã¢ï¿½Å’ ${error.message}` : "Ã¢ï¿½Å’ Place could not be saved." ); } }; /* ======================================================= CATEGORIES ======================================================= */ const categories: Array<{ name: Category; icon: string; }> = [ { name: "All", icon: "ÄŸÅ¸Å’ï¿½", }, { name: "Stays", icon: "ÄŸÅ¸ï¿½Â ", }, { name: "Shops", icon: "ÄŸÅ¸â€ºï¿½Ã¯Â¸ï¿½", }, { name: "Food", icon: "ÄŸÅ¸ï¿½â€�", }, { name: "Services", icon: "ÄŸÅ¸â€�Â§", }, { name: "Jobs", icon: "ÄŸÅ¸â€™Â¼", }, ]; const categoryLabel = ( category: Category ) => { if (category === "All") return t("all"); if ( category === "Stays" ) return t("stays"); if ( category === "Shops" ) return t("shops"); if ( category === "Food" ) return t("food"); if ( category === "Services" ) return t("services"); return t("jobs"); }; const selectedDistance = selectedPlace && userLocation ? distanceInKm( userLocation.lat, userLocation.lng, selectedPlace.lat, selectedPlace.lng ) : null; const selectedCategory = selectedPlace ? categoryIcons[ selectedPlace.category ] : null; /* ======================================================= UI ======================================================= */ return ( <div style={{ minHeight: "100vh", background: "#f5f7fa", color: "#222", paddingBottom: "90px", }} > {/* HEADER */} <header style={{ background: "#fff", padding: "22px 16px", textAlign: "center", borderBottom: "1px solid #eee", }} > <h1 style={{ margin: "0 0 10px", fontSize: "34px", }} > ÄŸÅ¸â€”ÂºÃ¯Â¸ï¿½ PioneerMap </h1> <p style={{ margin: "0 auto 18px", maxWidth: "650px", fontSize: "17px", lineHeight: "1.45", }} > {t( "appDescription" )} </p> {/* APP LANGUAGE */} <div style={{ maxWidth: "420px", margin: "0 auto 15px", textAlign: "left", }} > <label style={{ display: "block", marginBottom: "7px", fontWeight: "700", fontSize: "14px", }} > {t( "languageSelector" )} </label> <select value={ appLanguage } onChange={(e) => setAppLanguage( e.target.value as AppLanguage ) } style={{ width: "100%", boxSizing: "border-box", padding: "12px", borderRadius: "10px", border: "1px solid #ccc", background: "#fff", fontSize: "15px", fontWeight: "600", }} > {appLanguages.map( (language) => ( <option key={ language.value } value={ language.value } > {language.label} </option> ) )} </select> </div> {!signedIn ? ( <button onClick={ loginWithPi } style={{ padding: "13px 25px", border: "none", borderRadius: "10px", background: "#1976D2", color: "#fff", fontSize: "16px", fontWeight: "700", }} > {t("signIn")} </button> ) : ( <div style={{ display: "inline-block", padding: "12px 20px", borderRadius: "10px", background: "#e8f5e9", color: "#2e7d32", fontWeight: "700", }} > Ã¢Å“â€¦ {t("connected")} Ã¢â‚¬â€� @{username} </div> )} <Toast message={status} onClose={() => setStatus("")} /> </header> {/* SEARCH */} <section style={{ background: "#fff", padding: "15px", }} > <div style={{ maxWidth: "700px", margin: "0 auto", }} > <input value={ searchText } onChange={(e) => setSearchText( e.target.value ) } placeholder={t( "search" )} style={{ width: "100%", boxSizing: "border-box", padding: "15px", borderRadius: "30px", border: "2px solid #ddd", fontSize: "16px", }} /> <button onClick={() => nearbyOnly ? showAllPlaces() : findNearbyPlaces() } style={{ width: "100%", marginTop: "10px", padding: "14px", border: "none", borderRadius: "28px", background: nearbyOnly ? "#d32f2f" : "#1976D2", color: "#fff", fontSize: "16px", fontWeight: "700", }} > {nearbyOnly ? t("allPlaces") : t("nearby")} </button> {nearbyOnly && userLocation && ( <div style={{ marginTop: "10px", padding: "11px", borderRadius: "12px", background: "#e3f2fd", color: "#1565c0", textAlign: "center", fontWeight: "700", }} > {t( "locationFound" )} <br /> {t( "nearestFirst" )} </div> )} </div> </section> {/* CATEGORIES */} <section style={{ background: "#fff", padding: "0 15px 15px", display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap", }} > {categories.map( (category) => ( <button key={ category.name } onClick={() => setActiveCategory( category.name ) } style={{ padding: "10px 16px", borderRadius: "22px", border: "1px solid #ddd", background: activeCategory === category.name ? "#f1c40f" : "#fff", fontWeight: activeCategory === category.name ? "700" : "400", }} > {category.icon}{" "} {categoryLabel( category.name )} </button> ) )} <button onClick={() => setShowForm(true) } style={{ padding: "10px 18px", border: "none", borderRadius: "22px", background: "#222", color: "#fff", fontWeight: "700", }} > {t("addPlace")} </button> </section> {/* LANGUAGE + COUNTRY */} <section style={{ background: "#fff", padding: "0 15px 15px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", maxWidth: "700px", margin: "0 auto", }} > <select value={ activeLanguage } onChange={(e) => setActiveLanguage( e.target.value ) } style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #ccc", fontSize: "15px", }} > <option value="All"> {t( "allLanguages" )} </option> {languages.map( (language) => ( <option key={ language.value } value={ language.value } > {language.label} </option> ) )} </select> <select value={ activeCountry } onChange={(e) => setActiveCountry( e.target.value ) } style={{ width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #ccc", fontSize: "15px", }} > <option value="All"> {t( "allCountries" )} </option> {countries.map( (country) => ( <option key={ country.value } value={ country.value } > {country.label} </option> ) )} </select> </section> {/* ADD PLACE FORM */} {showForm && ( <section style={{ margin: "15px", padding: "20px", background: "#fff", borderRadius: "14px", boxShadow: "0 3px 14px rgba(0,0,0,.12)", }} > <h2> {t( "addPlaceTitle" )} </h2> <p> {t("tapMap")} </p> {selectedLocation && ( <p style={{ color: "#2e7d32", fontWeight: "700", }} > {t( "locationSelected" )} </p> )} <input value={ placeName } onChange={(e) => setPlaceName( e.target.value ) } placeholder={t( "placeName" )} style={{ width: "100%", boxSizing: "border-box", padding: "12px", marginBottom: "10px", borderRadius: "8px", border: "1px solid #ccc", }} /> <select value={ placeCategory } onChange={(e) => setPlaceCategory( e.target .value as Exclude< Category, "All" > ) } style={{ width: "100%", padding: "12px", marginBottom: "10px", borderRadius: "8px", border: "1px solid #ccc", }} > <option value="Stays"> ÄŸÅ¸ï¿½Â  {t("stays")} </option> <option value="Shops"> ÄŸÅ¸â€ºï¿½Ã¯Â¸ï¿½ {t("shops")} </option> <option value="Food"> ÄŸÅ¸ï¿½â€� {t("food")} </option> <option value="Services"> ÄŸÅ¸â€�Â§ {t("services")} </option> <option value="Jobs"> ÄŸÅ¸â€™Â¼ {t("jobs")} </option> </select> <select value={ placeLanguage } onChange={(e) => setPlaceLanguage( e.target.value ) } style={{ width: "100%", padding: "12px", marginBottom: "10px", borderRadius: "8px", border: "1px solid #ccc", }} > {languages.map( (language) => ( <option key={ language.value } value={ language.value } > {language.label} </option> ) )} </select> <select value={ placeCountry } onChange={(e) => setPlaceCountry( e.target.value ) } style={{ width: "100%", padding: "12px", marginBottom: "10px", borderRadius: "8px", border: "1px solid #ccc", }} > {countries.map( (country) => ( <option key={ country.value } value={ country.value } > {country.label} </option> ) )} </select> <textarea value={ placeDescription } onChange={(e) => setPlaceDescription( e.target.value ) } placeholder={t( "description" )} rows={4} style={{ width: "100%", boxSizing: "border-box", padding: "12px", marginBottom: "10px", borderRadius: "8px", border: "1px solid #ccc", }} /> <button onClick={ addPlace } style={{ padding: "12px 20px", border: "none", borderRadius: "9px", background: "#2e7d32", color: "#fff", fontWeight: "700", marginRight: "8px", }} > {t("save")} </button> <button onClick={() => { setShowForm( false ); setSelectedLocation( null ); }} style={{ padding: "12px 20px", border: "none", borderRadius: "9px", background: "#777", color: "#fff", fontWeight: "700", }} > {t("cancel")} </button> {selectedLocation && ( <div style={{ marginTop: "15px", padding: "12px", borderRadius: "10px", background: "#f5f5f5", }} > {t( "selectedLocation" )}{" "} :{" "} {selectedLocation.lat.toFixed( 5 )}{" "} ,{" "} {selectedLocation.lng.toFixed( 5 )} </div> )} </section> )} {/* MAP + DETAILS */} <main style={{ padding: "15px", }} > <div ref={mapRef} style={{ width: "100%", height: "500px", borderRadius: "14px", overflow: "hidden", background: "#ddd", }} /> {selectedPlace && selectedCategory && ( <section id="pioneer-detail-card" style={{ marginTop: "16px", background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 4px 18px rgba(0,0,0,.16)", borderTop: `7px solid ${selectedCategory.color}`, }} > <div style={{ padding: "20px", }} > <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", }} > <div> <div style={{ fontSize: "42px", }} > { selectedCategory.icon } </div> <h2 style={{ margin: "6px 0 0", }} > { selectedPlace.name } </h2> </div> <button onClick={() => setSelectedPlace( null ) } aria-label={t( "close" )} style={{ width: "38px", height: "38px", borderRadius: "50%", border: "none", background: "#eee", fontSize: "22px", }} > Ãƒâ€” </button> </div> {/* CATEGORY */} <div style={{ display: "inline-block", marginTop: "10px", padding: "7px 14px", borderRadius: "20px", background: selectedCategory.color, color: "#fff", fontWeight: "700", }} > { selectedCategory.icon }{" "} {categoryLabel( selectedPlace.category )} </div> {/* DESCRIPTION */} <div style={{ marginTop: "15px", padding: "15px", borderRadius: "12px", background: "#f7f7f7", }} > <strong> {t( "descriptionTitle" )} </strong> <div style={{ marginTop: "6px", lineHeight: "1.5", }} > { selectedPlace.description } </div> </div> {/* LANGUAGE + COUNTRY */} <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "10px", }} > <div style={{ padding: "13px", borderRadius: "12px", background: "#eef7ff", }} > ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½{" "} <strong> {t( "language" )} </strong> <br /> { selectedPlace.language || "Turkish" } </div> <div style={{ padding: "13px", borderRadius: "12px", background: "#f5f0ff", }} > ÄŸÅ¸Å’ï¿½{" "} <strong> {t( "country" )} </strong> <br /> { selectedPlace.country || "TÃƒÂ¼rkiye" } </div> </div> {/* USER */} {selectedPlace.username && ( <div style={{ marginTop: "10px", padding: "13px", borderRadius: "12px", background: "#f3e5f5", color: "#7b1fa2", fontWeight: "700", }} > ÄŸÅ¸â€˜Â¤ @ { selectedPlace.username } </div> )} {/* DISTANCE */} {selectedDistance !== null && ( <div style={{ marginTop: "10px", padding: "13px", borderRadius: "12px", background: "#e3f2fd", color: "#1565c0", fontWeight: "700", }} > ÄŸÅ¸â€œï¿½{" "} {selectedDistance.toFixed( 1 )}{" "} {t( "distance" )} </div> )} {/* ACTIONS */} <div style={{ display: "flex", gap: "9px", flexWrap: "wrap", marginTop: "15px", }} > <button onClick={() => { const map = mapInstance.current; if (map) { map.setView( [ selectedPlace.lat, selectedPlace.lng, ], 15 ); } }} style={{ flex: "1", minWidth: "160px", padding: "13px", border: "none", borderRadius: "10px", background: "#1976D2", color: "#fff", fontWeight: "700", }} > {t("map")} </button> {signedIn && username && selectedPlace.username === username && ( <button onClick={() => deletePlace( selectedPlace ) } style={{ flex: "1", minWidth: "160px", padding: "13px", border: "none", borderRadius: "10px", background: "#d32f2f", color: "#fff", fontWeight: "700", }} > {t( "delete" )} </button> )} </div> </div> </section> )} {/* BOTTOM STATUS */} <div style={{ textAlign: "center", fontWeight: "700", padding: "15px 5px 20px", }} > {nearbyOnly && userLocation ? t( "nearbyPlaces" ) : searchText.trim() ? `ÄŸÅ¸â€�Å½ "${searchText}" ${t( "results" )}` : activeLanguage !== "All" ? `ÄŸÅ¸â€”Â£Ã¯Â¸ï¿½ ${activeLanguage}` : activeCountry !== "All" ? `ÄŸÅ¸Å’ï¿½ ${activeCountry}` : activeCategory === "All" ? t("places") : `${ categoryIcons[ activeCategory ].icon } ${categoryLabel( activeCategory )}`} </div> </main> {activeNav === "favorites" && ( <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: "82px", zIndex: 9000, overflowY: "auto", background: "#f5f7fa", paddingTop: "15px", }} > <Favorites favorites={favorites} onRemove={(id) => { setFavorites((current) => current.filter((place) => place._id !== id) ); }} onPlaceClick={(place) => { const found = places.find( (item) => item._id === place._id ); if (found) { setSelectedPlace(found); setActiveNav("home"); window.scrollTo({ top: 0, behavior: "smooth", }); } }} /> </div> )} {/* ===================================================== BOTTOM NAVIGATION ===================================================== */} <nav style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 9999, background: "#ffffff", borderTop: "1px solid #ddd", boxShadow: "0 -4px 18px rgba(0,0,0,.15)", display: "grid", gridTemplateColumns: "repeat(5,1fr)", padding: "8px 4px", paddingBottom: "calc(8px + env(safe-area-inset-bottom))", }} > {[ [ "ÄŸÅ¸ï¿½Â ", "Ana Sayfa", "home", ], [ "ÄŸÅ¸â€œï¿½", "YakÃ„Â±nÃ„Â±mda", "nearby", ], [ "Ã¢Å¾â€¢", "Yer Ekle", "add", ], [ "Ã¢Â­ï¿½", "Favoriler", "favorites", ], [ "ÄŸÅ¸â€˜Â¤", "Profil", "profile", ], ].map( ([icon, label, key]) => ( <button key={key} type="button" onClick={() => { setActiveNav( key as | "home" | "nearby" | "add" | "favorites" | "profile" ); if ( key === "home" ) { setNearbyOnly( false ); setUserLocation( null ); setSelectedPlace( null ); setStatus(""); window.scrollTo( { top: 0, behavior: "smooth", } ); } if ( key === "nearby" ) { findNearbyPlaces(); window.scrollTo( { top: 0, behavior: "smooth", } ); } if ( key === "add" ) { setShowForm( true ); setStatus(""); window.scrollTo( { top: 0, behavior: "smooth", } ); } if ( key === "favorites" ) { setStatus(""); window.scrollTo({ top: 0, behavior: "smooth", }); } if ( key === "profile" ) { setStatus( signedIn ? `ÄŸÅ¸â€˜Â¤ @${username}` : appLanguage === "English" ? "ÄŸÅ¸â€˜Â¤ Please sign in with Pi." : "ÄŸÅ¸â€˜Â¤ Pi ile giriÃ…Å¸ yapmalÃ„Â±sÃ„Â±n." ); } }} style={{ border: "none", borderRadius: "12px", background: activeNav === key ? "#e3f2fd" : "transparent", color: activeNav === key ? "#1976D2" : "#333", padding: "7px 2px", fontWeight: "700", fontSize: "11px", cursor: "pointer", }} > <div style={{ fontSize: "23px", lineHeight: "25px", }} > {icon} </div> <div> {label} </div> </button> ) )} </nav> </div> ); } export default PioneerMapPage;
+import { useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import Toast from "../components/Toast";
+import "leaflet/dist/leaflet.css";
+import Favorites from "../components/Favorites";
+type Category =
+  | "All"
+  | "Stays"
+  | "Shops"
+  | "Food"
+  | "Services"
+  | "Jobs";
+
+type Place = {
+  _id?: string;
+  name: string;
+  category: Exclude<Category, "All">;
+  lat: number;
+  lng: number;
+  description: string;
+  username?: string;
+  user_id?: string | null;
+  language?: string;
+  country?: string;
+};
+
+type AppLanguage =
+  | "Turkish"
+  | "English"
+  | "Arabic"
+  | "Spanish"
+  | "French"
+  | "German"
+  | "Portuguese"
+  | "Russian"
+  | "Chinese"
+  | "Hindi";
+
+const categoryIcons: Record<
+  Exclude<Category, "All">,
+  { icon: string; color: string }
+> = {
+  Stays: { icon: "🏠", color: "#1976D2" },
+  Shops: { icon: "🛍️", color: "#E91E63" },
+  Food: { icon: "🍔", color: "#FF9800" },
+  Services: { icon: "🔧", color: "#009688" },
+  Jobs: { icon: "💼", color: "#673AB7" },
+};
+
+/* =========================================================
+FEATURE #4
+PLACE LANGUAGE + COUNTRY DATA
+========================================================= */
+
+const languages = [
+  { value: "Turkish", label: "🇹🇷 Türkçe" },
+  { value: "English", label: "🇬🇧 English" },
+  { value: "Arabic", label: "🇸🇦 العربية" },
+  { value: "Chinese", label: "🇨🇳 中文" },
+  { value: "Hindi", label: "🇮🇳 हिन्दी" },
+  { value: "Spanish", label: "🇪🇸 Español" },
+  { value: "French", label: "🇫🇷 Français" },
+  { value: "Portuguese", label: "🇵🇹 Português" },
+  { value: "Russian", label: "🇷🇺 Русский" },
+  { value: "Bengali", label: "🇧🇩 বাংলা" },
+  { value: "German", label: "🇩🇪 Deutsch" },
+  { value: "Japanese", label: "🇯🇵 日本語" },
+  { value: "Korean", label: "🇰🇷 한국어" },
+  { value: "Persian", label: "🇮🇷 فارسی" },
+  { value: "Italian", label: "🇮🇹 Italiano" },
+  { value: "Urdu", label: "🇵🇰 اردو" },
+  { value: "Vietnamese", label: "🇻🇳 Tiếng Việt" },
+  { value: "Telugu", label: "🇮🇳 తెలుగు" },
+  { value: "Marathi", label: "🇮🇳 मराठी" },
+  { value: "Tamil", label: "🇮🇳 தமிழ்" },
+  { value: "Yue Chinese", label: "🇭🇰 粵語" },
+  { value: "Wu Chinese", label: "🇨🇳 吴语" },
+  { value: "Gujarati", label: "🇮🇳 ગુજરાતી" },
+  { value: "Kannada", label: "🇮🇳 ಕನ್ನಡ" },
+  { value: "Polish", label: "🇵🇱 Polski" },
+  { value: "Ukrainian", label: "🇺🇦 Українська" },
+  { value: "Malay", label: "🇲🇾 Bahasa Melayu" },
+  { value: "Malayalam", label: "🇮🇳 മലയാളം" },
+  { value: "Odia", label: "🇮🇳 ଓଡ଼ିଆ" },
+  { value: "Punjabi", label: "🇮🇳 ਪੰਜਾਬੀ" },
+  { value: "Romanian", label: "🇷🇴 Română" },
+  { value: "Dutch", label: "🇳🇱 Nederlands" },
+  { value: "Greek", label: "🇬🇷 Ελληνικά" },
+  { value: "Czech", label: "🇨🇿 Čeština" },
+  { value: "Swedish", label: "🇸🇪 Svenska" },
+  { value: "Hungarian", label: "🇭🇺 Magyar" },
+  { value: "Hebrew", label: "🇮🇱 עברית" },
+  { value: "Finnish", label: "🇫🇮 Suomi" },
+  { value: "Norwegian", label: "🇳🇴 Norsk" },
+  { value: "Danish", label: "🇩🇰 Dansk" },
+  { value: "Bulgarian", label: "🇧🇬 Български" },
+  { value: "Serbian", label: "🇷🇸 Српски" },
+  { value: "Croatian", label: "🇭🇷 Hrvatski" },
+  { value: "Slovak", label: "🇸🇰 Slovenčina" },
+  { value: "Lithuanian", label: "🇱🇹 Lietuvių" },
+  { value: "Slovenian", label: "🇸🇮 Slovenščina" },
+  { value: "Latvian", label: "🇱🇻 Latviešu" },
+  { value: "Estonian", label: "🇪🇪 Eesti" },
+  { value: "Thai", label: "🇹🇭 ไทย" },
+  { value: "Indonesian", label: "🇮🇩 Bahasa Indonesia" },
+];
+
+const countries = [
+  { value: "Türkiye", label: "🇹🇷 Türkiye" },
+  { value: "United States", label: "🇺🇸 ABD" },
+  { value: "Canada", label: "🇨🇦 Kanada" },
+  { value: "Mexico", label: "🇲🇽 Meksika" },
+  { value: "Brazil", label: "🇧🇷 Brezilya" },
+  { value: "Argentina", label: "🇦🇷 Arjantin" },
+  { value: "Chile", label: "🇨🇱 Şili" },
+  { value: "Colombia", label: "🇨🇴 Kolombiya" },
+  { value: "Peru", label: "🇵🇪 Peru" },
+  { value: "United Kingdom", label: "🇬🇧 İngiltere" },
+  { value: "Ireland", label: "🇮🇪 İrlanda" },
+  { value: "France", label: "🇫🇷 Fransa" },
+  { value: "Germany", label: "🇩🇪 Almanya" },
+  { value: "Italy", label: "🇮🇹 İtalya" },
+  { value: "Spain", label: "🇪🇸 İspanya" },
+  { value: "Portugal", label: "🇵🇹 Portekiz" },
+  { value: "Netherlands", label: "🇳🇱 Hollanda" },
+  { value: "Belgium", label: "🇧🇪 Belçika" },
+  { value: "Switzerland", label: "🇨🇭 İsviçre" },
+  { value: "Austria", label: "🇦🇹 Avusturya" },
+  { value: "Sweden", label: "🇸🇪 İsveç" },
+  { value: "Norway", label: "🇳🇴 Norveç" },
+  { value: "Denmark", label: "🇩🇰 Danimarka" },
+  { value: "Finland", label: "🇫🇮 Finlandiya" },
+  { value: "Iceland", label: "🇮🇸 İzlanda" },
+  { value: "Poland", label: "🇵🇱 Polonya" },
+  { value: "Czechia", label: "🇨🇿 Çekya" },
+  { value: "Slovakia", label: "🇸🇰 Slovakya" },
+  { value: "Hungary", label: "🇭🇺 Macaristan" },
+  { value: "Romania", label: "🇷🇴 Romanya" },
+  { value: "Bulgaria", label: "🇧🇬 Bulgaristan" },
+  { value: "Greece", label: "🇬🇷 Yunanistan" },
+  { value: "Ukraine", label: "🇺🇦 Ukrayna" },
+  { value: "Serbia", label: "🇷🇸 Sırbistan" },
+  { value: "Croatia", label: "🇭🇷 Hırvatistan" },
+  { value: "Slovenia", label: "🇸🇮 Slovenya" },
+  { value: "Bosnia and Herzegovina", label: "🇧🇦 Bosna-Hersek" },
+  { value: "Albania", label: "🇦🇱 Arnavutluk" },
+  { value: "Lithuania", label: "🇱🇹 Litvanya" },
+  { value: "Latvia", label: "🇱🇻 Letonya" },
+  { value: "Estonia", label: "🇪🇪 Estonya" },
+  { value: "Russia", label: "🇷🇺 Rusya" },
+  { value: "Georgia", label: "🇬🇪 Gürcistan" },
+  { value: "Armenia", label: "🇦🇲 Ermenistan" },
+  { value: "Azerbaijan", label: "🇦🇿 Azerbaycan" },
+  { value: "Kazakhstan", label: "🇰🇿 Kazakistan" },
+  { value: "Uzbekistan", label: "🇺🇿 Özbekistan" },
+  { value: "China", label: "🇨🇳 Çin" },
+  { value: "Japan", label: "🇯🇵 Japonya" },
+  { value: "South Korea", label: "🇰🇷 Güney Kore" },
+  { value: "India", label: "🇮🇳 Hindistan" },
+  { value: "Pakistan", label: "🇵🇰 Pakistan" },
+  { value: "Bangladesh", label: "🇧🇩 Bangladeş" },
+  { value: "Nepal", label: "🇳🇵 Nepal" },
+  { value: "Sri Lanka", label: "🇱🇰 Sri Lanka" },
+  { value: "Thailand", label: "🇹🇭 Tayland" },
+  { value: "Vietnam", label: "🇻🇳 Vietnam" },
+  { value: "Malaysia", label: "🇲🇾 Malezya" },
+  { value: "Singapore", label: "🇸🇬 Singapur" },
+  { value: "Indonesia", label: "🇮🇩 Endonezya" },
+  { value: "Philippines", label: "🇵🇭 Filipinler" },
+  { value: "Australia", label: "🇦🇺 Avustralya" },
+  { value: "New Zealand", label: "🇳🇿 Yeni Zelanda" },
+  { value: "Saudi Arabia", label: "🇸🇦 Suudi Arabistan" },
+  { value: "United Arab Emirates", label: "🇦🇪 BAE" },
+  { value: "Qatar", label: "🇶🇦 Katar" },
+  { value: "Kuwait", label: "🇰🇼 Kuveyt" },
+  { value: "Bahrain", label: "🇧🇭 Bahreyn" },
+  { value: "Oman", label: "🇴🇲 Umman" },
+  { value: "Jordan", label: "🇯🇴 Ürdün" },
+  { value: "Lebanon", label: "🇱🇧 Lübnan" },
+  { value: "Israel", label: "🇮🇱 İsrail" },
+  { value: "Iraq", label: "🇮🇶 Irak" },
+  { value: "Iran", label: "🇮🇷 İran" },
+  { value: "Egypt", label: "🇪🇬 Mısır" },
+  { value: "Morocco", label: "🇲🇦 Fas" },
+  { value: "Algeria", label: "🇩🇿 Cezayir" },
+  { value: "Tunisia", label: "🇹🇳 Tunus" },
+  { value: "Libya", label: "🇱🇾 Libya" },
+  { value: "South Africa", label: "🇿🇦 Güney Afrika" },
+  { value: "Nigeria", label: "🇳🇬 Nijerya" },
+  { value: "Ghana", label: "🇬🇭 Gana" },
+  { value: "Kenya", label: "🇰🇪 Kenya" },
+  { value: "Ethiopia", label: "🇪🇹 Etiyopya" },
+  { value: "Tanzania", label: "🇹🇿 Tanzanya" },
+];
+
+/* =========================================================
+FEATURE #5
+APP LANGUAGE
+========================================================= */
+
+const appLanguages: Array<{
+  value: AppLanguage;
+  label: string;
+}> = [
+  { value: "Turkish", label: "🇹🇷 Türkçe" },
+  { value: "English", label: "🇬🇧 English" },
+  { value: "Arabic", label: "🇸🇦 العربية" },
+  { value: "Spanish", label: "🇪🇸 Español" },
+  { value: "French", label: "🇫🇷 Français" },
+  { value: "German", label: "🇩🇪 Deutsch" },
+  { value: "Portuguese", label: "🇵🇹 Português" },
+  { value: "Russian", label: "🇷🇺 Русский" },
+  { value: "Chinese", label: "🇨🇳 中文" },
+  { value: "Hindi", label: "🇮🇳 हिन्दी" },
+];
+
+const translations = {
+  Turkish: {
+    appDescription:
+      "Pi destekli mağazaları, ürünleri, hizmetleri ve işletmeleri yakınında keşfet.",
+    signIn: "π Pi ile Giriş Yap",
+    connected: "Pi Bağlandı",
+    search: "🔎 Yer, işletme veya kullanıcı ara...",
+    nearby: "📍 Yakınımdaki Yerler",
+    allPlaces: "🌍 Tüm Yerleri Göster",
+    locationFound: "📍 Konumun bulundu",
+    nearestFirst: "📏 En yakın yerler önce gösteriliyor",
+    all: "Tümü",
+    stays: "Konaklama",
+    shops: "Mağazalar",
+    food: "Yemek",
+    services: "Hizmetler",
+    jobs: "İşler",
+    addPlace: "📍 Yer Ekle",
+    language: "Dil",
+    country: "Ülke",
+    allLanguages: "🗣️ Tüm Diller",
+    allCountries: "🌍 Tüm Ülkeler",
+    addPlaceTitle: "📍 Yer Ekle",
+    tapMap: "Konum seçmek için haritaya dokunabilirsin.",
+    locationSelected: "✅ Konum seçildi",
+    placeName: "Yer adı",
+    description: "Açıklama",
+    save: "💾 Kaydet",
+    cancel: "İptal",
+    selectedLocation: "📍 Seçilen konum",
+    details: "📋 Detayları Gör",
+    detailsTitle: "Detaylar",
+    map: "🗺️ Haritada Göster",
+    delete: "🗑️ Yeri Sil",
+    close: "Kapat",
+    distance: "km uzaklıkta",
+    places: "🌍 Pi Economy Yerleri",
+    nearbyPlaces: "📍 50 km içindeki yerler — en yakından uzağa",
+    results: "sonuçları",
+    searchingLocation: "📍 Konumun alınıyor...",
+    locationNotSupported: "❌ Konum özelliği desteklenmiyor.",
+    locationDenied: "❌ Konum izni verilmedi.",
+    signInFirst: "❌ Önce Pi ile giriş yapmalısın.",
+    deleteLogin: "❌ Silmek için Pi ile giriş yapmalısın.",
+    saving: "⏳ Yer kaydediliyor...",
+    deleting: "⏳ Yer siliniyor...",
+    deleted: "silindi.",
+    saved: "kaydedildi.",
+    nameRequired: "❌ Yer adını yaz.",
+    descriptionTitle: "AÇIKLAMA",
+    languageSelector: "🌐 Uygulama Dili",
+    confirmDelete: "yerini silmek istediğine emin misin?",
+    piSdkError: "❌ Pi SDK yüklenemedi.",
+    piUserError: "Pi kullanıcı bilgisi alınamadı.",
+    backendError: "Backend giriş işlemi başarısız.",
+    loginFailed: "❌ Pi Sign-In başarısız.",
+    locationChosen: "📍 Konum seçildi. Yer bilgilerini gir.",
+    location: "📍 Konum",
+    anonymous: "Kullanıcı",
+  },
+
+  English: {
+    appDescription:
+      "Discover Pi-powered stores, products, services, and businesses near you.",
+    signIn: "π Sign in with Pi",
+    connected: "Pi Connected",
+    search: "🔎 Search places, businesses or users...",
+    nearby: "📍 Nearby Places",
+    allPlaces: "🌍 Show All Places",
+    locationFound: "📍 Location found",
+    nearestFirst: "📏 Nearest places shown first",
+    all: "All",
+    stays: "Stays",
+    shops: "Shops",
+    food: "Food",
+    services: "Services",
+    jobs: "Jobs",
+    addPlace: "📍 Add Place",
+    language: "Language",
+    country: "Country",
+    allLanguages: "🗣️ All Languages",
+    allCountries: "🌍 All Countries",
+    addPlaceTitle: "📍 Add Place",
+    tapMap: "Tap the map to select a location.",
+    locationSelected: "✅ Location selected",
+    placeName: "Place name",
+    description: "Description",
+    save: "💾 Save",
+    cancel: "Cancel",
+    selectedLocation: "📍 Selected location",
+    details: "📋 View Details",
+    detailsTitle: "Details",
+    map: "🗺️ Show on Map",
+    delete: "🗑️ Delete Place",
+    close: "Close",
+    distance: "km away",
+    places: "🌍 Pi Economy Places",
+    nearbyPlaces: "📍 Places within 50 km — nearest first",
+    results: "results",
+    searchingLocation: "📍 Getting your location...",
+    locationNotSupported: "❌ Location is not supported.",
+    locationDenied: "❌ Location permission denied.",
+    signInFirst: "❌ Please sign in with Pi first.",
+    deleteLogin: "❌ You must sign in with Pi to delete.",
+    saving: "⏳ Saving place...",
+    deleting: "⏳ Deleting place...",
+    deleted: "deleted.",
+    saved: "saved.",
+    nameRequired: "❌ Enter a place name.",
+    descriptionTitle: "DESCRIPTION",
+    languageSelector: "🌐 App Language",
+    confirmDelete: "Are you sure you want to delete this place?",
+    piSdkError: "❌ Pi SDK could not be loaded.",
+    piUserError: "Pi user information could not be obtained.",
+    backendError: "Backend sign-in failed.",
+    loginFailed: "❌ Pi Sign-In failed.",
+    locationChosen:
+      "📍 Location selected. Enter the place information.",
+    location: "📍 Location",
+    anonymous: "User",
+  },
+
+  Arabic: {
+    appDescription:
+      "اكتشف المتاجر والمنتجات والخدمات والأعمال المدعومة من Pi بالقرب منك.",
+    signIn: "π تسجيل الدخول باستخدام Pi",
+    connected: "Pi متصل",
+    search: "🔎 ابحث عن الأماكن أو الأعمال أو المستخدمين...",
+    nearby: "📍 الأماكن القريبة",
+    allPlaces: "🌍 عرض جميع الأماكن",
+    locationFound: "📍 تم العثور على موقعك",
+    nearestFirst: "📏 عرض الأماكن الأقرب أولاً",
+    all: "الكل",
+    stays: "الإقامات",
+    shops: "المتاجر",
+    food: "الطعام",
+    services: "الخدمات",
+    jobs: "الوظائف",
+    addPlace: "📍 إضافة مكان",
+    language: "اللغة",
+    country: "الدولة",
+    allLanguages: "🗣️ جميع اللغات",
+    allCountries: "🌍 جميع الدول",
+    addPlaceTitle: "📍 إضافة مكان",
+    tapMap: "اضغط على الخريطة لاختيار الموقع.",
+    locationSelected: "✅ تم اختيار الموقع",
+    placeName: "اسم المكان",
+    description: "الوصف",
+    save: "💾 حفظ",
+    cancel: "إلغاء",
+    selectedLocation: "📍 الموقع المحدد",
+    details: "📋 عرض التفاصيل",
+    detailsTitle: "التفاصيل",
+    map: "🗺️ عرض على الخريطة",
+    delete: "🗑️ حذف المكان",
+    close: "إغلاق",
+    distance: "كم",
+    places: "🌍 أماكن Pi Economy",
+    nearbyPlaces: "📍 الأماكن ضمن 50 كم — الأقرب أولاً",
+    results: "النتائج",
+    searchingLocation: "📍 جارٍ تحديد موقعك...",
+    locationNotSupported: "❌ الموقع غير مدعوم.",
+    locationDenied: "❌ تم رفض إذن الموقع.",
+    signInFirst: "❌ يرجى تسجيل الدخول باستخدام Pi أولاً.",
+    deleteLogin: "❌ يجب تسجيل الدخول باستخدام Pi للحذف.",
+    saving: "⏳ جارٍ حفظ المكان...",
+    deleting: "⏳ جارٍ حذف المكان...",
+    deleted: "تم حذفه.",
+    saved: "تم حفظه.",
+    nameRequired: "❌ أدخل اسم المكان.",
+    descriptionTitle: "الوصف",
+    languageSelector: "🌐 لغة التطبيق",
+    confirmDelete: "هل أنت متأكد من حذف هذا المكان؟",
+    piSdkError: "❌ تعذر تحميل Pi SDK.",
+    piUserError: "تعذر الحصول على معلومات مستخدم Pi.",
+    backendError: "فشل تسجيل الدخول إلى الخادم.",
+    loginFailed: "❌ فشل تسجيل الدخول باستخدام Pi.",
+    locationChosen: "📍 تم اختيار الموقع. أدخل معلومات المكان.",
+    location: "📍 الموقع",
+    anonymous: "مستخدم",
+  },
+
+  Spanish: {
+    appDescription:
+      "Descubre tiendas, productos, servicios y negocios impulsados por Pi cerca de ti.",
+    signIn: "π Iniciar sesión con Pi",
+    connected: "Pi conectado",
+    search: "🔎 Buscar lugares, negocios o usuarios...",
+    nearby: "📍 Lugares cercanos",
+    allPlaces: "🌍 Mostrar todos los lugares",
+    locationFound: "📍 Ubicación encontrada",
+    nearestFirst: "📏 Los lugares más cercanos aparecen primero",
+    all: "Todos",
+    stays: "Alojamientos",
+    shops: "Tiendas",
+    food: "Comida",
+    services: "Servicios",
+    jobs: "Empleos",
+    addPlace: "📍 Añadir lugar",
+    language: "Idioma",
+    country: "País",
+    allLanguages: "🗣️ Todos los idiomas",
+    allCountries: "🌍 Todos los países",
+    addPlaceTitle: "📍 Añadir lugar",
+    tapMap: "Toca el mapa para seleccionar una ubicación.",
+    locationSelected: "✅ Ubicación seleccionada",
+    placeName: "Nombre del lugar",
+    description: "Descripción",
+    save: "💾 Guardar",
+    cancel: "Cancelar",
+    selectedLocation: "📍 Ubicación seleccionada",
+    details: "📋 Ver detalles",
+    detailsTitle: "Detalles",
+    map: "🗺️ Mostrar en el mapa",
+    delete: "🗑️ Eliminar lugar",
+    close: "Cerrar",
+    distance: "km de distancia",
+    places: "🌍 Lugares de Pi Economy",
+    nearbyPlaces: "📍 Lugares en 50 km — más cercanos primero",
+    results: "resultados",
+    searchingLocation: "📍 Obteniendo tu ubicación...",
+    locationNotSupported: "❌ La ubicación no es compatible.",
+    locationDenied: "❌ Permiso de ubicación denegado.",
+    signInFirst: "❌ Inicia sesión con Pi primero.",
+    deleteLogin: "❌ Debes iniciar sesión con Pi para eliminar.",
+    saving: "⏳ Guardando lugar...",
+    deleting: "⏳ Eliminando lugar...",
+    deleted: "eliminado.",
+    saved: "guardado.",
+    nameRequired: "❌ Introduce un nombre.",
+    descriptionTitle: "DESCRIPCIÓN",
+    languageSelector: "🌐 Idioma de la aplicación",
+    confirmDelete: "¿Seguro que quieres eliminar este lugar?",
+    piSdkError: "❌ No se pudo cargar Pi SDK.",
+    piUserError: "No se pudo obtener la información del usuario Pi.",
+    backendError: "Error al iniciar sesión en el backend.",
+    loginFailed: "❌ Falló el inicio de sesión con Pi.",
+    locationChosen:
+      "📍 Ubicación seleccionada. Introduce la información.",
+    location: "📍 Ubicación",
+    anonymous: "Usuario",
+  },
+
+  French: {
+    appDescription:
+      "Découvrez les magasins, produits, services et entreprises propulsés par Pi près de chez vous.",
+    signIn: "π Se connecter avec Pi",
+    connected: "Pi connecté",
+    search: "🔎 Rechercher des lieux, entreprises ou utilisateurs...",
+    nearby: "📍 Lieux à proximité",
+    allPlaces: "🌍 Afficher tous les lieux",
+    locationFound: "📍 Position trouvée",
+    nearestFirst: "📏 Les lieux les plus proches en premier",
+    all: "Tous",
+    stays: "Hébergements",
+    shops: "Boutiques",
+    food: "Restaurants",
+    services: "Services",
+    jobs: "Emplois",
+    addPlace: "📍 Ajouter un lieu",
+    language: "Langue",
+    country: "Pays",
+    allLanguages: "🗣️ Toutes les langues",
+    allCountries: "🌍 Tous les pays",
+    addPlaceTitle: "📍 Ajouter un lieu",
+    tapMap: "Touchez la carte pour sélectionner un emplacement.",
+    locationSelected: "✅ Emplacement sélectionné",
+    placeName: "Nom du lieu",
+    description: "Description",
+    save: "💾 Enregistrer",
+    cancel: "Annuler",
+    selectedLocation: "📍 Emplacement sélectionné",
+    details: "📋 Voir les détails",
+    detailsTitle: "Détails",
+    map: "🗺️ Afficher sur la carte",
+    delete: "🗑️ Supprimer le lieu",
+    close: "Fermer",
+    distance: "km",
+    places: "🌍 Lieux Pi Economy",
+    nearbyPlaces:
+      "📍 Lieux dans un rayon de 50 km — plus proches en premier",
+    results: "résultats",
+    searchingLocation: "📍 Obtention de votre position...",
+    locationNotSupported:
+      "❌ La localisation n'est pas prise en charge.",
+    locationDenied: "❌ Autorisation de localisation refusée.",
+    signInFirst: "❌ Connectez-vous d'abord avec Pi.",
+    deleteLogin:
+      "❌ Vous devez être connecté avec Pi pour supprimer.",
+    saving: "⏳ Enregistrement...",
+    deleting: "⏳ Suppression...",
+    deleted: "supprimé.",
+    saved: "enregistré.",
+    nameRequired: "❌ Entrez le nom du lieu.",
+    descriptionTitle: "DESCRIPTION",
+    languageSelector: "🌐 Langue de l'application",
+    confirmDelete: "Voulez-vous vraiment supprimer ce lieu ?",
+    piSdkError: "❌ Pi SDK n'a pas pu être chargé.",
+    piUserError:
+      "Impossible d'obtenir les informations utilisateur Pi.",
+    backendError: "Échec de la connexion au backend.",
+    loginFailed: "❌ Échec de la connexion Pi.",
+    locationChosen:
+      "📍 Emplacement sélectionné. Saisissez les informations.",
+    location: "📍 Emplacement",
+    anonymous: "Utilisateur",
+  },
+
+  German: {
+    appDescription:
+      "Entdecke Pi-betriebene Geschäfte, Produkte, Dienstleistungen und Unternehmen in deiner Nähe.",
+    signIn: "π Mit Pi anmelden",
+    connected: "Pi verbunden",
+    search: "🔎 Orte, Unternehmen oder Nutzer suchen...",
+    nearby: "📍 Orte in der Nähe",
+    allPlaces: "🌍 Alle Orte anzeigen",
+    locationFound: "📍 Standort gefunden",
+    nearestFirst: "📏 Nächste Orte zuerst",
+    all: "Alle",
+    stays: "Unterkünfte",
+    shops: "Geschäfte",
+    food: "Essen",
+    services: "Dienstleistungen",
+    jobs: "Jobs",
+    addPlace: "📍 Ort hinzufügen",
+    language: "Sprache",
+    country: "Land",
+    allLanguages: "🗣️ Alle Sprachen",
+    allCountries: "🌍 Alle Länder",
+    addPlaceTitle: "📍 Ort hinzufügen",
+    tapMap: "Tippe auf die Karte, um einen Standort auszuwählen.",
+    locationSelected: "✅ Standort ausgewählt",
+    placeName: "Name des Ortes",
+    description: "Beschreibung",
+    save: "💾 Speichern",
+    cancel: "Abbrechen",
+    selectedLocation: "📍 Ausgewählter Standort",
+    details: "📋 Details anzeigen",
+    detailsTitle: "Details",
+    map: "🗺️ Auf Karte anzeigen",
+    delete: "🗑️ Ort löschen",
+    close: "Schließen",
+    distance: "km entfernt",
+    places: "🌍 Pi Economy Orte",
+    nearbyPlaces: "📍 Orte innerhalb von 50 km — nächste zuerst",
+    results: "Ergebnisse",
+    searchingLocation: "📍 Standort wird ermittelt...",
+    locationNotSupported: "❌ Standort wird nicht unterstützt.",
+    locationDenied: "❌ Standortberechtigung verweigert.",
+    signInFirst: "❌ Bitte zuerst mit Pi anmelden.",
+    deleteLogin:
+      "❌ Zum Löschen musst du mit Pi angemeldet sein.",
+    saving: "⏳ Ort wird gespeichert...",
+    deleting: "⏳ Ort wird gelöscht...",
+    deleted: "gelöscht.",
+    saved: "gespeichert.",
+    nameRequired: "❌ Bitte einen Namen eingeben.",
+    descriptionTitle: "BESCHREIBUNG",
+    languageSelector: "🌐 App-Sprache",
+    confirmDelete: "Möchtest du diesen Ort wirklich löschen?",
+    piSdkError: "❌ Pi SDK konnte nicht geladen werden.",
+    piUserError:
+      "Pi-Benutzerinformationen konnten nicht abgerufen werden.",
+    backendError: "Backend-Anmeldung fehlgeschlagen.",
+    loginFailed: "❌ Pi-Anmeldung fehlgeschlagen.",
+    locationChosen:
+      "📍 Standort ausgewählt. Gib die Informationen ein.",
+    location: "📍 Standort",
+    anonymous: "Benutzer",
+  },
+
+  Portuguese: {
+    appDescription:
+      "Descubra lojas, produtos, serviços e empresas com tecnologia Pi perto de você.",
+    signIn: "π Entrar com Pi",
+    connected: "Pi conectado",
+    search: "🔎 Pesquisar lugares, empresas ou usuários...",
+    nearby: "📍 Lugares próximos",
+    allPlaces: "🌍 Mostrar todos os lugares",
+    locationFound: "📍 Localização encontrada",
+    nearestFirst: "📏 Lugares mais próximos primeiro",
+    all: "Todos",
+    stays: "Hospedagens",
+    shops: "Lojas",
+    food: "Comida",
+    services: "Serviços",
+    jobs: "Empregos",
+    addPlace: "📍 Adicionar lugar",
+    language: "Idioma",
+    country: "País",
+    allLanguages: "🗣️ Todos os idiomas",
+    allCountries: "🌍 Todos os países",
+    addPlaceTitle: "📍 Adicionar lugar",
+    tapMap: "Toque no mapa para selecionar um local.",
+    locationSelected: "✅ Local selecionado",
+    placeName: "Nome do lugar",
+    description: "Descrição",
+    save: "💾 Salvar",
+    cancel: "Cancelar",
+    selectedLocation: "📍 Local selecionado",
+    details: "📋 Ver detalhes",
+    detailsTitle: "Detalhes",
+    map: "🗺️ Mostrar no mapa",
+    delete: "🗑️ Excluir lugar",
+    close: "Fechar",
+    distance: "km de distância",
+    places: "🌍 Lugares Pi Economy",
+    nearbyPlaces:
+      "📍 Lugares em até 50 km — mais próximos primeiro",
+    results: "resultados",
+    searchingLocation: "📍 Obtendo sua localização...",
+    locationNotSupported: "❌ Localização não suportada.",
+    locationDenied: "❌ Permissão de localização negada.",
+    signInFirst: "❌ Entre com Pi primeiro.",
+    deleteLogin:
+      "❌ Você precisa entrar com Pi para excluir.",
+    saving: "⏳ Salvando lugar...",
+    deleting: "⏳ Excluindo lugar...",
+    deleted: "excluído.",
+    saved: "salvo.",
+    nameRequired: "❌ Digite o nome do lugar.",
+    descriptionTitle: "DESCRIÇÃO",
+    languageSelector: "🌐 Idioma do aplicativo",
+    confirmDelete:
+      "Tem certeza de que deseja excluir este lugar?",
+    piSdkError: "❌ Não foi possível carregar o Pi SDK.",
+    piUserError:
+      "Não foi possível obter os dados do usuário Pi.",
+    backendError: "Falha no login do backend.",
+    loginFailed: "❌ Falha no login com Pi.",
+    locationChosen:
+      "📍 Local selecionado. Digite as informações.",
+    location: "📍 Localização",
+    anonymous: "Usuário",
+  },
+
+  Russian: {
+    appDescription:
+      "Открывайте магазины, товары, услуги и компании на базе Pi рядом с вами.",
+    signIn: "π Войти через Pi",
+    connected: "Pi подключён",
+    search: "🔎 Поиск мест, компаний или пользователей...",
+    nearby: "📍 Места рядом",
+    allPlaces: "🌍 Показать все места",
+    locationFound: "📍 Местоположение найдено",
+    nearestFirst: "📏 Сначала ближайшие места",
+    all: "Все",
+    stays: "Проживание",
+    shops: "Магазины",
+    food: "Еда",
+    services: "Услуги",
+    jobs: "Работа",
+    addPlace: "📍 Добавить место",
+    language: "Язык",
+    country: "Страна",
+    allLanguages: "🗣️ Все языки",
+    allCountries: "🌍 Все страны",
+    addPlaceTitle: "📍 Добавить место",
+    tapMap: "Нажмите на карту, чтобы выбрать место.",
+    locationSelected: "✅ Место выбрано",
+    placeName: "Название места",
+    description: "Описание",
+    save: "💾 Сохранить",
+    cancel: "Отмена",
+    selectedLocation: "📍 Выбранное место",
+    details: "📋 Подробнее",
+    detailsTitle: "Подробности",
+    map: "🗺️ Показать на карте",
+    delete: "🗑️ Удалить место",
+    close: "Закрыть",
+    distance: "км",
+    places: "🌍 Места Pi Economy",
+    nearbyPlaces:
+      "📍 Места в пределах 50 км — ближайшие первыми",
+    results: "результаты",
+    searchingLocation: "📍 Определяем местоположение...",
+    locationNotSupported: "❌ Геолокация не поддерживается.",
+    locationDenied:
+      "❌ Доступ к местоположению запрещён.",
+    signInFirst: "❌ Сначала войдите через Pi.",
+    deleteLogin:
+      "❌ Для удаления необходимо войти через Pi.",
+    saving: "⏳ Сохранение места...",
+    deleting: "⏳ Удаление места...",
+    deleted: "удалено.",
+    saved: "сохранено.",
+    nameRequired: "❌ Введите название места.",
+    descriptionTitle: "ОПИСАНИЕ",
+    languageSelector: "🌐 Язык приложения",
+    confirmDelete:
+      "Вы уверены, что хотите удалить это место?",
+    piSdkError: "❌ Не удалось загрузить Pi SDK.",
+    piUserError:
+      "Не удалось получить данные пользователя Pi.",
+    backendError: "Ошибка входа через backend.",
+    loginFailed: "❌ Ошибка входа через Pi.",
+    locationChosen:
+      "📍 Место выбрано. Введите информацию.",
+    location: "📍 Местоположение",
+    anonymous: "Пользователь",
+  },
+
+  Chinese: {
+    appDescription:
+      "发现附近由 Pi 驱动的商店、产品、服务和企业。",
+    signIn: "π 使用 Pi 登录",
+    connected: "Pi 已连接",
+    search: "🔎 搜索地点、商家或用户...",
+    nearby: "📍 附近地点",
+    allPlaces: "🌍 显示所有地点",
+    locationFound: "📍 已找到位置",
+    nearestFirst: "📏 优先显示最近的地点",
+    all: "全部",
+    stays: "住宿",
+    shops: "商店",
+    food: "餐饮",
+    services: "服务",
+    jobs: "工作",
+    addPlace: "📍 添加地点",
+    language: "语言",
+    country: "国家",
+    allLanguages: "🗣️ 所有语言",
+    allCountries: "🌍 所有国家",
+    addPlaceTitle: "📍 添加地点",
+    tapMap: "点击地图选择位置。",
+    locationSelected: "✅ 已选择位置",
+    placeName: "地点名称",
+    description: "描述",
+    save: "💾 保存",
+    cancel: "取消",
+    selectedLocation: "📍 已选择的位置",
+    details: "📋 查看详情",
+    detailsTitle: "详情",
+    map: "🗺️ 在地图上显示",
+    delete: "🗑️ 删除地点",
+    close: "关闭",
+    distance: "公里",
+    places: "🌍 Pi Economy 地点",
+    nearbyPlaces:
+      "📍 50 公里内的地点 — 最近的优先",
+    results: "结果",
+    searchingLocation: "📍 正在获取位置...",
+    locationNotSupported: "❌ 不支持定位。",
+    locationDenied: "❌ 定位权限被拒绝。",
+    signInFirst: "❌ 请先使用 Pi 登录。",
+    deleteLogin: "❌ 删除前必须使用 Pi 登录。",
+    saving: "⏳ 正在保存地点...",
+    deleting: "⏳ 正在删除地点...",
+    deleted: "已删除。",
+    saved: "已保存。",
+    nameRequired: "❌ 请输入地点名称。",
+    descriptionTitle: "描述",
+    languageSelector: "🌐 应用语言",
+    confirmDelete: "确定要删除这个地点吗？",
+    piSdkError: "❌ Pi SDK 无法加载。",
+    piUserError: "无法获取 Pi 用户信息。",
+    backendError: "后台登录失败。",
+    loginFailed: "❌ Pi 登录失败。",
+    locationChosen:
+      "📍 已选择位置。请输入地点信息。",
+    location: "📍 位置",
+    anonymous: "用户",
+  },
+
+  Hindi: {
+    appDescription:
+      "अपने आसपास Pi द्वारा संचालित स्टोर, उत्पाद, सेवाएँ और व्यवसाय खोजें।",
+    signIn: "π Pi से साइन इन करें",
+    connected: "Pi कनेक्टेड",
+    search: "🔎 स्थान, व्यवसाय या उपयोगकर्ता खोजें...",
+    nearby: "📍 आस-पास के स्थान",
+    allPlaces: "🌍 सभी स्थान दिखाएँ",
+    locationFound: "📍 स्थान मिल गया",
+    nearestFirst: "📏 सबसे नज़दीकी स्थान पहले",
+    all: "सभी",
+    stays: "रहने की जगह",
+    shops: "दुकानें",
+    food: "भोजन",
+    services: "सेवाएँ",
+    jobs: "नौकरियाँ",
+    addPlace: "📍 स्थान जोड़ें",
+    language: "भाषा",
+    country: "देश",
+    allLanguages: "🗣️ सभी भाषाएँ",
+    allCountries: "🌍 सभी देश",
+    addPlaceTitle: "📍 स्थान जोड़ें",
+    tapMap: "स्थान चुनने के लिए मानचित्र पर टैप करें।",
+    locationSelected: "✅ स्थान चुना गया",
+    placeName: "स्थान का नाम",
+    description: "विवरण",
+    save: "💾 सहेजें",
+    cancel: "रद्द करें",
+    selectedLocation: "📍 चयनित स्थान",
+    details: "📋 विवरण देखें",
+    detailsTitle: "विवरण",
+    map: "🗺️ मानचित्र पर दिखाएँ",
+    delete: "🗑️ स्थान हटाएँ",
+    close: "बंद करें",
+    distance: "किमी दूर",
+    places: "🌍 Pi Economy स्थान",
+    nearbyPlaces:
+      "📍 50 किमी के भीतर के स्थान — सबसे नज़दीकी पहले",
+    results: "परिणाम",
+    searchingLocation:
+      "📍 आपका स्थान प्राप्त किया जा रहा है...",
+    locationNotSupported:
+      "❌ स्थान सुविधा समर्थित नहीं है।",
+    locationDenied:
+      "❌ स्थान की अनुमति नहीं दी गई।",
+    signInFirst: "❌ पहले Pi से साइन इन करें।",
+    deleteLogin:
+      "❌ हटाने के लिए Pi से साइन इन करना आवश्यक है।",
+    saving: "⏳ स्थान सहेजा जा रहा है...",
+    deleting: "⏳ स्थान हटाया जा रहा है...",
+    deleted: "हटा दिया गया।",
+    saved: "सहेजा गया।",
+    nameRequired: "❌ स्थान का नाम दर्ज करें।",
+    descriptionTitle: "विवरण",
+    languageSelector: "🌐 ऐप की भाषा",
+    confirmDelete:
+      "क्या आप वाकई इस स्थान को हटाना चाहते हैं?",
+    piSdkError: "❌ Pi SDK लोड नहीं हो सका।",
+    piUserError:
+      "Pi उपयोगकर्ता की जानकारी प्राप्त नहीं हो सकी।",
+    backendError: "Backend साइन-इन विफल हुआ।",
+    loginFailed: "❌ Pi साइन-इन विफल हुआ।",
+    locationChosen:
+      "📍 स्थान चुना गया। स्थान की जानकारी दर्ज करें।",
+    location: "📍 स्थान",
+    anonymous: "उपयोगकर्ता",
+  },
+} as const;
+
+type TranslationKey = keyof typeof translations.Turkish;
+
+function distanceInKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+) {
+  const R = 6371;
+
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+
+  return (
+    R *
+    2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    )
+  );
+}
+
+function createCategoryIcon(
+  category: Exclude<Category, "All">
+) {
+  const item = categoryIcons[category];
+
+  return L.divIcon({
+    className: "pioneer-place-marker",
+    html: `
+      <div style="
+        width:48px;
+        height:48px;
+        background:${item.color};
+        border:4px solid white;
+        border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);
+        box-shadow:0 4px 12px rgba(0,0,0,.35);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      ">
+        <span style="
+          transform:rotate(45deg);
+          font-size:23px;
+        ">
+          ${item.icon}
+        </span>
+      </div>
+    `,
+    iconSize: [56, 56],
+    iconAnchor: [28, 56],
+    popupAnchor: [0, -55],
+  });
+}
+
+function createUserIcon() {
+  return L.divIcon({
+    className: "pioneer-user-marker",
+    html: `
+      <div style="
+        width:22px;
+        height:22px;
+        background:#1976D2;
+        border:4px solid white;
+        border-radius:50%;
+        box-shadow:
+          0 0 0 8px rgba(25,118,210,.20),
+          0 3px 10px rgba(0,0,0,.35);
+      "></div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
+}
+
+const initialPlaces: Place[] = [
+  {
+    name: "Pi Stay Ankara",
+    category: "Stays",
+    lat: 39.9334,
+    lng: 32.8597,
+    description: "Pi-powered accommodation",
+    language: "Turkish",
+    country: "Türkiye",
+  },
+  {
+    name: "Pi Market",
+    category: "Shops",
+    lat: 39.925,
+    lng: 32.85,
+    description: "Pi-powered shop",
+    language: "Turkish",
+    country: "Türkiye",
+  },
+  {
+    name: "Pi Food",
+    category: "Food",
+    lat: 39.94,
+    lng: 32.87,
+    description: "Pi-powered food business",
+    language: "Turkish",
+    country: "Türkiye",
+  },
+];
+
+function PioneerMapPage() {
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://pioneermap-2.onrender.com";
+
+  /* =======================================================
+  APP LANGUAGE
+  ======================================================= */
+
+  const [appLanguage, setAppLanguage] =
+    useState<AppLanguage>(() => {
+      try {
+        const saved =
+          localStorage.getItem(
+            "pioneerMapAppLanguage"
+          );
+
+        if (
+          saved &&
+          [
+            "Turkish",
+            "English",
+            "Arabic",
+            "Spanish",
+            "French",
+            "German",
+            "Portuguese",
+            "Russian",
+            "Chinese",
+            "Hindi",
+          ].includes(saved)
+        ) {
+          return saved as AppLanguage;
+        }
+      } catch {}
+
+      return "Turkish";
+    });
+
+  const t = (key: TranslationKey) =>
+    translations[appLanguage][key];
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "pioneerMapAppLanguage",
+        appLanguage
+      );
+    } catch {}
+
+    document.documentElement.lang =
+      appLanguage === "Turkish"
+        ? "tr"
+        : appLanguage === "English"
+        ? "en"
+        : appLanguage === "Arabic"
+        ? "ar"
+        : appLanguage === "Spanish"
+        ? "es"
+        : appLanguage === "French"
+        ? "fr"
+        : appLanguage === "German"
+        ? "de"
+        : appLanguage === "Portuguese"
+        ? "pt"
+        : appLanguage === "Russian"
+        ? "ru"
+        : appLanguage === "Chinese"
+        ? "zh"
+        : "hi";
+
+    document.documentElement.dir =
+      appLanguage === "Arabic"
+        ? "rtl"
+        : "ltr";
+  }, [appLanguage]);
+
+  /* =======================================================
+  STATE
+  ======================================================= */
+
+  const [status, setStatus] =
+    useState("");
+
+  const [activeNav, setActiveNav] =
+    useState<
+      "home" |
+      "nearby" |
+      "add" |
+      "favorites" |
+      "profile"
+    >("home");
+
+  const [signedIn, setSignedIn] =
+    useState(false);
+
+  const [username, setUsername] =
+    useState("");
+
+  const [places, setPlaces] =
+    useState<Place[]>(initialPlaces);
+
+  const [favorites, setFavorites] = useState<Place[]>(() => {
+    try {
+      const saved = localStorage.getItem("pioneerMapFavorites");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "pioneerMapFavorites",
+        JSON.stringify(favorites)
+      );
+    } catch {}
+  }, [favorites]);
+
+  const getPlaceKey = (place: Place) =>
+    place._id ||
+    `${place.name}|${place.lat}|${place.lng}`;
+
+  const isFavorite = (place: Place) =>
+    favorites.some(
+      (favorite) =>
+        getPlaceKey(favorite) ===
+        getPlaceKey(place)
+    );
+
+  const toggleFavorite = (place: Place) => {
+    setFavorites((current) => {
+      const key = getPlaceKey(place);
+      const exists = current.some(
+        (favorite) =>
+          getPlaceKey(favorite) === key
+      );
+
+      if (exists) {
+        return current.filter(
+          (favorite) =>
+            getPlaceKey(favorite) !== key
+        );
+      }
+
+      return [...current, place];
+    });
+
+    setStatus(
+      isFavorite(place)
+        ? "⭐ Favorilerden çıkarıldı."
+        : "⭐ Favorilere eklendi."
+    );
+  };
+
+  const [activeCategory, setActiveCategory] =
+    useState<Category>("All");
+
+  const [activeLanguage, setActiveLanguage] =
+    useState("All");
+
+  const [activeCountry, setActiveCountry] =
+    useState("All");
+
+  const [searchText, setSearchText] =
+    useState("");
+
+  const [nearbyOnly, setNearbyOnly] =
+    useState(false);
+
+  const [userLocation, setUserLocation] =
+    useState<{
+      lat: number;
+      lng: number;
+    } | null>(null);
+
+  const [selectedPlace, setSelectedPlace] =
+    useState<Place | null>(null);
+
+  const [showForm, setShowForm] =
+    useState(false);
+
+  const [selectedLocation, setSelectedLocation] =
+    useState<{
+      lat: number;
+      lng: number;
+    } | null>(null);
+
+  const [placeName, setPlaceName] =
+    useState("");
+
+  const [placeDescription, setPlaceDescription] =
+    useState("");
+
+  const [placeCategory, setPlaceCategory] =
+    useState<
+      Exclude<Category, "All">
+    >("Stays");
+
+  const [placeLanguage, setPlaceLanguage] =
+    useState("Turkish");
+
+  const [placeCountry, setPlaceCountry] =
+    useState("Türkiye");
+
+  const mapRef =
+    useRef<HTMLDivElement | null>(
+      null
+    );
+
+  const mapInstance =
+    useRef<L.Map | null>(null);
+
+  const markersRef =
+    useRef<L.Marker[]>([]);
+
+  const userMarkerRef =
+    useRef<L.Marker | null>(null);
+
+  /* =======================================================
+  PI LOGIN
+  ======================================================= */
+
+  const loginWithPi = async () => {
+    try {
+      const pi = (window as any).Pi;
+
+      if (!pi) {
+        setStatus(t("piSdkError"));
+        return;
+      }
+
+      await pi.init({
+        version: "2.0",
+        sandbox: false,
+      });
+
+      const auth =
+        await pi.authenticate(
+          ["username"],
+          () => true
+        );
+
+      if (
+        !auth?.user?.username ||
+        !auth?.accessToken
+      ) {
+        throw new Error(
+          t("piUserError")
+        );
+      }
+
+      const response =
+        await fetch(
+          `${backendUrl}/user/signin`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              authResult: auth,
+            }),
+          }
+        );
+
+      const data =
+        await response
+          .json()
+          .catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            t("backendError")
+        );
+      }
+
+      setSignedIn(true);
+      setUsername(
+        auth.user.username
+      );
+
+      const welcome =
+        appLanguage === "Turkish"
+          ? "Hoş geldin"
+          : appLanguage === "English"
+          ? "Welcome"
+          : appLanguage === "Arabic"
+          ? "مرحباً"
+          : appLanguage === "Spanish"
+          ? "Bienvenido"
+          : appLanguage === "French"
+          ? "Bienvenue"
+          : appLanguage === "German"
+          ? "Willkommen"
+          : appLanguage === "Portuguese"
+          ? "Bem-vindo"
+          : appLanguage === "Russian"
+          ? "Добро пожаловать"
+          : appLanguage === "Chinese"
+          ? "欢迎"
+          : "स्वागत है";
+
+      setStatus(
+        `✅ ${welcome} @${auth.user.username}`
+      );
+    } catch (error) {
+      console.error(
+        "Pi login error:",
+        error
+      );
+
+      setSignedIn(false);
+      setUsername("");
+
+      setStatus(
+        error instanceof Error
+          ? `❌ ${error.message}`
+          : t("loginFailed")
+      );
+    }
+  };
+
+  /* =======================================================
+  LOAD PLACES
+  ======================================================= */
+
+  useEffect(() => {
+    const loadPlaces = async () => {
+      try {
+        const response =
+          await fetch(
+            `${backendUrl}/api/places`,
+            {
+              credentials: "include",
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        if (Array.isArray(data)) {
+          setPlaces(
+            data.length > 0
+              ? data
+              : initialPlaces
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Places load error:",
+          error
+        );
+      }
+    };
+
+    loadPlaces();
+  }, [backendUrl]);
+
+  /* =======================================================
+  MAP INITIALIZATION
+  ======================================================= */
+
+  useEffect(() => {
+    if (
+      !mapRef.current ||
+      mapInstance.current
+    ) {
+      return;
+    }
+
+    const map =
+      L.map(mapRef.current).setView(
+        [39.9334, 32.8597],
+        6
+      );
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution:
+          "© OpenStreetMap contributors",
+      }
+    ).addTo(map);
+
+    map.on(
+      "click",
+      (event) => {
+        setSelectedLocation({
+          lat: event.latlng.lat,
+          lng: event.latlng.lng,
+        });
+
+        setShowForm(true);
+        setStatus(
+          t("locationChosen")
+        );
+      }
+    );
+
+    mapInstance.current = map;
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
+
+    return () => {
+      map.remove();
+      mapInstance.current = null;
+    };
+  }, []);
+
+  /* =======================================================
+  NEARBY
+  ======================================================= */
+
+  const findNearbyPlaces = () => {
+    if (!navigator.geolocation) {
+      setStatus(
+        t("locationNotSupported")
+      );
+      return;
+    }
+
+    setStatus(
+      t("searchingLocation")
+    );
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat:
+            position.coords.latitude,
+          lng:
+            position.coords.longitude,
+        };
+
+        setUserLocation(location);
+        setNearbyOnly(true);
+
+        const map =
+          mapInstance.current;
+
+        if (map) {
+          map.setView(
+            [
+              location.lat,
+              location.lng,
+            ],
+            12
+          );
+        }
+
+        if (userMarkerRef.current) {
+          userMarkerRef.current.remove();
+        }
+
+        if (map) {
+          userMarkerRef.current =
+            L.marker(
+              [
+                location.lat,
+                location.lng,
+              ],
+              {
+                icon:
+                  createUserIcon(),
+                zIndexOffset: 1000,
+              }
+            )
+              .addTo(map)
+              .bindPopup(
+                t("location")
+              );
+        }
+
+        setStatus(
+          t("nearestFirst")
+        );
+      },
+      () => {
+        setStatus(
+          t("locationDenied")
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      }
+    );
+  };
+
+  const showAllPlaces = () => {
+    setNearbyOnly(false);
+    setUserLocation(null);
+    setSelectedPlace(null);
+
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+      userMarkerRef.current = null;
+    }
+
+    setStatus(t("allPlaces"));
+  };
+
+  /* =======================================================
+  DELETE PLACE
+  ======================================================= */
+
+  const deletePlace = async (
+    place: Place
+  ) => {
+    if (!place._id) {
+      setStatus(
+        "❌ Place ID not found."
+      );
+      return;
+    }
+
+    if (!signedIn) {
+      setStatus(
+        t("deleteLogin")
+      );
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        `"${place.name}" ${t(
+          "confirmDelete"
+        )}`
+      );
+
+    if (!confirmed) return;
+
+    try {
+      setStatus(
+        t("deleting")
+      );
+
+      const response =
+        await fetch(
+          `${backendUrl}/api/places/${place._id}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            "Place could not be deleted."
+        );
+      }
+
+      setPlaces(
+        (current) =>
+          current.filter(
+            (item) =>
+              item._id !== place._id
+          )
+      );
+
+      setSelectedPlace(null);
+
+      setStatus(
+        `✅ ${place.name} ${t(
+          "deleted"
+        )}`
+      );
+    } catch (error) {
+      setStatus(
+        error instanceof Error
+          ? `❌ ${error.message}`
+          : "❌ Place could not be deleted."
+      );
+    }
+  };
+
+  /* =======================================================
+  MARKERS
+  ======================================================= */
+
+  useEffect(() => {
+    const map =
+      mapInstance.current;
+
+    if (!map) return;
+
+    markersRef.current.forEach(
+      (marker) =>
+        marker.remove()
+    );
+
+    markersRef.current = [];
+
+    const query =
+      searchText
+        .trim()
+        .toLowerCase();
+
+    let filteredPlaces =
+      places.filter((place) => {
+        const categoryMatch =
+          activeCategory === "All" ||
+          place.category ===
+            activeCategory;
+
+        const languageMatch =
+          activeLanguage === "All" ||
+          (place.language || "") ===
+            activeLanguage;
+
+        const countryMatch =
+          activeCountry === "All" ||
+          (place.country || "") ===
+            activeCountry;
+
+        const text = [
+          place.name,
+          place.description,
+          place.username || "",
+          place.category,
+          place.language || "",
+          place.country || "",
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        const searchMatch =
+          query === "" ||
+          text.includes(query);
+
+        let nearbyMatch = true;
+
+        if (
+          nearbyOnly &&
+          userLocation
+        ) {
+          nearbyMatch =
+            distanceInKm(
+              userLocation.lat,
+              userLocation.lng,
+              place.lat,
+              place.lng
+            ) <= 50;
+        }
+
+        return (
+          categoryMatch &&
+          languageMatch &&
+          countryMatch &&
+          searchMatch &&
+          nearbyMatch
+        );
+      });
+
+    if (userLocation) {
+      filteredPlaces = [
+        ...filteredPlaces,
+      ].sort(
+        (a, b) =>
+          distanceInKm(
+            userLocation.lat,
+            userLocation.lng,
+            a.lat,
+            a.lng
+          ) -
+          distanceInKm(
+            userLocation.lat,
+            userLocation.lng,
+            b.lat,
+            b.lng
+          )
+      );
+    }
+
+    filteredPlaces.forEach(
+      (place) => {
+        const category =
+          categoryIcons[
+            place.category
+          ];
+
+        const distance =
+          userLocation
+            ? distanceInKm(
+                userLocation.lat,
+                userLocation.lng,
+                place.lat,
+                place.lng
+              )
+            : null;
+
+        const marker =
+          L.marker(
+            [
+              place.lat,
+              place.lng,
+            ],
+            {
+              icon:
+                createCategoryIcon(
+                  place.category
+                ),
+            }
+          ).addTo(map);
+
+        marker.bindPopup(`
+          <div style="
+            min-width:230px;
+            text-align:center;
+            font-family:Arial,sans-serif;
+          ">
+            <div style="
+              font-size:34px;
+            ">
+              ${category.icon}
+            </div>
+
+            <div style="
+              font-size:19px;
+              font-weight:700;
+              margin:6px 0;
+            ">
+              ${place.name}
+            </div>
+
+            <div style="
+              color:#666;
+              font-size:14px;
+              line-height:1.4;
+            ">
+              ${place.description}
+            </div>
+
+            ${
+              place.username
+                ? `
+                  <div style="
+                    margin-top:8px;
+                    color:#7b1fa2;
+                    font-weight:700;
+                  ">
+                    👤 @${place.username}
+                  </div>
+                `
+                : ""
+            }
+
+            <div style="
+              display:inline-block;
+              margin-top:8px;
+              padding:5px 12px;
+              border-radius:20px;
+              background:${category.color};
+              color:white;
+              font-weight:700;
+              font-size:12px;
+            ">
+              ${category.icon}
+              ${
+                place.category ===
+                "Stays"
+                  ? t("stays")
+                  : place.category ===
+                    "Shops"
+                  ? t("shops")
+                  : place.category ===
+                    "Food"
+                  ? t("food")
+                  : place.category ===
+                    "Services"
+                  ? t("services")
+                  : t("jobs")
+              }
+            </div>
+
+            ${
+              place.language
+                ? `
+                  <div style="
+                    margin-top:7px;
+                    font-size:13px;
+                  ">
+                    🗣️ ${place.language}
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              place.country
+                ? `
+                  <div style="
+                    margin-top:5px;
+                    font-size:13px;
+                  ">
+                    🌍 ${place.country}
+                  </div>
+                `
+                : ""
+            }
+
+            ${
+              distance !== null
+                ? `
+                  <div style="
+                    margin-top:8px;
+                    color:#1976D2;
+                    font-weight:700;
+                  ">
+                    📍 ${distance.toFixed(
+                      1
+                    )} km
+                  </div>
+                `
+                : ""
+            }
+
+            <button
+              class="pioneer-details-button"
+              type="button"
+              style="
+                width:100%;
+                margin-top:12px;
+                padding:10px;
+                border:0;
+                border-radius:9px;
+                background:#1976D2;
+                color:white;
+                font-size:14px;
+                font-weight:700;
+                cursor:pointer;
+              "
+            >
+              ${t("details")}
+            </button>
+          </div>
+        `);
+
+        marker.on(
+          "click",
+          () => {
+            setSelectedPlace(place);
+          }
+        );
+
+        marker.on(
+          "popupopen",
+          (event) => {
+            const popupElement =
+              event.popup.getElement();
+
+            if (!popupElement)
+              return;
+
+            const button =
+              popupElement.querySelector(
+                ".pioneer-details-button"
+              ) as HTMLButtonElement | null;
+
+            if (!button) return;
+
+            L.DomEvent.off(
+              button
+            );
+
+            L.DomEvent.on(
+              button,
+              "click",
+              (clickEvent) => {
+                L.DomEvent.stopPropagation(
+                  clickEvent
+                );
+
+                setSelectedPlace(
+                  place
+                );
+
+                map.closePopup();
+
+                setTimeout(() => {
+                  document
+                    .getElementById(
+                      "pioneer-detail-card"
+                    )
+                    ?.scrollIntoView({
+                      behavior:
+                        "smooth",
+                      block: "start",
+                    });
+                }, 100);
+              }
+            );
+          }
+        );
+
+        markersRef.current.push(
+          marker
+        );
+      }
+    );
+  }, [
+    places,
+    activeCategory,
+    activeLanguage,
+    activeCountry,
+    searchText,
+    nearbyOnly,
+    userLocation,
+    appLanguage,
+  ]);
+
+  /* =======================================================
+  ADD PLACE
+  ======================================================= */
+
+  const addPlace = async () => {
+    if (!signedIn) {
+      setStatus(
+        t("signInFirst")
+      );
+      return;
+    }
+
+    if (!placeName.trim()) {
+      setStatus(
+        t("nameRequired")
+      );
+      return;
+    }
+
+    const map =
+      mapInstance.current;
+
+    const location =
+      selectedLocation ||
+      (map
+        ? map.getCenter()
+        : {
+            lat: 39.9334,
+            lng: 32.8597,
+          });
+
+    const newPlace = {
+      name: placeName.trim(),
+      category: placeCategory,
+      lat: location.lat,
+      lng: location.lng,
+      description:
+        placeDescription.trim() ||
+        "Pi Economy place",
+      language: placeLanguage,
+      country: placeCountry,
+      username:
+        username || undefined,
+    };
+
+    try {
+      setStatus(
+        t("saving")
+      );
+
+      const response =
+        await fetch(
+          `${backendUrl}/api/places`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(
+              newPlace
+            ),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            "Place could not be saved."
+        );
+      }
+
+      const savedPlace: Place = {
+        _id: data._id,
+        name:
+          data.name ||
+          newPlace.name,
+        category:
+          data.category ||
+          newPlace.category,
+        lat:
+          typeof data.lat ===
+          "number"
+            ? data.lat
+            : newPlace.lat,
+        lng:
+          typeof data.lng ===
+          "number"
+            ? data.lng
+            : newPlace.lng,
+        description:
+          data.description ||
+          newPlace.description,
+        username:
+          data.username ||
+          newPlace.username,
+        user_id:
+          data.user_id || null,
+        language:
+          data.language ||
+          newPlace.language,
+        country:
+          data.country ||
+          newPlace.country,
+      };
+
+      setPlaces(
+        (current) => [
+          ...current,
+          savedPlace,
+        ]
+      );
+
+      setSelectedPlace(
+        savedPlace
+      );
+
+      setPlaceName("");
+      setPlaceDescription("");
+      setPlaceCategory(
+        "Stays"
+      );
+      setPlaceLanguage(
+        "Turkish"
+      );
+      setPlaceCountry(
+        "Türkiye"
+      );
+      setSelectedLocation(
+        null
+      );
+      setShowForm(false);
+
+      setStatus(
+        `✅ ${savedPlace.name} ${t(
+          "saved"
+        )}`
+      );
+    } catch (error) {
+      console.error(
+        "Add place error:",
+        error
+      );
+
+      setStatus(
+        error instanceof Error
+          ? `❌ ${error.message}`
+          : "❌ Place could not be saved."
+      );
+    }
+  };
+
+  /* =======================================================
+  CATEGORIES
+  ======================================================= */
+
+  const categories: Array<{
+    name: Category;
+    icon: string;
+  }> = [
+    {
+      name: "All",
+      icon: "🌍",
+    },
+    {
+      name: "Stays",
+      icon: "🏠",
+    },
+    {
+      name: "Shops",
+      icon: "🛍️",
+    },
+    {
+      name: "Food",
+      icon: "🍔",
+    },
+    {
+      name: "Services",
+      icon: "🔧",
+    },
+    {
+      name: "Jobs",
+      icon: "💼",
+    },
+  ];
+
+  const categoryLabel = (
+    category: Category
+  ) => {
+    if (category === "All")
+      return t("all");
+
+    if (
+      category === "Stays"
+    )
+      return t("stays");
+
+    if (
+      category === "Shops"
+    )
+      return t("shops");
+
+    if (
+      category === "Food"
+    )
+      return t("food");
+
+    if (
+      category === "Services"
+    )
+      return t("services");
+
+    return t("jobs");
+  };
+
+  const selectedDistance =
+    selectedPlace &&
+    userLocation
+      ? distanceInKm(
+          userLocation.lat,
+          userLocation.lng,
+          selectedPlace.lat,
+          selectedPlace.lng
+        )
+      : null;
+
+  const selectedCategory =
+    selectedPlace
+      ? categoryIcons[
+          selectedPlace.category
+        ]
+      : null;
+
+  /* =======================================================
+  UI
+  ======================================================= */
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f5f7fa",
+        color: "#222",
+        paddingBottom: "90px",
+      }}
+    >
+      {/* HEADER */}
+      <header
+        style={{
+          background: "#fff",
+          padding: "22px 16px",
+          textAlign: "center",
+          borderBottom:
+            "1px solid #eee",
+        }}
+      >
+        <h1
+          style={{
+            margin:
+              "0 0 10px",
+            fontSize: "34px",
+          }}
+        >
+          🗺️ PioneerMap
+        </h1>
+
+        <p
+          style={{
+            margin:
+              "0 auto 18px",
+            maxWidth: "650px",
+            fontSize: "17px",
+            lineHeight: "1.45",
+          }}
+        >
+          {t(
+            "appDescription"
+          )}
+        </p>
+
+        {/* APP LANGUAGE */}
+        <div
+          style={{
+            maxWidth: "420px",
+            margin:
+              "0 auto 15px",
+            textAlign: "left",
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+              marginBottom: "7px",
+              fontWeight: "700",
+              fontSize: "14px",
+            }}
+          >
+            {t(
+              "languageSelector"
+            )}
+          </label>
+
+          <select
+            value={
+              appLanguage
+            }
+            onChange={(e) =>
+              setAppLanguage(
+                e.target.value as AppLanguage
+              )
+            }
+            style={{
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "12px",
+              borderRadius: "10px",
+              border:
+                "1px solid #ccc",
+              background: "#fff",
+              fontSize: "15px",
+              fontWeight: "600",
+            }}
+          >
+            {appLanguages.map(
+              (language) => (
+                <option
+                  key={
+                    language.value
+                  }
+                  value={
+                    language.value
+                  }
+                >
+                  {language.label}
+                </option>
+              )
+            )}
+          </select>
+        </div>
+
+        {!signedIn ? (
+          <button
+            onClick={
+              loginWithPi
+            }
+            style={{
+              padding:
+                "13px 25px",
+              border: "none",
+              borderRadius:
+                "10px",
+              background:
+                "#1976D2",
+              color: "#fff",
+              fontSize: "16px",
+              fontWeight: "700",
+            }}
+          >
+            {t("signIn")}
+          </button>
+        ) : (
+          <div
+            style={{
+              display:
+                "inline-block",
+              padding:
+                "12px 20px",
+              borderRadius:
+                "10px",
+              background:
+                "#e8f5e9",
+              color:
+                "#2e7d32",
+              fontWeight:
+                "700",
+            }}
+          >
+            ✅ {t("connected")} —
+            @{username}
+          </div>
+        )}
+<Toast
+  message={status}
+  onClose={() => setStatus("")}
+/>
+        
+      </header>
+
+      {/* SEARCH */}
+      <section
+        style={{
+          background: "#fff",
+          padding: "15px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "700px",
+            margin: "0 auto",
+          }}
+        >
+          <input
+            value={
+              searchText
+            }
+            onChange={(e) =>
+              setSearchText(
+                e.target.value
+              )
+            }
+            placeholder={t(
+              "search"
+            )}
+            style={{
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "15px",
+              borderRadius:
+                "30px",
+              border:
+                "2px solid #ddd",
+              fontSize: "16px",
+            }}
+          />
+
+          <button
+            onClick={() =>
+              nearbyOnly
+                ? showAllPlaces()
+                : findNearbyPlaces()
+            }
+            style={{
+              width: "100%",
+              marginTop: "10px",
+              padding: "14px",
+              border: "none",
+              borderRadius:
+                "28px",
+              background:
+                nearbyOnly
+                  ? "#d32f2f"
+                  : "#1976D2",
+              color: "#fff",
+              fontSize: "16px",
+              fontWeight: "700",
+            }}
+          >
+            {nearbyOnly
+              ? t("allPlaces")
+              : t("nearby")}
+          </button>
+
+          {nearbyOnly &&
+            userLocation && (
+              <div
+                style={{
+                  marginTop:
+                    "10px",
+                  padding: "11px",
+                  borderRadius:
+                    "12px",
+                  background:
+                    "#e3f2fd",
+                  color:
+                    "#1565c0",
+                  textAlign:
+                    "center",
+                  fontWeight:
+                    "700",
+                }}
+              >
+                {t(
+                  "locationFound"
+                )}
+                <br />
+                {t(
+                  "nearestFirst"
+                )}
+              </div>
+            )}
+        </div>
+      </section>
+
+      {/* CATEGORIES */}
+      <section
+        style={{
+          background: "#fff",
+          padding:
+            "0 15px 15px",
+          display: "flex",
+          gap: "8px",
+          justifyContent:
+            "center",
+          flexWrap: "wrap",
+        }}
+      >
+        {categories.map(
+          (category) => (
+            <button
+              key={
+                category.name
+              }
+              onClick={() =>
+                setActiveCategory(
+                  category.name
+                )
+              }
+              style={{
+                padding:
+                  "10px 16px",
+                borderRadius:
+                  "22px",
+                border:
+                  "1px solid #ddd",
+                background:
+                  activeCategory ===
+                  category.name
+                    ? "#f1c40f"
+                    : "#fff",
+                fontWeight:
+                  activeCategory ===
+                  category.name
+                    ? "700"
+                    : "400",
+              }}
+            >
+              {category.icon}{" "}
+              {categoryLabel(
+                category.name
+              )}
+            </button>
+          )
+        )}
+
+        <button
+          onClick={() =>
+            setShowForm(true)
+          }
+          style={{
+            padding:
+              "10px 18px",
+            border: "none",
+            borderRadius:
+              "22px",
+            background:
+              "#222",
+            color: "#fff",
+            fontWeight:
+              "700",
+          }}
+        >
+          {t("addPlace")}
+        </button>
+      </section>
+
+      {/* LANGUAGE + COUNTRY */}
+      <section
+        style={{
+          background: "#fff",
+          padding:
+            "0 15px 15px",
+          display: "grid",
+          gridTemplateColumns:
+            "1fr 1fr",
+          gap: "10px",
+          maxWidth:
+            "700px",
+          margin: "0 auto",
+        }}
+      >
+        <select
+          value={
+            activeLanguage
+          }
+          onChange={(e) =>
+            setActiveLanguage(
+              e.target.value
+            )
+          }
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius:
+              "10px",
+            border:
+              "1px solid #ccc",
+            fontSize: "15px",
+          }}
+        >
+          <option value="All">
+            {t(
+              "allLanguages"
+            )}
+          </option>
+
+          {languages.map(
+            (language) => (
+              <option
+                key={
+                  language.value
+                }
+                value={
+                  language.value
+                }
+              >
+                {language.label}
+              </option>
+            )
+          )}
+        </select>
+
+        <select
+          value={
+            activeCountry
+          }
+          onChange={(e) =>
+            setActiveCountry(
+              e.target.value
+            )
+          }
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius:
+              "10px",
+            border:
+              "1px solid #ccc",
+            fontSize: "15px",
+          }}
+        >
+          <option value="All">
+            {t(
+              "allCountries"
+            )}
+          </option>
+
+          {countries.map(
+            (country) => (
+              <option
+                key={
+                  country.value
+                }
+                value={
+                  country.value
+                }
+              >
+                {country.label}
+              </option>
+            )
+          )}
+        </select>
+      </section>
+
+      {/* ADD PLACE FORM */}
+      {showForm && (
+        <section
+          style={{
+            margin: "15px",
+            padding: "20px",
+            background: "#fff",
+            borderRadius:
+              "14px",
+            boxShadow:
+              "0 3px 14px rgba(0,0,0,.12)",
+          }}
+        >
+          <h2>
+            {t(
+              "addPlaceTitle"
+            )}
+          </h2>
+
+          <p>
+            {t("tapMap")}
+          </p>
+
+          {selectedLocation && (
+            <p
+              style={{
+                color:
+                  "#2e7d32",
+                fontWeight:
+                  "700",
+              }}
+            >
+              {t(
+                "locationSelected"
+              )}
+            </p>
+          )}
+
+          <input
+            value={
+              placeName
+            }
+            onChange={(e) =>
+              setPlaceName(
+                e.target.value
+              )
+            }
+            placeholder={t(
+              "placeName"
+            )}
+            style={{
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+            }}
+          />
+
+          <select
+            value={
+              placeCategory
+            }
+            onChange={(e) =>
+              setPlaceCategory(
+                e.target
+                  .value as Exclude<
+                  Category,
+                  "All"
+                >
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+            }}
+          >
+            <option value="Stays">
+              🏠 {t("stays")}
+            </option>
+            <option value="Shops">
+              🛍️ {t("shops")}
+            </option>
+            <option value="Food">
+              🍔 {t("food")}
+            </option>
+            <option value="Services">
+              🔧 {t("services")}
+            </option>
+            <option value="Jobs">
+              💼 {t("jobs")}
+            </option>
+          </select>
+
+          <select
+            value={
+              placeLanguage
+            }
+            onChange={(e) =>
+              setPlaceLanguage(
+                e.target.value
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+            }}
+          >
+            {languages.map(
+              (language) => (
+                <option
+                  key={
+                    language.value
+                  }
+                  value={
+                    language.value
+                  }
+                >
+                  {language.label}
+                </option>
+              )
+            )}
+          </select>
+
+          <select
+            value={
+              placeCountry
+            }
+            onChange={(e) =>
+              setPlaceCountry(
+                e.target.value
+              )
+            }
+            style={{
+              width: "100%",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+            }}
+          >
+            {countries.map(
+              (country) => (
+                <option
+                  key={
+                    country.value
+                  }
+                  value={
+                    country.value
+                  }
+                >
+                  {country.label}
+                </option>
+              )
+            )}
+          </select>
+
+          <textarea
+            value={
+              placeDescription
+            }
+            onChange={(e) =>
+              setPlaceDescription(
+                e.target.value
+              )
+            }
+            placeholder={t(
+              "description"
+            )}
+            rows={4}
+            style={{
+              width: "100%",
+              boxSizing:
+                "border-box",
+              padding: "12px",
+              marginBottom:
+                "10px",
+              borderRadius:
+                "8px",
+              border:
+                "1px solid #ccc",
+            }}
+          />
+
+          <button
+            onClick={
+              addPlace
+            }
+            style={{
+              padding:
+                "12px 20px",
+              border: "none",
+              borderRadius:
+                "9px",
+              background:
+                "#2e7d32",
+              color: "#fff",
+              fontWeight:
+                "700",
+              marginRight:
+                "8px",
+            }}
+          >
+            {t("save")}
+          </button>
+
+          <button
+            onClick={() => {
+              setShowForm(
+                false
+              );
+              setSelectedLocation(
+                null
+              );
+            }}
+            style={{
+              padding:
+                "12px 20px",
+              border: "none",
+              borderRadius:
+                "9px",
+              background:
+                "#777",
+              color: "#fff",
+              fontWeight:
+                "700",
+            }}
+          >
+            {t("cancel")}
+          </button>
+
+          {selectedLocation && (
+            <div
+              style={{
+                marginTop:
+                  "15px",
+                padding:
+                  "12px",
+                borderRadius:
+                  "10px",
+                background:
+                  "#f5f5f5",
+              }}
+            >
+              {t(
+                "selectedLocation"
+              )}{" "}
+              :{" "}
+              {selectedLocation.lat.toFixed(
+                5
+              )}{" "}
+              ,{" "}
+              {selectedLocation.lng.toFixed(
+                5
+              )}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* MAP + DETAILS */}
+      <main
+        style={{
+          padding: "15px",
+        }}
+      >
+        <div
+          ref={mapRef}
+          style={{
+            width: "100%",
+            height: "500px",
+            borderRadius:
+              "14px",
+            overflow:
+              "hidden",
+            background:
+              "#ddd",
+          }}
+        />
+
+        {selectedPlace &&
+          selectedCategory && (
+            <section
+              id="pioneer-detail-card"
+              style={{
+                marginTop:
+                  "16px",
+                background:
+                  "#fff",
+                borderRadius:
+                  "18px",
+                overflow:
+                  "hidden",
+                boxShadow:
+                  "0 4px 18px rgba(0,0,0,.16)",
+                borderTop:
+                  `7px solid ${selectedCategory.color}`,
+              }}
+            >
+              <div
+                style={{
+                  padding:
+                    "20px",
+                }}
+              >
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    justifyContent:
+                      "space-between",
+                    alignItems:
+                      "flex-start",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize:
+                          "42px",
+                      }}
+                    >
+                      {
+                        selectedCategory.icon
+                      }
+                    </div>
+
+                    <h2
+                      style={{
+                        margin:
+                          "6px 0 0",
+                      }}
+                    >
+                      {
+                        selectedPlace.name
+                      }
+                    </h2>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleFavorite(
+                          selectedPlace
+                        )
+                      }
+                      aria-label={
+                        isFavorite(
+                          selectedPlace
+                        )
+                          ? "Favorilerden çıkar"
+                          : "Favorilere ekle"
+                      }
+                      style={{
+                        minWidth: "48px",
+                        height: "38px",
+                        padding: "0 10px",
+                        border: "none",
+                        borderRadius: "19px",
+                        background:
+                          isFavorite(
+                            selectedPlace
+                          )
+                            ? "#FFF3CD"
+                            : "#f1f3f5",
+                        color:
+                          isFavorite(
+                            selectedPlace
+                          )
+                            ? "#E6A700"
+                            : "#555",
+                        fontSize: "22px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ⭐
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedPlace(
+                          null
+                        )
+                      }
+                      aria-label={t(
+                        "close"
+                      )}
+                      style={{
+                        width:
+                          "38px",
+                        height:
+                          "38px",
+                        borderRadius:
+                          "50%",
+                        border:
+                          "none",
+                        background:
+                          "#eee",
+                        fontSize:
+                          "22px",
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+
+                {/* CATEGORY */}
+                <div
+                  style={{
+                    display:
+                      "inline-block",
+                    marginTop:
+                      "10px",
+                    padding:
+                      "7px 14px",
+                    borderRadius:
+                      "20px",
+                    background:
+                      selectedCategory.color,
+                    color:
+                      "#fff",
+                    fontWeight:
+                      "700",
+                  }}
+                >
+                  {
+                    selectedCategory.icon
+                  }{" "}
+                  {categoryLabel(
+                    selectedPlace.category
+                  )}
+                </div>
+
+                {/* DESCRIPTION */}
+                <div
+                  style={{
+                    marginTop:
+                      "15px",
+                    padding:
+                      "15px",
+                    borderRadius:
+                      "12px",
+                    background:
+                      "#f7f7f7",
+                  }}
+                >
+                  <strong>
+                    {t(
+                      "descriptionTitle"
+                    )}
+                  </strong>
+
+                  <div
+                    style={{
+                      marginTop:
+                        "6px",
+                      lineHeight:
+                        "1.5",
+                    }}
+                  >
+                    {
+                      selectedPlace.description
+                    }
+                  </div>
+                </div>
+
+                {/* LANGUAGE + COUNTRY */}
+                <div
+                  style={{
+                    display:
+                      "grid",
+                    gridTemplateColumns:
+                      "1fr 1fr",
+                    gap: "10px",
+                    marginTop:
+                      "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#eef7ff",
+                    }}
+                  >
+                    🗣️{" "}
+                    <strong>
+                      {t(
+                        "language"
+                      )}
+                    </strong>
+                    <br />
+                    {
+                      selectedPlace.language ||
+                      "Turkish"
+                    }
+                  </div>
+
+                  <div
+                    style={{
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#f5f0ff",
+                    }}
+                  >
+                    🌍{" "}
+                    <strong>
+                      {t(
+                        "country"
+                      )}
+                    </strong>
+                    <br />
+                    {
+                      selectedPlace.country ||
+                      "Türkiye"
+                    }
+                  </div>
+                </div>
+
+                {/* USER */}
+                {selectedPlace.username && (
+                  <div
+                    style={{
+                      marginTop:
+                        "10px",
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#f3e5f5",
+                      color:
+                        "#7b1fa2",
+                      fontWeight:
+                        "700",
+                    }}
+                  >
+                    👤 @
+                    {
+                      selectedPlace.username
+                    }
+                  </div>
+                )}
+
+                {/* DISTANCE */}
+                {selectedDistance !==
+                  null && (
+                  <div
+                    style={{
+                      marginTop:
+                        "10px",
+                      padding:
+                        "13px",
+                      borderRadius:
+                        "12px",
+                      background:
+                        "#e3f2fd",
+                      color:
+                        "#1565c0",
+                      fontWeight:
+                        "700",
+                    }}
+                  >
+                    📍{" "}
+                    {selectedDistance.toFixed(
+                      1
+                    )}{" "}
+                    {t(
+                      "distance"
+                    )}
+                  </div>
+                )}
+
+                {/* FAVORITE */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    toggleFavorite(
+                      selectedPlace
+                    )
+                  }
+                  style={{
+                    width: "100%",
+                    marginTop: "15px",
+                    padding: "13px",
+                    border: "none",
+                    borderRadius: "10px",
+                    background:
+                      isFavorite(
+                        selectedPlace
+                      )
+                        ? "#FFF3CD"
+                        : "#FFD54F",
+                    color: "#5D4500",
+                    fontWeight: "800",
+                    fontSize: "15px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isFavorite(
+                    selectedPlace
+                  )
+                    ? "⭐ Favorilerden Çıkar"
+                    : "⭐ Favorilere Ekle"}
+                </button>
+
+                {/* ACTIONS */}
+                <div
+                  style={{
+                    display:
+                      "flex",
+                    gap: "9px",
+                    flexWrap:
+                      "wrap",
+                    marginTop:
+                      "15px",
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      const map =
+                        mapInstance.current;
+
+                      if (map) {
+                        map.setView(
+                          [
+                            selectedPlace.lat,
+                            selectedPlace.lng,
+                          ],
+                          15
+                        );
+                      }
+                    }}
+                    style={{
+                      flex: "1",
+                      minWidth:
+                        "160px",
+                      padding:
+                        "13px",
+                      border:
+                        "none",
+                      borderRadius:
+                        "10px",
+                      background:
+                        "#1976D2",
+                      color:
+                        "#fff",
+                      fontWeight:
+                        "700",
+                    }}
+                  >
+                    {t("map")}
+                  </button>
+
+                  {signedIn &&
+                    username &&
+                    selectedPlace.username ===
+                      username && (
+                      <button
+                        onClick={() =>
+                          deletePlace(
+                            selectedPlace
+                          )
+                        }
+                        style={{
+                          flex: "1",
+                          minWidth:
+                            "160px",
+                          padding:
+                            "13px",
+                          border:
+                            "none",
+                          borderRadius:
+                            "10px",
+                          background:
+                            "#d32f2f",
+                          color:
+                            "#fff",
+                          fontWeight:
+                            "700",
+                        }}
+                      >
+                        {t(
+                          "delete"
+                        )}
+                      </button>
+                    )}
+                </div>
+              </div>
+            </section>
+          )}
+
+        {/* BOTTOM STATUS */}
+        <div
+          style={{
+            textAlign:
+              "center",
+            fontWeight:
+              "700",
+            padding:
+              "15px 5px 20px",
+          }}
+        >
+          {nearbyOnly &&
+          userLocation
+            ? t(
+                "nearbyPlaces"
+              )
+            : searchText.trim()
+            ? `🔎 "${searchText}" ${t(
+                "results"
+              )}`
+            : activeLanguage !==
+              "All"
+            ? `🗣️ ${activeLanguage}`
+            : activeCountry !==
+              "All"
+            ? `🌍 ${activeCountry}`
+            : activeCategory ===
+              "All"
+            ? t("places")
+            : `${
+                categoryIcons[
+                  activeCategory
+                ].icon
+              } ${categoryLabel(
+                activeCategory
+              )}`}
+        </div>
+      </main>
+
+      {activeNav === "favorites" && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: "82px",
+            zIndex: 9000,
+            overflowY: "auto",
+            background: "#f5f7fa",
+            paddingTop: "15px",
+          }}
+        >
+          <Favorites
+            favorites={favorites}
+            onRemove={(id) => {
+              setFavorites((current) =>
+                current.filter((place) => place._id !== id)
+              );
+            }}
+            onPlaceClick={(place) => {
+              const found = places.find(
+                (item) => item._id === place._id
+              );
+
+              if (found) {
+                setSelectedPlace(found);
+                setActiveNav("home");
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* =====================================================
+      BOTTOM NAVIGATION
+      ===================================================== */}
+
+      <nav
+        style={{
+          position:
+            "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          background:
+            "#ffffff",
+          borderTop:
+            "1px solid #ddd",
+          boxShadow:
+            "0 -4px 18px rgba(0,0,0,.15)",
+          display:
+            "grid",
+          gridTemplateColumns:
+            "repeat(5,1fr)",
+          padding:
+            "8px 4px",
+          paddingBottom:
+            "calc(8px + env(safe-area-inset-bottom))",
+        }}
+      >
+        {[
+          [
+            "🏠",
+            "Ana Sayfa",
+            "home",
+          ],
+          [
+            "📍",
+            "Yakınımda",
+            "nearby",
+          ],
+          [
+            "➕",
+            "Yer Ekle",
+            "add",
+          ],
+          [
+            "⭐",
+            "Favoriler",
+            "favorites",
+          ],
+          [
+            "👤",
+            "Profil",
+            "profile",
+          ],
+        ].map(
+          ([icon, label, key]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                setActiveNav(
+                  key as
+                    | "home"
+                    | "nearby"
+                    | "add"
+                    | "favorites"
+                    | "profile"
+                );
+
+                if (
+                  key === "home"
+                ) {
+                  setNearbyOnly(
+                    false
+                  );
+                  setUserLocation(
+                    null
+                  );
+                  setSelectedPlace(
+                    null
+                  );
+                  setStatus("");
+
+                  window.scrollTo(
+                    {
+                      top: 0,
+                      behavior:
+                        "smooth",
+                    }
+                  );
+                }
+
+                if (
+                  key ===
+                  "nearby"
+                ) {
+                  findNearbyPlaces();
+
+                  window.scrollTo(
+                    {
+                      top: 0,
+                      behavior:
+                        "smooth",
+                    }
+                  );
+                }
+
+                if (
+                  key === "add"
+                ) {
+                  setShowForm(
+                    true
+                  );
+                  setStatus("");
+
+                  window.scrollTo(
+                    {
+                      top: 0,
+                      behavior:
+                        "smooth",
+                    }
+                  );
+                }
+
+                if (
+                  key ===
+                  "favorites"
+                ) {
+                  setStatus("");
+                  window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                  });
+                }
+
+                if (
+                  key ===
+                  "profile"
+                ) {
+                  setStatus(
+                    signedIn
+                      ? `👤 @${username}`
+                      : appLanguage ===
+                        "English"
+                      ? "👤 Please sign in with Pi."
+                      : "👤 Pi ile giriş yapmalısın."
+                  );
+                }
+              }}
+              style={{
+                border:
+                  "none",
+                borderRadius:
+                  "12px",
+                background:
+                  activeNav ===
+                  key
+                    ? "#e3f2fd"
+                    : "transparent",
+                color:
+                  activeNav ===
+                  key
+                    ? "#1976D2"
+                    : "#333",
+                padding:
+                  "7px 2px",
+                fontWeight:
+                  "700",
+                fontSize:
+                  "11px",
+                cursor:
+                  "pointer",
+              }}
+            >
+              <div
+                style={{
+                  fontSize:
+                    "23px",
+                  lineHeight:
+                    "25px",
+                }}
+              >
+                {icon}
+              </div>
+
+              <div>
+                {label}
+              </div>
+            </button>
+          )
+        )}
+      </nav>
+    </div>
+  );
+}
+
+export default PioneerMapPage;
