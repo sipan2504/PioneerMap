@@ -1,53 +1,62 @@
 import React, { type ChangeEvent } from "react";
 
+export type AddPlaceFormLabels = {
+  title?: string;
+  name?: string;
+  namePlaceholder?: string;
+  category?: string;
+  categoryPlaceholder?: string;
+  description?: string;
+  descriptionPlaceholder?: string;
+  language?: string;
+  languagePlaceholder?: string;
+  country?: string;
+  countryPlaceholder?: string;
+  photo?: string;
+  photoPreparing?: string;
+  removePhoto?: string;
+  selectedPhotoAlt?: string;
+  location?: string;
+  chooseLocation?: string;
+  chooseLocationFromMap?: string;
+  saving?: string;
+  savePlace?: string;
+  invalidImage?: string;
+  imageTooLarge?: string;
+};
+
 type AddPlaceFormProps = {
   placeName: string;
   setPlaceName: (value: string) => void;
-
   placeDescription: string;
   setPlaceDescription: (value: string) => void;
-
   placeCategory: string;
   setPlaceCategory: (value: string) => void;
-
   placeLanguage: string;
   setPlaceLanguage: (value: string) => void;
-
   placeCountry: string;
   setPlaceCountry: (value: string) => void;
-
   categories: string[];
   languages: Array<string | { value: string; label: string }>;
   countries: Array<string | { value: string; label: string }>;
-
-  selectedLocation?: {
-    lat: number;
-    lng: number;
-  } | null;
-
+  selectedLocation?: { lat: number; lng: number } | null;
   onMapSelect?: () => void;
   onSubmit: () => void;
   onCancel?: () => void;
-
   submitting?: boolean;
-
-  // Photo support
   placeImage?: string;
   setPlaceImage?: (value: string) => void;
   imageUploading?: boolean;
+  labels?: AddPlaceFormLabels;
 };
 
 const getOptionValue = (
   item: string | { value: string; label: string }
-) => {
-  return typeof item === "string" ? item : item.value;
-};
+) => (typeof item === "string" ? item : item.value);
 
 const getOptionLabel = (
   item: string | { value: string; label: string }
-) => {
-  return typeof item === "string" ? item : item.label;
-};
+) => (typeof item === "string" ? item : item.label);
 
 const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
   placeName,
@@ -71,36 +80,58 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
   placeImage = "",
   setPlaceImage,
   imageUploading = false,
+  labels = {},
 }) => {
-  const handleImageChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
+  const t = {
+    title: labels.title ?? "Yeni Yer Ekle",
+    name: labels.name ?? "İşletme / Yer Adı",
+    namePlaceholder: labels.namePlaceholder ?? "Örn: Dilek's Home",
+    category: labels.category ?? "Kategori",
+    categoryPlaceholder: labels.categoryPlaceholder ?? "Kategori seçin",
+    description: labels.description ?? "Açıklama",
+    descriptionPlaceholder:
+      labels.descriptionPlaceholder ?? "Yer hakkında kısa bilgi...",
+    language: labels.language ?? "Dil",
+    languagePlaceholder: labels.languagePlaceholder ?? "Dil seçin",
+    country: labels.country ?? "Ülke",
+    countryPlaceholder: labels.countryPlaceholder ?? "Ülke seçin",
+    photo: labels.photo ?? "Fotoğraf",
+    photoPreparing:
+      labels.photoPreparing ?? "Fotoğraf hazırlanıyor...",
+    removePhoto: labels.removePhoto ?? "Fotoğrafı Kaldır",
+    selectedPhotoAlt: labels.selectedPhotoAlt ?? "Seçilen fotoğraf",
+    location: labels.location ?? "Konum",
+    chooseLocation:
+      labels.chooseLocation ?? "Haritadan bir konum seçin.",
+    chooseLocationFromMap:
+      labels.chooseLocationFromMap ?? "Haritadan Konum Seç",
+    saving: labels.saving ?? "Kaydediliyor...",
+    savePlace: labels.savePlace ?? "Yeri Kaydet",
+    invalidImage:
+      labels.invalidImage ?? "Lütfen bir resim dosyası seçin.",
+    imageTooLarge:
+      labels.imageTooLarge ?? "Fotoğraf en fazla 2 MB olabilir.",
+  };
 
-    if (!file || !setPlaceImage) {
-      return;
-    }
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !setPlaceImage) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Lütfen bir resim dosyası seçin.");
+      alert(t.invalidImage);
       return;
     }
 
     const maxSize = 2 * 1024 * 1024;
-
     if (file.size > maxSize) {
-      alert("Fotoğraf en fazla 2 MB olabilir.");
+      alert(t.imageTooLarge);
       return;
     }
 
     const reader = new FileReader();
-
     reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setPlaceImage(reader.result);
-      }
+      if (typeof reader.result === "string") setPlaceImage(reader.result);
     };
-
     reader.readAsDataURL(file);
   };
 
@@ -124,16 +155,9 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           gap: 10,
         }}
       >
-        <h2
-          style={{
-            margin: 0,
-            fontSize: 21,
-            fontWeight: 800,
-          }}
-        >
-          📍 Yeni Yer Ekle
+        <h2 style={{ margin: 0, fontSize: 21, fontWeight: 800 }}>
+          📍 {t.title}
         </h2>
-
         {onCancel && (
           <button
             type="button"
@@ -147,27 +171,21 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
               fontSize: 18,
               cursor: "pointer",
             }}
+            aria-label="Close"
           >
             ✕
           </button>
         )}
       </div>
 
-      <label
-        style={{
-          display: "block",
-          fontWeight: 700,
-          marginBottom: 6,
-        }}
-      >
-        İşletme / Yer Adı
+      <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+        {t.name}
       </label>
-
       <input
         type="text"
         value={placeName}
         onChange={(e) => setPlaceName(e.target.value)}
-        placeholder="Örn: Dilek's Home"
+        placeholder={t.namePlaceholder}
         style={{
           width: "100%",
           boxSizing: "border-box",
@@ -179,16 +197,9 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
         }}
       />
 
-      <label
-        style={{
-          display: "block",
-          fontWeight: 700,
-          marginBottom: 6,
-        }}
-      >
-        Kategori
+      <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+        {t.category}
       </label>
-
       <select
         value={placeCategory}
         onChange={(e) => setPlaceCategory(e.target.value)}
@@ -203,8 +214,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           background: "#fff",
         }}
       >
-        <option value="">Kategori seçin</option>
-
+        <option value="">{t.categoryPlaceholder}</option>
         {categories.map((category) => (
           <option key={category} value={category}>
             {category}
@@ -212,20 +222,13 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
         ))}
       </select>
 
-      <label
-        style={{
-          display: "block",
-          fontWeight: 700,
-          marginBottom: 6,
-        }}
-      >
-        Açıklama
+      <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+        {t.description}
       </label>
-
       <textarea
         value={placeDescription}
         onChange={(e) => setPlaceDescription(e.target.value)}
-        placeholder="Yer hakkında kısa bilgi..."
+        placeholder={t.descriptionPlaceholder}
         rows={4}
         style={{
           width: "100%",
@@ -239,16 +242,9 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
         }}
       />
 
-      <label
-        style={{
-          display: "block",
-          fontWeight: 700,
-          marginBottom: 6,
-        }}
-      >
-        🌐 Dil
+      <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+        🌐 {t.language}
       </label>
-
       <select
         value={placeLanguage}
         onChange={(e) => setPlaceLanguage(e.target.value)}
@@ -263,30 +259,20 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           background: "#fff",
         }}
       >
-        <option value="">Dil seçin</option>
-
+        <option value="">{t.languagePlaceholder}</option>
         {languages.map((language) => {
           const value = getOptionValue(language);
-          const label = getOptionLabel(language);
-
           return (
             <option key={value} value={value}>
-              {label}
+              {getOptionLabel(language)}
             </option>
           );
         })}
       </select>
 
-      <label
-        style={{
-          display: "block",
-          fontWeight: 700,
-          marginBottom: 6,
-        }}
-      >
-        🌍 Ülke
+      <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+        🌍 {t.country}
       </label>
-
       <select
         value={placeCountry}
         onChange={(e) => setPlaceCountry(e.target.value)}
@@ -301,15 +287,12 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           background: "#fff",
         }}
       >
-        <option value="">Ülke seçin</option>
-
+        <option value="">{t.countryPlaceholder}</option>
         {countries.map((country) => {
           const value = getOptionValue(country);
-          const label = getOptionLabel(country);
-
           return (
             <option key={value} value={value}>
-              {label}
+              {getOptionLabel(country)}
             </option>
           );
         })}
@@ -324,48 +307,28 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           background: "#f8fafc",
         }}
       >
-        <div
-          style={{
-            fontWeight: 700,
-            marginBottom: 8,
-          }}
-        >
-          📷 Fotoğraf
+        <div style={{ fontWeight: 700, marginBottom: 8 }}>
+          📷 {t.photo}
         </div>
-
         <input
           type="file"
           accept="image/*"
           onChange={handleImageChange}
           disabled={imageUploading || submitting}
-          style={{
-            width: "100%",
-            marginBottom: 8,
-          }}
+          style={{ width: "100%", marginBottom: 8 }}
         />
 
         {imageUploading && (
-          <div
-            style={{
-              fontSize: 13,
-              color: "#666",
-              marginBottom: 8,
-            }}
-          >
-            Fotoğraf hazırlanıyor...
+          <div style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>
+            {t.photoPreparing}
           </div>
         )}
 
         {placeImage && (
-          <div
-            style={{
-              position: "relative",
-              marginTop: 8,
-            }}
-          >
+          <div style={{ position: "relative", marginTop: 8 }}>
             <img
               src={placeImage}
-              alt="Seçilen fotoğraf"
+              alt={t.selectedPhotoAlt}
               style={{
                 width: "100%",
                 maxHeight: 220,
@@ -374,7 +337,6 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
                 display: "block",
               }}
             />
-
             {setPlaceImage && (
               <button
                 type="button"
@@ -390,7 +352,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
                   cursor: "pointer",
                 }}
               >
-                🗑️ Fotoğrafı Kaldır
+                🗑️ {t.removePhoto}
               </button>
             )}
           </div>
@@ -406,35 +368,20 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           border: "1px solid #e5e7eb",
         }}
       >
-        <div
-          style={{
-            fontWeight: 700,
-            marginBottom: 6,
-          }}
-        >
-          📍 Konum
+        <div style={{ fontWeight: 700, marginBottom: 6 }}>
+          📍 {t.location}
         </div>
 
-        {selectedLocation ? (
-          <div
-            style={{
-              fontSize: 13,
-              color: "#555",
-              marginBottom: 9,
-            }}
-          >
-            {selectedLocation.lat.toFixed(6)},{" "}
-            {selectedLocation.lng.toFixed(6)}
+        {selectedLocation &&
+        Number.isFinite(Number(selectedLocation.lat)) &&
+        Number.isFinite(Number(selectedLocation.lng)) ? (
+          <div style={{ fontSize: 13, color: "#555", marginBottom: 9 }}>
+            {Number(selectedLocation.lat).toFixed(6)},{" "}
+            {Number(selectedLocation.lng).toFixed(6)}
           </div>
         ) : (
-          <div
-            style={{
-              fontSize: 13,
-              color: "#777",
-              marginBottom: 9,
-            }}
-          >
-            Haritadan bir konum seçin.
+          <div style={{ fontSize: 13, color: "#777", marginBottom: 9 }}>
+            {t.chooseLocation}
           </div>
         )}
 
@@ -453,7 +400,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
               cursor: "pointer",
             }}
           >
-            🗺️ Haritadan Konum Seç
+            🗺️ {t.chooseLocationFromMap}
           </button>
         )}
       </div>
@@ -473,12 +420,10 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
           fontSize: 16,
           fontWeight: 800,
           cursor:
-            submitting || imageUploading
-              ? "not-allowed"
-              : "pointer",
+            submitting || imageUploading ? "not-allowed" : "pointer",
         }}
       >
-        {submitting ? "⏳ Kaydediliyor..." : "➕ Yeri Kaydet"}
+        {submitting ? `⏳ ${t.saving}` : `➕ ${t.savePlace}`}
       </button>
     </section>
   );
