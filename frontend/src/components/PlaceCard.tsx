@@ -1,4 +1,4 @@
-import React from "react";
+import type { CSSProperties } from "react";
 
 export type PlaceCardPlace = {
   _id?: string;
@@ -8,6 +8,7 @@ export type PlaceCardPlace = {
   language?: string;
   country?: string;
   username?: string;
+  image?: string;
 };
 
 type PlaceCardProps = {
@@ -15,14 +16,26 @@ type PlaceCardProps = {
   icon?: string;
   onSelect?: (place: PlaceCardPlace) => void;
   onDelete?: (place: PlaceCardPlace) => void;
+  onToggleFavorite?: (place: PlaceCardPlace) => void;
+  isFavorite?: boolean;
 };
 
-const PlaceCard: React.FC<PlaceCardProps> = ({
+const buttonBase: CSSProperties = {
+  border: "none",
+  borderRadius: 9,
+  padding: "9px 12px",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+const PlaceCard = ({
   place,
   icon = "📍",
   onSelect,
   onDelete,
-}) => {
+  onToggleFavorite,
+  isFavorite = false,
+}: PlaceCardProps) => {
   return (
     <div
       style={{
@@ -34,6 +47,21 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
         boxShadow: "0 3px 12px rgba(0,0,0,.08)",
       }}
     >
+      {place.image && (
+        <img
+          src={place.image}
+          alt={place.name}
+          style={{
+            width: "100%",
+            height: 170,
+            objectFit: "cover",
+            borderRadius: 10,
+            display: "block",
+            marginBottom: 12,
+          }}
+        />
+      )}
+
       <div
         style={{
           display: "flex",
@@ -42,14 +70,8 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
           gap: 10,
         }}
       >
-        <div style={{ flex: 1 }}>
-          <div
-            style={{
-              fontSize: 17,
-              fontWeight: 700,
-              marginBottom: 6,
-            }}
-          >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 6 }}>
             {icon} {place.name}
           </div>
 
@@ -81,43 +103,37 @@ const PlaceCard: React.FC<PlaceCardProps> = ({
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          marginTop: 12,
-        }}
-      >
+      <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         {onSelect && (
           <button
+            type="button"
             onClick={() => onSelect(place)}
-            style={{
-              flex: 1,
-              border: "none",
-              borderRadius: 9,
-              padding: "9px 10px",
-              background: "#2563eb",
-              color: "#fff",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            style={{ ...buttonBase, flex: 1, background: "#2563eb", color: "#fff" }}
           >
             📍 Gör
           </button>
         )}
 
+        {onToggleFavorite && (
+          <button
+            type="button"
+            onClick={() => onToggleFavorite(place)}
+            aria-label={isFavorite ? "Favorilerden çıkar" : "Favorilere ekle"}
+            style={{
+              ...buttonBase,
+              background: isFavorite ? "#fef3c7" : "#f3f4f6",
+              color: isFavorite ? "#b45309" : "#374151",
+            }}
+          >
+            {isFavorite ? "★ Favoride" : "☆ Favori"}
+          </button>
+        )}
+
         {onDelete && (
           <button
+            type="button"
             onClick={() => onDelete(place)}
-            style={{
-              border: "none",
-              borderRadius: 9,
-              padding: "9px 12px",
-              background: "#ef4444",
-              color: "#fff",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            style={{ ...buttonBase, background: "#ef4444", color: "#fff" }}
           >
             🗑️
           </button>
