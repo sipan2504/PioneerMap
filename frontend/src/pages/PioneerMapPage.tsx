@@ -2802,10 +2802,10 @@ function PioneerMapPage() {
                 setMapInteractive(true);
               }
             }}
-            onDelete={(place) => deletePlace(place)}
+            onDelete={() => deletePlace(selectedPlace)}
             isFavorite={isFavorite(selectedPlace)}
-            onToggleFavorite={(place) => toggleFavorite(place as Place)}
-            onShare={(place) => sharePlace(place as Place)}
+            onToggleFavorite={() => toggleFavorite(selectedPlace)}
+            onShare={() => sharePlace(selectedPlace)}
           />
         )}
 
