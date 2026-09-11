@@ -2205,26 +2205,6 @@ function PioneerMapPage() {
     return t("jobs");
   };
 
-  const selectedDistance =
-    selectedPlace &&
-    userLocation &&
-    Number.isFinite(Number(selectedPlace.lat)) &&
-    Number.isFinite(Number(selectedPlace.lng))
-      ? distanceInKm(
-          userLocation.lat,
-          userLocation.lng,
-          Number(selectedPlace.lat),
-          Number(selectedPlace.lng)
-        )
-      : null;
-
-  const selectedCategory =
-    selectedPlace
-      ? categoryIcons[
-          selectedPlace.category
-        ]
-      : null;
-
   /* =======================================================
   UI
   ======================================================= */
@@ -2713,7 +2693,17 @@ function PioneerMapPage() {
           placeDescription={placeDescription}
           setPlaceDescription={setPlaceDescription}
           placeCategory={placeCategory}
-          setPlaceCategory={setPlaceCategory}
+          setPlaceCategory={(value) => {
+            if (
+              value === "Stays" ||
+              value === "Shops" ||
+              value === "Food" ||
+              value === "Services" ||
+              value === "Jobs"
+            ) {
+              setPlaceCategory(value);
+            }
+          }}
           placeLanguage={placeLanguage}
           setPlaceLanguage={setPlaceLanguage}
           placeCountry={placeCountry}
@@ -2722,7 +2712,7 @@ function PioneerMapPage() {
           languages={languages.map((item) => item.value)}
           countries={countries.map((item) => item.value)}
           selectedLocation={selectedLocation}
-          onMapSelect={(location) => setSelectedLocation(location)}
+          onMapSelect={() => setMapInteractive(true)}
           onSubmit={addPlace}
           onCancel={() => {
             setShowForm(false);
@@ -2801,7 +2791,10 @@ function PioneerMapPage() {
             onShowOnMap={(place) => {
               const map = mapInstance.current;
               if (map) {
-                map.setView([place.lat, place.lng], 15);
+                map.setView(
+                  [Number((place as any).lat), Number((place as any).lng)],
+                  15
+                );
                 setMapInteractive(true);
               }
             }}
