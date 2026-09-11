@@ -2690,7 +2690,7 @@ function PioneerMapPage() {
           placeDescription={placeDescription}
           setPlaceDescription={setPlaceDescription}
           placeCategory={placeCategory}
-          setPlaceCategory={setPlaceCategory}
+          setPlaceCategory={(value: string) => setPlaceCategory(value as Exclude<Category, "All">)}
           placeLanguage={placeLanguage}
           setPlaceLanguage={setPlaceLanguage}
           placeCountry={placeCountry}
@@ -2699,7 +2699,7 @@ function PioneerMapPage() {
           languages={languages.map((item) => item.value)}
           countries={countries.map((item) => item.value)}
           selectedLocation={selectedLocation}
-          onMapSelect={(location) => setSelectedLocation(location)}
+          onMapSelect={setSelectedLocation as unknown as () => void}
           onSubmit={addPlace}
           onCancel={() => {
             setShowForm(false);
