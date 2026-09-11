@@ -1,5 +1,3 @@
-import React from "react";
-
 type ToastProps = {
   message: string;
   onClose?: () => void;
@@ -41,8 +39,7 @@ export default function Toast({
         fontSize: "14px",
         fontWeight: "700",
         textAlign: "center",
-        boxShadow:
-          "0 5px 20px rgba(0,0,0,.25)",
+        boxShadow: "0 5px 20px rgba(0,0,0,.25)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
