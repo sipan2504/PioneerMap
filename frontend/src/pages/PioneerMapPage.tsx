@@ -2502,7 +2502,8 @@ function PioneerMapPage() {
           style={{
             margin:
               "0 0 10px",
-            fontSize: "34px",
+            fontSize: "30px",
+             letterSpacing: "-0.8px",
           }}
         >
           🗺️ PioneerMap
@@ -2635,7 +2636,7 @@ function PioneerMapPage() {
       <section
         style={{
           background: "#fff",
-          padding: "15px",
+          padding: "8px 15px 18px",
         }}
       >
         <div
@@ -2972,7 +2973,7 @@ function PioneerMapPage() {
           languages={languages.map((item) => item.value)}
           countries={countries.map((item) => item.value)}
           selectedLocation={selectedLocation}
-          onMapSelect={(location: { lat: number; lng: number }) => { if (Number.isFinite(location.lat) && Number.isFinite(location.lng)) setSelectedLocation(location); }}
+          onMapSelect={() => setMapInteractive(true)}
           onSubmit={addPlace}
           onCancel={() => {
             setShowForm(false);
@@ -3008,20 +3009,36 @@ function PioneerMapPage() {
           <PlaceDetails
             place={selectedPlace}
             onClose={() => setSelectedPlace(null)}
-            onShowOnMap={(place) => {
+            onShowOnMap={() => {
               const map = mapInstance.current;
-              if (map) {
-                map.setView([place.lat, place.lng], 15);
+              if (
+                map &&
+                Number.isFinite(Number(selectedPlace.lat)) &&
+                Number.isFinite(Number(selectedPlace.lng))
+              ) {
+                map.setView(
+                  [Number(selectedPlace.lat), Number(selectedPlace.lng)],
+                  15
+                );
+                setMapInteractive(true);
               }
             }}
-            onDelete={(place) => deletePlace(place as any)}
+            onDelete={() => deletePlace(selectedPlace)}
             isFavorite={isFavorite(selectedPlace)}
-            onToggleFavorite={(place) => toggleFavorite(place as Place)}
-            onShare={(place) => sharePlace(place as Place)}
+            onToggleFavorite={() => toggleFavorite(selectedPlace)}
+            onShare={() => sharePlace(selectedPlace)}
           />
         )}
 
-        <section style={{ marginTop: "16px" }}>
+        <section
+          style={{
+            marginTop: "14px",
+            background: "#fff",
+            borderRadius: "24px",
+            padding: "6px",
+            boxShadow: "0 10px 30px rgba(33,44,80,.08)",
+          }}
+        >
           <PlaceList
             places={places}
             categoryIcons={{
