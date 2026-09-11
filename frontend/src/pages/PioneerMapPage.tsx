@@ -882,6 +882,22 @@ const translations = {
     anonymous: "उपयोगकर्ता",
   },
 } as const;
+type ExtraTranslation = {
+  home:string; nearby:string; add:string; favorites:string; profile:string; share:string; removeFavorite:string; addFavorite:string; showOnMap:string; delete:string; close:string; emptyFavorites:string; noPlaces:string; viewDetails:string; placeImage:string; removeImage:string; preparingPhoto:string; photoAdded:string; choosePhoto:string; savePlace:string; cancel:string; location:string; category:string; language:string; country:string; photoTooLarge:string;
+};
+const extraTranslations: Record<AppLanguage, ExtraTranslation> = {
+  Turkish:{home:"Ana Sayfa",nearby:"Yakınımda",add:"Yer Ekle",favorites:"Favoriler",profile:"Profil",share:"Paylaş",removeFavorite:"Favorilerden çıkar",addFavorite:"Favorilere ekle",showOnMap:"Haritada Göster",delete:"Yeri Sil",close:"Kapat",emptyFavorites:"Henüz favori eklenmedi.",noPlaces:"Henüz yer bulunamadı.",viewDetails:"Detayları Gör",placeImage:"İşletme Fotoğrafı",removeImage:"Fotoğrafı kaldır",preparingPhoto:"Fotoğraf hazırlanıyor...",photoAdded:"Fotoğraf eklendi.",choosePhoto:"Fotoğraf seç",savePlace:"Yeri Kaydet",cancel:"İptal",location:"Konum",category:"Kategori",language:"Dil",country:"Ülke",photoTooLarge:"Fotoğraf en fazla 10 MB olabilir."},
+  English:{home:"Home",nearby:"Nearby",add:"Add Place",favorites:"Favorites",profile:"Profile",share:"Share",removeFavorite:"Remove from favorites",addFavorite:"Add to favorites",showOnMap:"Show on Map",delete:"Delete Place",close:"Close",emptyFavorites:"No favorites yet.",noPlaces:"No places found yet.",viewDetails:"View Details",placeImage:"Place Photo",removeImage:"Remove photo",preparingPhoto:"Preparing photo...",photoAdded:"Photo added.",choosePhoto:"Choose photo",savePlace:"Save Place",cancel:"Cancel",location:"Location",category:"Category",language:"Language",country:"Country",photoTooLarge:"Photo must be 10 MB or less."},
+  Arabic:{home:"الرئيسية",nearby:"بالقرب مني",add:"إضافة مكان",favorites:"المفضلة",profile:"الملف الشخصي",share:"مشاركة",removeFavorite:"إزالة من المفضلة",addFavorite:"إضافة إلى المفضلة",showOnMap:"عرض على الخريطة",delete:"حذف المكان",close:"إغلاق",emptyFavorites:"لا توجد مفضلات بعد.",noPlaces:"لا توجد أماكن بعد.",viewDetails:"عرض التفاصيل",placeImage:"صورة المكان",removeImage:"إزالة الصورة",preparingPhoto:"جارٍ تجهيز الصورة...",photoAdded:"تمت إضافة الصورة.",choosePhoto:"اختر صورة",savePlace:"حفظ المكان",cancel:"إلغاء",location:"الموقع",category:"الفئة",language:"اللغة",country:"الدولة",photoTooLarge:"يجب ألا تتجاوز الصورة 10 ميغابايت."},
+  Spanish:{home:"Inicio",nearby:"Cerca",add:"Añadir lugar",favorites:"Favoritos",profile:"Perfil",share:"Compartir",removeFavorite:"Quitar de favoritos",addFavorite:"Añadir a favoritos",showOnMap:"Mostrar en el mapa",delete:"Eliminar lugar",close:"Cerrar",emptyFavorites:"Aún no hay favoritos.",noPlaces:"Aún no hay lugares.",viewDetails:"Ver detalles",placeImage:"Foto del lugar",removeImage:"Quitar foto",preparingPhoto:"Preparando foto...",photoAdded:"Foto añadida.",choosePhoto:"Elegir foto",savePlace:"Guardar lugar",cancel:"Cancelar",location:"Ubicación",category:"Categoría",language:"Idioma",country:"País",photoTooLarge:"La foto debe tener 10 MB o menos."},
+  French:{home:"Accueil",nearby:"À proximité",add:"Ajouter un lieu",favorites:"Favoris",profile:"Profil",share:"Partager",removeFavorite:"Retirer des favoris",addFavorite:"Ajouter aux favoris",showOnMap:"Afficher sur la carte",delete:"Supprimer le lieu",close:"Fermer",emptyFavorites:"Aucun favori pour le moment.",noPlaces:"Aucun lieu pour le moment.",viewDetails:"Voir les détails",placeImage:"Photo du lieu",removeImage:"Supprimer la photo",preparingPhoto:"Préparation de la photo...",photoAdded:"Photo ajoutée.",choosePhoto:"Choisir une photo",savePlace:"Enregistrer",cancel:"Annuler",location:"Emplacement",category:"Catégorie",language:"Langue",country:"Pays",photoTooLarge:"La photo doit faire 10 Mo ou moins."},
+  German:{home:"Startseite",nearby:"In der Nähe",add:"Ort hinzufügen",favorites:"Favoriten",profile:"Profil",share:"Teilen",removeFavorite:"Aus Favoriten entfernen",addFavorite:"Zu Favoriten hinzufügen",showOnMap:"Auf Karte anzeigen",delete:"Ort löschen",close:"Schließen",emptyFavorites:"Noch keine Favoriten.",noPlaces:"Noch keine Orte.",viewDetails:"Details anzeigen",placeImage:"Ortsfoto",removeImage:"Foto entfernen",preparingPhoto:"Foto wird vorbereitet...",photoAdded:"Foto hinzugefügt.",choosePhoto:"Foto auswählen",savePlace:"Ort speichern",cancel:"Abbrechen",location:"Standort",category:"Kategorie",language:"Sprache",country:"Land",photoTooLarge:"Das Foto darf höchstens 10 MB groß sein."},
+  Portuguese:{home:"Início",nearby:"Perto de mim",add:"Adicionar lugar",favorites:"Favoritos",profile:"Perfil",share:"Compartilhar",removeFavorite:"Remover dos favoritos",addFavorite:"Adicionar aos favoritos",showOnMap:"Mostrar no mapa",delete:"Excluir lugar",close:"Fechar",emptyFavorites:"Ainda não há favoritos.",noPlaces:"Ainda não há lugares.",viewDetails:"Ver detalhes",placeImage:"Foto do lugar",removeImage:"Remover foto",preparingPhoto:"Preparando foto...",photoAdded:"Foto adicionada.",choosePhoto:"Escolher foto",savePlace:"Salvar lugar",cancel:"Cancelar",location:"Localização",category:"Categoria",language:"Idioma",country:"País",photoTooLarge:"La foto debe tener 10 MB o menos."},
+  Russian:{home:"Главная",nearby:"Рядом",add:"Добавить место",favorites:"Избранное",profile:"Профиль",share:"Поделиться",removeFavorite:"Удалить из избранного",addFavorite:"Добавить в избранное",showOnMap:"Показать на карте",delete:"Удалить место",close:"Закрыть",emptyFavorites:"Избранных мест пока нет.",noPlaces:"Мест пока нет.",viewDetails:"Подробнее",placeImage:"Фото места",removeImage:"Удалить фото",preparingPhoto:"Подготовка фото...",photoAdded:"Фото добавлено.",choosePhoto:"Выбрать фото",savePlace:"Сохранить место",cancel:"Отмена",location:"Местоположение",category:"Категория",language:"Язык",country:"Страна",photoTooLarge:"Фото должно быть не более 10 МБ."},
+  Chinese:{home:"首页",nearby:"附近",add:"添加地点",favorites:"收藏",profile:"个人资料",share:"分享",removeFavorite:"取消收藏",addFavorite:"加入收藏",showOnMap:"在地图上显示",delete:"删除地点",close:"关闭",emptyFavorites:"暂无收藏。",noPlaces:"暂无地点。",viewDetails:"查看详情",placeImage:"地点照片",removeImage:"删除照片",preparingPhoto:"正在准备照片...",photoAdded:"照片已添加。",choosePhoto:"选择照片",savePlace:"保存地点",cancel:"取消",location:"位置",category:"类别",language:"语言",country:"国家",photoTooLarge:"照片大小必须不超过 10 MB。"},
+  Hindi:{home:"होम",nearby:"पास में",add:"स्थान जोड़ें",favorites:"पसंदीदा",profile:"प्रोफ़ाइल",share:"साझा करें",removeFavorite:"पसंदीदा से हटाएँ",addFavorite:"पसंदीदा में जोड़ें",showOnMap:"मानचित्र पर दिखाएँ",delete:"स्थान हटाएँ",close:"बंद करें",emptyFavorites:"अभी कोई पसंदीदा नहीं।",noPlaces:"अभी कोई स्थान नहीं।",viewDetails:"विवरण देखें",placeImage:"स्थान की फोटो",removeImage:"फोटो हटाएँ",preparingPhoto:"फोटो तैयार हो रही है...",photoAdded:"फोटो जोड़ दी गई।",choosePhoto:"फोटो चुनें",savePlace:"स्थान सहेजें",cancel:"रद्द करें",location:"स्थान",category:"श्रेणी",language:"भाषा",country:"देश",photoTooLarge:"फ़ोटो 10 MB या उससे कम होनी चाहिए।"},
+};
+
 
 type TranslationKey = keyof typeof translations.Turkish;
 
@@ -1037,6 +1053,266 @@ function PioneerMapPage() {
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
+
+  /* =======================================================
+     GLOBAL UI LANGUAGE BRIDGE
+     Some legacy child components still contain fixed Turkish
+     labels. This bridge translates only exact UI strings so the
+     selected app language applies across the whole visible app.
+  ======================================================= */
+  useEffect(() => {
+    const placeTitle: Record<AppLanguage, string> = {
+      Turkish: "Yerler",
+      English: "Places",
+      Arabic: "الأماكن",
+      Spanish: "Lugares",
+      French: "Lieux",
+      German: "Orte",
+      Portuguese: "Lugares",
+      Russian: "Места",
+      Chinese: "地点",
+      Hindi: "स्थान",
+    };
+
+    const map: Record<AppLanguage, Record<string, string>> = {
+      Turkish: {
+        "Yerler": "Yerler",
+        "sonuç": "sonuç",
+        "⭐ Favorilere Ekle": "⭐ Favorilere Ekle",
+        "⭐ Favorilerden Çıkar": "⭐ Favorilerden Çıkar",
+        "📤 Yeri Paylaş": "📤 Yeri Paylaş",
+        "🗺️ Haritada Göster": "🗺️ Haritada Göster",
+        "🗑️ Sil": "🗑️ Sil",
+        "Dil:": "Dil:",
+        "Ülke:": "Ülke:",
+        "👤 Ekleyen:": "👤 Ekleyen:",
+        "⭐ Favoriler": "⭐ Favoriler",
+        "⭐ Henüz favori eklenmedi.": "⭐ Henüz favori eklenmedi.",
+        "📍 Gör": "📍 Gör",
+        "Ana Sayfa": "Ana Sayfa",
+        "Yakınımda": "Yakınımda",
+        "Yer Ekle": "Yer Ekle",
+        "Favoriler": "Favoriler",
+        "Profil": "Profil",
+      },
+      English: {
+        "Yerler": placeTitle.English,
+        "sonuç": "results",
+        "📍 Gör": `📍 ${extraTranslations.English.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.English.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.English.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.English.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.English.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.English.delete}`,
+        "Dil:": "Language:",
+        "Ülke:": "Country:",
+        "👤 Ekleyen:": "👤 Added by:",
+        "⭐ Favoriler": "⭐ Favorites",
+        "⭐ Henüz favori eklenmedi.": "⭐ No favorites yet.",
+        "Ana Sayfa": extraTranslations.English.home,
+        "Yakınımda": extraTranslations.English.nearby,
+        "Yer Ekle": extraTranslations.English.add,
+        "Favoriler": extraTranslations.English.favorites,
+        "Profil": extraTranslations.English.profile,
+      },
+      Arabic: {
+        "Yerler": placeTitle.Arabic,
+        "sonuç": "نتيجة",
+        "📍 Gör": `📍 ${extraTranslations.Arabic.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Arabic.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Arabic.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Arabic.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Arabic.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Arabic.delete}`,
+        "Dil:": "اللغة:",
+        "Ülke:": "الدولة:",
+        "👤 Ekleyen:": "👤 أضافه:",
+        "⭐ Favoriler": "⭐ المفضلة",
+        "⭐ Henüz favori eklenmedi.": "⭐ لا توجد مفضلات بعد.",
+        "Ana Sayfa": extraTranslations.Arabic.home,
+        "Yakınımda": extraTranslations.Arabic.nearby,
+        "Yer Ekle": extraTranslations.Arabic.add,
+        "Favoriler": extraTranslations.Arabic.favorites,
+        "Profil": extraTranslations.Arabic.profile,
+      },
+      Spanish: {
+        "Yerler": placeTitle.Spanish,
+        "sonuç": "resultados",
+        "📍 Gör": `📍 ${extraTranslations.Spanish.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Spanish.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Spanish.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Spanish.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Spanish.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Spanish.delete}`,
+        "Dil:": "Idioma:",
+        "Ülke:": "País:",
+        "👤 Ekleyen:": "👤 Añadido por:",
+        "⭐ Favoriler": "⭐ Favoritos",
+        "⭐ Henüz favori eklenmedi.": "⭐ Aún no hay favoritos.",
+        "Ana Sayfa": extraTranslations.Spanish.home,
+        "Yakınımda": extraTranslations.Spanish.nearby,
+        "Yer Ekle": extraTranslations.Spanish.add,
+        "Favoriler": extraTranslations.Spanish.favorites,
+        "Profil": extraTranslations.Spanish.profile,
+      },
+      French: {
+        "Yerler": placeTitle.French,
+        "sonuç": "résultats",
+        "📍 Gör": `📍 ${extraTranslations.French.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.French.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.French.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.French.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.French.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.French.delete}`,
+        "Dil:": "Langue:",
+        "Ülke:": "Pays:",
+        "👤 Ekleyen:": "👤 Ajouté par:",
+        "⭐ Favoriler": "⭐ Favoris",
+        "⭐ Henüz favori eklenmedi.": "⭐ Aucun favori pour le moment.",
+        "Ana Sayfa": extraTranslations.French.home,
+        "Yakınımda": extraTranslations.French.nearby,
+        "Yer Ekle": extraTranslations.French.add,
+        "Favoriler": extraTranslations.French.favorites,
+        "Profil": extraTranslations.French.profile,
+      },
+      German: {
+        "Yerler": placeTitle.German,
+        "sonuç": "Ergebnisse",
+        "📍 Gör": `📍 ${extraTranslations.German.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.German.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.German.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.German.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.German.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.German.delete}`,
+        "Dil:": "Sprache:",
+        "Ülke:": "Land:",
+        "👤 Ekleyen:": "👤 Hinzugefügt von:",
+        "⭐ Favoriler": "⭐ Favoriten",
+        "⭐ Henüz favori eklenmedi.": "⭐ Noch keine Favoriten.",
+        "Ana Sayfa": extraTranslations.German.home,
+        "Yakınımda": extraTranslations.German.nearby,
+        "Yer Ekle": extraTranslations.German.add,
+        "Favoriler": extraTranslations.German.favorites,
+        "Profil": extraTranslations.German.profile,
+      },
+      Portuguese: {
+        "Yerler": placeTitle.Portuguese,
+        "sonuç": "resultados",
+        "📍 Gör": `📍 ${extraTranslations.Portuguese.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Portuguese.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Portuguese.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Portuguese.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Portuguese.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Portuguese.delete}`,
+        "Dil:": "Idioma:",
+        "Ülke:": "País:",
+        "👤 Ekleyen:": "👤 Adicionado por:",
+        "⭐ Favoriler": "⭐ Favoritos",
+        "⭐ Henüz favori eklenmedi.": "⭐ Ainda não há favoritos.",
+        "Ana Sayfa": extraTranslations.Portuguese.home,
+        "Yakınımda": extraTranslations.Portuguese.nearby,
+        "Yer Ekle": extraTranslations.Portuguese.add,
+        "Favoriler": extraTranslations.Portuguese.favorites,
+        "Profil": extraTranslations.Portuguese.profile,
+      },
+      Russian: {
+        "Yerler": placeTitle.Russian,
+        "sonuç": "результатов",
+        "📍 Gör": `📍 ${extraTranslations.Russian.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Russian.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Russian.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Russian.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Russian.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Russian.delete}`,
+        "Dil:": "Язык:",
+        "Ülke:": "Страна:",
+        "👤 Ekleyen:": "👤 Добавил:",
+        "⭐ Favoriler": "⭐ Избранное",
+        "⭐ Henüz favori eklenmedi.": "⭐ Избранных мест пока нет.",
+        "Ana Sayfa": extraTranslations.Russian.home,
+        "Yakınımda": extraTranslations.Russian.nearby,
+        "Yer Ekle": extraTranslations.Russian.add,
+        "Favoriler": extraTranslations.Russian.favorites,
+        "Profil": extraTranslations.Russian.profile,
+      },
+      Chinese: {
+        "Yerler": placeTitle.Chinese,
+        "sonuç": "个结果",
+        "📍 Gör": `📍 ${extraTranslations.Chinese.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Chinese.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Chinese.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Chinese.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Chinese.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Chinese.delete}`,
+        "Dil:": "语言:",
+        "Ülke:": "国家:",
+        "👤 Ekleyen:": "👤 添加者:",
+        "⭐ Favoriler": "⭐ 收藏",
+        "⭐ Henüz favori eklenmedi.": "⭐ 暂无收藏。",
+        "Ana Sayfa": extraTranslations.Chinese.home,
+        "Yakınımda": extraTranslations.Chinese.nearby,
+        "Yer Ekle": extraTranslations.Chinese.add,
+        "Favoriler": extraTranslations.Chinese.favorites,
+        "Profil": extraTranslations.Chinese.profile,
+      },
+      Hindi: {
+        "Yerler": placeTitle.Hindi,
+        "sonuç": "परिणाम",
+        "📍 Gör": `📍 ${extraTranslations.Hindi.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Hindi.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Hindi.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Hindi.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Hindi.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Hindi.delete}`,
+        "Dil:": "भाषा:",
+        "Ülke:": "देश:",
+        "👤 Ekleyen:": "👤 जोड़ा गया:",
+        "⭐ Favoriler": "⭐ पसंदीदा",
+        "⭐ Henüz favori eklenmedi.": "⭐ अभी कोई पसंदीदा नहीं।",
+        "Ana Sayfa": extraTranslations.Hindi.home,
+        "Yakınımda": extraTranslations.Hindi.nearby,
+        "Yer Ekle": extraTranslations.Hindi.add,
+        "Favoriler": extraTranslations.Hindi.favorites,
+        "Profil": extraTranslations.Hindi.profile,
+      },
+    };
+
+    const replaceTextNodes = () => {
+      const replacements = map[appLanguage];
+      const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT
+      );
+      const nodes: Text[] = [];
+      let current: Node | null;
+      while ((current = walker.nextNode())) {
+        if (current.nodeType === Node.TEXT_NODE) {
+          nodes.push(current as Text);
+        }
+      }
+      nodes.forEach((node) => {
+        const original = node.nodeValue ?? "";
+        const trimmed = original.trim();
+        if (!trimmed || !replacements[trimmed]) return;
+        const start = original.indexOf(trimmed);
+        const end = start + trimmed.length;
+        node.nodeValue =
+          original.slice(0, start) +
+          replacements[trimmed] +
+          original.slice(end);
+      });
+    };
+
+    replaceTextNodes();
+    const observer = new MutationObserver(() => replaceTextNodes());
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => observer.disconnect();
+  }, [appLanguage]);
 
   useEffect(() => {
     try {
@@ -1214,8 +1490,6 @@ function PioneerMapPage() {
       lng: number;
     } | null>(null);
 
-  const [mapInteractive, setMapInteractive] = useState(false);
-
   const [placeName, setPlaceName] =
     useState("");
 
@@ -1352,9 +1626,22 @@ function PioneerMapPage() {
       setSignedIn(false);
       setUsername("");
 
-      setStatus(
+      const message =
         error instanceof Error
-          ? `❌ ${error.message}`
+          ? error.message
+          : "";
+
+      const consentError = /consent|scope|network error/i.test(message);
+
+      setStatus(
+        consentError
+          ? (appLanguage === "English"
+              ? "❌ Pi consent could not be checked. Please reopen Pi Browser and try again."
+              : appLanguage === "Turkish"
+              ? "❌ Pi izinleri kontrol edilemedi. Pi Browser'ı yeniden açıp tekrar dene."
+              : t("loginFailed"))
+          : message
+          ? `❌ ${message}`
           : t("loginFailed")
       );
     }
@@ -1414,12 +1701,11 @@ function PioneerMapPage() {
       return;
     }
 
-    const map = L.map(mapRef.current, {
-      dragging: false,
-      touchZoom: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-    }).setView([39.9334, 32.8597], 6);
+    const map =
+      L.map(mapRef.current).setView(
+        [39.9334, 32.8597],
+        6
+      );
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -1455,23 +1741,6 @@ function PioneerMapPage() {
       mapInstance.current = null;
     };
   }, []);
-
-  useEffect(() => {
-    const map = mapInstance.current;
-    if (!map) return;
-
-    if (mapInteractive) {
-      map.dragging.enable();
-      map.touchZoom.enable();
-      map.scrollWheelZoom.enable();
-      map.doubleClickZoom.enable();
-    } else {
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.scrollWheelZoom.disable();
-      map.doubleClickZoom.disable();
-    }
-  }, [mapInteractive]);
 
   /* =======================================================
   NEARBY
@@ -2205,6 +2474,7 @@ function PioneerMapPage() {
     return t("jobs");
   };
 
+
   /* =======================================================
   UI
   ======================================================= */
@@ -2639,7 +2909,7 @@ function PioneerMapPage() {
               border: "1px solid #e0e0e0",
             }}
           >
-            <div style={{ fontWeight: 800, marginBottom: "8px" }}>📷 İşletme Fotoğrafı</div>
+            <div style={{ fontWeight: 800, marginBottom: "8px" }}>{extraTranslations[appLanguage].placeImage}</div>
             <input
               type="file"
               accept="image/*"
@@ -2647,33 +2917,33 @@ function PioneerMapPage() {
                 const file = e.target.files?.[0];
                 if (!file) return;
                 if (!file.type.startsWith("image/")) {
-                  setStatus("❌ Lütfen bir fotoğraf seç.");
+                  setStatus(t("nameRequired"));
                   return;
                 }
                 if (file.size > 10 * 1024 * 1024) {
-                  setStatus("❌ Fotoğraf en fazla 10 MB olabilir.");
+                  setStatus(extraTranslations[appLanguage].photoTooLarge);
                   return;
                 }
                 try {
                   setImageUploading(true);
                   const compressed = await compressPlaceImage(file);
                   setPlaceImage(compressed);
-                  setStatus("📷 Fotoğraf eklendi.");
+                  setStatus(extraTranslations[appLanguage].photoAdded);
                 } catch (error) {
                   console.error("Photo error:", error);
-                  setStatus("❌ Fotoğraf eklenemedi.");
+                  setStatus(t("backendError"));
                 } finally {
                   setImageUploading(false);
                 }
               }}
               style={{ width: "100%", boxSizing: "border-box" }}
             />
-            {imageUploading && <div style={{ marginTop: "8px", fontWeight: 700 }}>⏳ Fotoğraf hazırlanıyor...</div>}
+            {imageUploading && <div style={{ marginTop: "8px", fontWeight: 700 }}>{extraTranslations[appLanguage].preparingPhoto}</div>}
             {placeImage && (
               <div style={{ marginTop: "12px" }}>
                 <img
                   src={placeImage}
-                  alt="İşletme önizleme"
+                  alt={extraTranslations[appLanguage].placeImage}
                   style={{ width: "100%", maxHeight: "220px", objectFit: "cover", borderRadius: "10px", display: "block" }}
                 />
                 <button
@@ -2681,7 +2951,7 @@ function PioneerMapPage() {
                   onClick={() => setPlaceImage("")}
                   style={{ marginTop: "8px", padding: "8px 12px", border: "none", borderRadius: "8px", background: "#eee", cursor: "pointer", fontWeight: 700 }}
                 >
-                  🗑️ Fotoğrafı kaldır
+                  {extraTranslations[appLanguage].removeImage}
                 </button>
               </div>
             )}
@@ -2693,17 +2963,7 @@ function PioneerMapPage() {
           placeDescription={placeDescription}
           setPlaceDescription={setPlaceDescription}
           placeCategory={placeCategory}
-          setPlaceCategory={(value) => {
-            if (
-              value === "Stays" ||
-              value === "Shops" ||
-              value === "Food" ||
-              value === "Services" ||
-              value === "Jobs"
-            ) {
-              setPlaceCategory(value);
-            }
-          }}
+          setPlaceCategory={(value: string) => setPlaceCategory(value as Exclude<Category, "All">)}
           placeLanguage={placeLanguage}
           setPlaceLanguage={setPlaceLanguage}
           placeCountry={placeCountry}
@@ -2712,7 +2972,7 @@ function PioneerMapPage() {
           languages={languages.map((item) => item.value)}
           countries={countries.map((item) => item.value)}
           selectedLocation={selectedLocation}
-          onMapSelect={() => setMapInteractive(true)}
+          onMapSelect={(location: { lat: number; lng: number }) => { if (Number.isFinite(location.lat) && Number.isFinite(location.lng)) setSelectedLocation(location); }}
           onSubmit={addPlace}
           onCancel={() => {
             setShowForm(false);
@@ -2730,82 +2990,34 @@ function PioneerMapPage() {
           padding: "15px",
         }}
       >
-        <div style={{ position: "relative" }}>
-          <button
-            type="button"
-            onClick={() => setMapInteractive((current) => !current)}
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              zIndex: 1000,
-              padding: "8px 12px",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              background: "#fff",
-              color: "#222",
-              fontWeight: 800,
-              fontSize: "12px",
-              cursor: "pointer",
-            }}
-          >
-            MAP {mapInteractive ? "ON" : "OFF"}
-          </button>
-          <div
-            ref={mapRef}
-            style={{
-              width: "100%",
-              height: "360px",
+        <div
+          ref={mapRef}
+          style={{
+            width: "100%",
+            height: "500px",
             borderRadius:
               "14px",
             overflow:
               "hidden",
             background:
               "#ddd",
-            }}
-          />
-          {!mapInteractive && (
-            <div style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "12px",
-              transform: "translateX(-50%)",
-              zIndex: 1000,
-              padding: "8px 12px",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,.94)",
-              fontWeight: 700,
-              fontSize: "12px",
-              boxShadow: "0 2px 8px rgba(0,0,0,.18)",
-              pointerEvents: "none",
-            }}>
-              MAP OFF — Haritayı etkinleştir
-            </div>
-          )}
-        </div>
+          }}
+        />
 
         {selectedPlace && (
           <PlaceDetails
             place={selectedPlace}
             onClose={() => setSelectedPlace(null)}
-            onShowOnMap={() => {
+            onShowOnMap={(place) => {
               const map = mapInstance.current;
-              if (
-                map &&
-                Number.isFinite(Number(selectedPlace.lat)) &&
-                Number.isFinite(Number(selectedPlace.lng))
-              ) {
-                map.setView(
-                  [Number(selectedPlace.lat), Number(selectedPlace.lng)],
-                  15
-                );
-                setMapInteractive(true);
+              if (map) {
+                map.setView([place.lat, place.lng], 15);
               }
             }}
-            onDelete={() => deletePlace(selectedPlace)}
+            onDelete={(place) => deletePlace(place as any)}
             isFavorite={isFavorite(selectedPlace)}
-            onToggleFavorite={() => toggleFavorite(selectedPlace)}
-            onShare={() => sharePlace(selectedPlace)}
+            onToggleFavorite={(place) => toggleFavorite(place as Place)}
+            onShare={(place) => sharePlace(place as Place)}
           />
         )}
 
@@ -2937,31 +3149,11 @@ function PioneerMapPage() {
         }}
       >
         {[
-          [
-            "🏠",
-            "Ana Sayfa",
-            "home",
-          ],
-          [
-            "📍",
-            "Yakınımda",
-            "nearby",
-          ],
-          [
-            "➕",
-            "Yer Ekle",
-            "add",
-          ],
-          [
-            "⭐",
-            "Favoriler",
-            "favorites",
-          ],
-          [
-            "👤",
-            "Profil",
-            "profile",
-          ],
+          ["🏠", extraTranslations[appLanguage].home, "home"],
+          ["📍", extraTranslations[appLanguage].nearby, "nearby"],
+          ["➕", extraTranslations[appLanguage].add, "add"],
+          ["⭐", extraTranslations[appLanguage].favorites, "favorites"],
+          ["👤", extraTranslations[appLanguage].profile, "profile"],
         ].map(
           ([icon, label, key]) => (
             <button
@@ -3050,10 +3242,7 @@ function PioneerMapPage() {
                   setStatus(
                     signedIn
                       ? `👤 @${username}`
-                      : appLanguage ===
-                        "English"
-                      ? "👤 Please sign in with Pi."
-                      : "👤 Pi ile giriş yapmalısın."
+                      : `👤 ${t("signInFirst").replace("❌ ", "")}`
                   );
                 }
               }}
