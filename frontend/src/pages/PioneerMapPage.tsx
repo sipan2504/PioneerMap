@@ -3,7 +3,6 @@ import L from "leaflet";
 import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
 import Favorites from "../components/Favorites";
-import PlaceDetails from "../components/PlaceDetails";
 import PlaceList from "../components/PlaceList";
 import AddPlaceForm from "../components/AddPlaceForm";
 type Category =
@@ -1021,9 +1020,7 @@ function PioneerMapPage() {
   APP LANGUAGE
   ======================================================= */
 
-  const [appLanguage, setAppLanguage] =
-  const [mapInteractive, setMapInteractive] = useState(false);
-    useState<AppLanguage>(() => {
+  const [appLanguage, setAppLanguage] = useState<AppLanguage>(() => {
       try {
         const saved =
           localStorage.getItem(
@@ -1383,6 +1380,7 @@ function PioneerMapPage() {
       return [];
     }
   });
+  const [mapInteractive, setMapInteractive] = useState(false);
 
   useEffect(() => {
     try {
@@ -2484,27 +2482,30 @@ function PioneerMapPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f7fa",
-        color: "#222",
-        paddingBottom: "90px",
+        background: "linear-gradient(180deg,#f7f4ff 0%,#eef3ff 42%,#f7f9fc 100%)",
+        color: "#172033",
+        paddingBottom: "104px",
       }}
     >
       {/* HEADER */}
       <header
         style={{
-          background: "#fff",
-          padding: "22px 16px",
+          background: "linear-gradient(135deg,#4b2aad 0%,#275edb 55%,#15a5d9 100%)",
+          padding: "20px 16px 22px",
           textAlign: "center",
-          borderBottom:
-            "1px solid #eee",
+          color: "#fff",
+          borderBottomLeftRadius: "30px",
+          borderBottomRightRadius: "30px",
+          boxShadow: "0 14px 35px rgba(56,49,150,.22)",
         }}
       >
         <h1
           style={{
             margin:
               "0 0 10px",
-            fontSize: "30px",
-             letterSpacing: "-0.8px",
+            fontSize: "31px",
+            letterSpacing: "-1px",
+            fontWeight: "900",
           }}
         >
           🗺️ PioneerMap
@@ -2561,11 +2562,11 @@ function PioneerMapPage() {
                 "border-box",
               padding: "12px",
               borderRadius: "10px",
-              border:
-                "1px solid #ccc",
-              background: "#fff",
+              border: "1px solid rgba(255,255,255,.35)",
+              background: "rgba(255,255,255,.16)",
+              color: "#fff",
               fontSize: "15px",
-              fontWeight: "600",
+              fontWeight: "700",
             }}
           >
             {appLanguages.map(
@@ -2636,8 +2637,8 @@ function PioneerMapPage() {
       {/* SEARCH */}
       <section
         style={{
-          background: "#fff",
-          padding: "8px 15px 18px",
+          background: "transparent",
+          padding: "16px 15px 8px",
         }}
       >
         <div
@@ -2665,9 +2666,11 @@ function PioneerMapPage() {
               padding: "15px",
               borderRadius:
                 "30px",
-              border:
-                "2px solid #ddd",
+              border: "2px solid rgba(75,42,173,.10)",
+              boxShadow: "0 10px 28px rgba(30,42,90,.10)",
               fontSize: "16px",
+              outline: "none",
+              background: "#fff",
             }}
           />
 
@@ -2732,14 +2735,13 @@ function PioneerMapPage() {
       {/* CATEGORIES */}
       <section
         style={{
-          background: "#fff",
-          padding:
-            "0 15px 15px",
+          background: "transparent",
+          padding: "10px 15px 12px",
           display: "flex",
-          gap: "8px",
-          justifyContent:
-            "center",
-          flexWrap: "wrap",
+          gap: "9px",
+          justifyContent: "flex-start",
+          flexWrap: "nowrap",
+          overflowX: "auto",
         }}
       >
         {categories.map(
@@ -2758,13 +2760,13 @@ function PioneerMapPage() {
                   "10px 16px",
                 borderRadius:
                   "22px",
-                border:
-                  "1px solid #ddd",
-                background:
-                  activeCategory ===
-                  category.name
-                    ? "#f1c40f"
-                    : "#fff",
+                border: "1px solid rgba(75,42,173,.14)",
+                background: activeCategory === category.name
+                  ? "linear-gradient(135deg,#4b2aad,#275edb)"
+                  : "#fff",
+                color: activeCategory === category.name ? "#fff" : "#26314d",
+                boxShadow: "0 7px 18px rgba(33,44,80,.07)",
+                whiteSpace: "nowrap",
                 fontWeight:
                   activeCategory ===
                   category.name
@@ -2989,55 +2991,97 @@ function PioneerMapPage() {
       {/* MAP + DETAILS */}
       <main
         style={{
-          padding: "15px",
+          padding: "8px 15px 20px",
+          maxWidth: "920px",
+          margin: "0 auto",
         }}
       >
         <div
           ref={mapRef}
           style={{
             width: "100%",
-            height: "500px",
-            borderRadius:
-              "14px",
-            overflow:
-              "hidden",
-            background:
-              "#ddd",
+            height: "58vh",
+            minHeight: "390px",
+            borderRadius: "28px",
+            overflow: "hidden",
+            background: "#dfe5ef",
+            border: "5px solid rgba(255,255,255,.9)",
+            boxShadow: "0 18px 45px rgba(34,48,94,.18)",
           }}
         />
 
         {selectedPlace && (
-          <PlaceDetails
-            place={selectedPlace}
-            onClose={() => setSelectedPlace(null)}
-            onShowOnMap={() => {
-              const map = mapInstance.current;
-              if (
-                map &&
-                Number.isFinite(Number(selectedPlace.lat)) &&
-                Number.isFinite(Number(selectedPlace.lng))
-              ) {
-                map.setView(
-                  [Number(selectedPlace.lat), Number(selectedPlace.lng)],
-                  15
-                );
-                setMapInteractive(true);
-              }
+          <section
+            style={{
+              marginTop: "-54px",
+              position: "relative",
+              zIndex: 30,
+              background: "rgba(255,255,255,.98)",
+              borderRadius: "28px",
+              overflow: "hidden",
+              boxShadow: "0 18px 50px rgba(28,39,83,.20)",
+              border: "1px solid rgba(75,42,173,.10)",
             }}
-            onDelete={() => deletePlace(selectedPlace)}
-            isFavorite={isFavorite(selectedPlace)}
-            onToggleFavorite={() => toggleFavorite(selectedPlace)}
-            onShare={() => sharePlace(selectedPlace)}
-          />
+          >
+            {selectedPlace.image && (
+              <img
+                src={selectedPlace.image}
+                alt={selectedPlace.name}
+                style={{
+                  width: "100%",
+                  height: "190px",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            )}
+            <div style={{ padding: "18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start" }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: "24px", fontWeight: 900, color: "#172033", lineHeight: 1.15 }}>{selectedPlace.name}</div>
+                  <div style={{ marginTop: "7px", color: "#5d6780", fontWeight: 700 }}>
+                    {categoryIcons[selectedPlace.category]?.icon} {categoryLabel(selectedPlace.category)}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleFavorite(selectedPlace)}
+                  style={{ border: "none", width: "46px", height: "46px", borderRadius: "50%", background: isFavorite(selectedPlace) ? "#fff1c7" : "#f1f3f8", fontSize: "23px", cursor: "pointer" }}
+                >
+                  {isFavorite(selectedPlace) ? "★" : "☆"}
+                </button>
+              </div>
+
+              <p style={{ margin: "14px 0 8px", color: "#4c5870", lineHeight: 1.5 }}>{selectedPlace.description}</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginBottom: "15px" }}>
+                {selectedPlace.country && <span style={{ padding: "7px 10px", borderRadius: "999px", background: "#eef3ff", color: "#3656b5", fontWeight: 700 }}>🌍 {selectedPlace.country}</span>}
+                {selectedPlace.username && <span style={{ padding: "7px 10px", borderRadius: "999px", background: "#f2efff", color: "#5a39a8", fontWeight: 700 }}>👤 @{selectedPlace.username}</span>}
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "9px" }}>
+                <button type="button" onClick={() => {
+                  const map = mapInstance.current;
+                  if (map && Number.isFinite(Number(selectedPlace.lat)) && Number.isFinite(Number(selectedPlace.lng))) {
+                    map.setView([Number(selectedPlace.lat), Number(selectedPlace.lng)], 15);
+                    setMapInteractive(true);
+                  }
+                }} style={{ border: "none", borderRadius: "15px", padding: "13px 8px", background: "#eef3ff", color: "#3157bd", fontWeight: 800, cursor: "pointer" }}>🗺️ {t("map")}</button>
+                <button type="button" onClick={() => sharePlace(selectedPlace)} style={{ border: "none", borderRadius: "15px", padding: "13px 8px", background: "#f2efff", color: "#5838a8", fontWeight: 800, cursor: "pointer" }}>📤 {shareLabel}</button>
+                <button type="button" onClick={() => deletePlace(selectedPlace)} style={{ border: "none", borderRadius: "15px", padding: "13px 8px", background: "#fff0f0", color: "#c23a3a", fontWeight: 800, cursor: "pointer" }}>🗑️ {t("delete")}</button>
+                <button type="button" onClick={() => setSelectedPlace(null)} style={{ border: "none", borderRadius: "15px", padding: "13px 8px", background: "#f3f5f9", color: "#344054", fontWeight: 800, cursor: "pointer" }}>✕ {t("close")}</button>
+              </div>
+            </div>
+          </section>
         )}
 
         <section
           style={{
-            marginTop: "14px",
-            background: "#fff",
-            borderRadius: "24px",
-            padding: "6px",
-            boxShadow: "0 10px 30px rgba(33,44,80,.08)",
+            marginTop: "18px",
+            background: "rgba(255,255,255,.82)",
+            borderRadius: "28px",
+            padding: "8px",
+            boxShadow: "0 12px 32px rgba(33,44,80,.08)",
+            border: "1px solid rgba(75,42,173,.08)",
           }}
         >
           <PlaceList
@@ -3150,12 +3194,10 @@ function PioneerMapPage() {
           left: 0,
           right: 0,
           zIndex: 9999,
-          background:
-            "#ffffff",
-          borderTop:
-            "1px solid #ddd",
-          boxShadow:
-            "0 -4px 18px rgba(0,0,0,.15)",
+          background: "rgba(255,255,255,.96)",
+          borderTop: "1px solid rgba(75,42,173,.10)",
+          boxShadow: "0 -10px 30px rgba(34,48,94,.14)",
+          backdropFilter: "blur(18px)",
           display:
             "grid",
           gridTemplateColumns:
@@ -3267,18 +3309,11 @@ function PioneerMapPage() {
               style={{
                 border:
                   "none",
-                borderRadius:
-                  "12px",
-                background:
-                  activeNav ===
-                  key
-                    ? "#e3f2fd"
-                    : "transparent",
-                color:
-                  activeNav ===
-                  key
-                    ? "#1976D2"
-                    : "#333",
+                borderRadius: "17px",
+                background: activeNav === key
+                  ? "linear-gradient(135deg,#4b2aad,#275edb)"
+                  : "transparent",
+                color: activeNav === key ? "#fff" : "#4d5870",
                 padding:
                   "7px 2px",
                 fontWeight:
