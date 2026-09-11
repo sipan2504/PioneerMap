@@ -1,107 +1,45 @@
-import React from "react";
-
 type FavoritePlace = {
   _id?: string;
   name: string;
   category?: string;
   description?: string;
+  language?: string;
+  country?: string;
+  username?: string;
+  image?: string;
 };
 
 type FavoritesProps = {
-  favorites?: FavoritePlace[];
-  onRemove?: (id: string) => void;
+  favorites: FavoritePlace[];
+  onRemove: (id: string) => void;
   onPlaceClick?: (place: FavoritePlace) => void;
 };
 
-export default function Favorites({
-  favorites = [],
-  onRemove,
-  onPlaceClick,
-}: FavoritesProps) {
+const Favorites = ({ favorites, onRemove, onPlaceClick }: FavoritesProps) => {
   if (favorites.length === 0) {
-    return (
-      <div
-        style={{
-          padding: "25px 15px",
-          textAlign: "center",
-          color: "#666",
-        }}
-      >
-        <div style={{ fontSize: "42px", marginBottom: "10px" }}>
-          ⭐
-        </div>
-
-        <h3 style={{ margin: "0 0 8px" }}>
-          Favoriler
-        </h3>
-
-        <p style={{ margin: 0 }}>
-          Henüz favori yeriniz yok.
-        </p>
-      </div>
-    );
+    return <div style={{ padding: 24, textAlign: "center", color: "#777" }}>⭐ Henüz favori eklenmedi.</div>;
   }
 
   return (
-    <section style={{ padding: "15px" }}>
-      <h2 style={{ marginTop: 0 }}>
-        ⭐ Favoriler
-      </h2>
-
-      <div
-        style={{
-          display: "grid",
-          gap: "12px",
-        }}
-      >
-        {favorites.map((place) => (
-          <div
-            key={place._id || place.name}
-            style={{
-              background: "#fff",
-              borderRadius: "14px",
-              padding: "15px",
-              boxShadow: "0 2px 10px rgba(0,0,0,.10)",
-            }}
-          >
-            <h3 style={{ margin: "0 0 6px" }}>
-              {place.name}
-            </h3>
-
-            {place.category && (
-              <div style={{ fontSize: "13px", color: "#666" }}>
-                {place.category}
-              </div>
-            )}
-
-            {place.description && (
-              <p style={{ margin: "8px 0" }}>
-                {place.description}
-              </p>
-            )}
-
-            <div style={{ display: "flex", gap: "8px" }}>
-              {onPlaceClick && (
-                <button
-                  type="button"
-                  onClick={() => onPlaceClick(place)}
-                >
-                  Görüntüle
-                </button>
-              )}
-
-              {onRemove && place._id && (
-                <button
-                  type="button"
-                  onClick={() => onRemove(place._id!)}
-                >
-                  Favoriden Çıkar
-                </button>
-              )}
+    <div style={{ padding: 16 }}>
+      <h2 style={{ marginTop: 0 }}>⭐ Favoriler</h2>
+      {favorites.map((place, index) => {
+        const id = place._id || `${place.name}-${index}`;
+        return (
+          <div key={id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 14, padding: 12, marginBottom: 10 }}>
+            {place.image && <img src={place.image} alt={place.name} style={{ width: "100%", height: 150, objectFit: "cover", borderRadius: 10, marginBottom: 10 }} />}
+            <div style={{ fontWeight: 700, fontSize: 16 }}>📍 {place.name}</div>
+            {place.category && <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>{place.category}</div>}
+            {place.country && <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>🌍 {place.country}</div>}
+            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+              {onPlaceClick && <button type="button" onClick={() => onPlaceClick(place)} style={{ flex: 1, border: "none", borderRadius: 9, padding: 10, background: "#2563eb", color: "#fff", fontWeight: 700 }}>📍 Gör</button>}
+              {place._id && <button type="button" onClick={() => onRemove(place._id!)} style={{ border: "none", borderRadius: 9, padding: "10px 14px", background: "#ef4444", color: "#fff", fontWeight: 700 }}>🗑️</button>}
             </div>
           </div>
-        ))}
-      </div>
-    </section>
+        );
+      })}
+    </div>
   );
-}
+};
+
+export default Favorites;
