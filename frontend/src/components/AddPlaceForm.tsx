@@ -84,33 +84,33 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
 }) => {
   const t = {
     title: labels.title ?? "Yeni Yer Ekle",
-    name: labels.name ?? "İşletme / Yer Adı",
-    namePlaceholder: labels.namePlaceholder ?? "Örn: Dilek's Home",
+    name: labels.name ?? "Ä°ÅŸletme / Yer AdÄ±",
+    namePlaceholder: labels.namePlaceholder ?? "Ã–rn: Dilek's Home",
     category: labels.category ?? "Kategori",
-    categoryPlaceholder: labels.categoryPlaceholder ?? "Kategori seçin",
-    description: labels.description ?? "Açıklama",
+    categoryPlaceholder: labels.categoryPlaceholder ?? "Kategori seÃ§in",
+    description: labels.description ?? "AÃ§Ä±klama",
     descriptionPlaceholder:
-      labels.descriptionPlaceholder ?? "Yer hakkında kısa bilgi...",
+      labels.descriptionPlaceholder ?? "Yer hakkÄ±nda kÄ±sa bilgi...",
     language: labels.language ?? "Dil",
-    languagePlaceholder: labels.languagePlaceholder ?? "Dil seçin",
-    country: labels.country ?? "Ülke",
-    countryPlaceholder: labels.countryPlaceholder ?? "Ülke seçin",
-    photo: labels.photo ?? "Fotoğraf",
+    languagePlaceholder: labels.languagePlaceholder ?? "Dil seÃ§in",
+    country: labels.country ?? "Ãœlke",
+    countryPlaceholder: labels.countryPlaceholder ?? "Ãœlke seÃ§in",
+    photo: labels.photo ?? "FotoÄŸraf",
     photoPreparing:
-      labels.photoPreparing ?? "Fotoğraf hazırlanıyor...",
-    removePhoto: labels.removePhoto ?? "Fotoğrafı Kaldır",
-    selectedPhotoAlt: labels.selectedPhotoAlt ?? "Seçilen fotoğraf",
+      labels.photoPreparing ?? "FotoÄŸraf hazÄ±rlanÄ±yor...",
+    removePhoto: labels.removePhoto ?? "FotoÄŸrafÄ± KaldÄ±r",
+    selectedPhotoAlt: labels.selectedPhotoAlt ?? "SeÃ§ilen fotoÄŸraf",
     location: labels.location ?? "Konum",
     chooseLocation:
-      labels.chooseLocation ?? "Haritadan bir konum seçin.",
+      labels.chooseLocation ?? "Haritadan bir konum seÃ§in.",
     chooseLocationFromMap:
-      labels.chooseLocationFromMap ?? "Haritadan Konum Seç",
+      labels.chooseLocationFromMap ?? "Haritadan Konum SeÃ§",
     saving: labels.saving ?? "Kaydediliyor...",
     savePlace: labels.savePlace ?? "Yeri Kaydet",
     invalidImage:
-      labels.invalidImage ?? "Lütfen bir resim dosyası seçin.",
+      labels.invalidImage ?? "LÃ¼tfen bir resim dosyasÄ± seÃ§in.",
     imageTooLarge:
-      labels.imageTooLarge ?? "Fotoğraf en fazla 2 MB olabilir.",
+      labels.imageTooLarge ?? "FotoÄŸraf en fazla 2 MB olabilir.",
   };
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -156,7 +156,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
         }}
       >
         <h2 style={{ margin: 0, fontSize: 21, fontWeight: 800 }}>
-          📍 {t.title}
+          ğŸ“ {t.title}
         </h2>
         {onCancel && (
           <button
@@ -173,7 +173,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
             }}
             aria-label="Close"
           >
-            ✕
+            âœ•
           </button>
         )}
       </div>
@@ -243,7 +243,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
       />
 
       <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
-        🌐 {t.language}
+        ğŸŒ {t.language}
       </label>
       <select
         value={placeLanguage}
@@ -271,7 +271,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
       </select>
 
       <label style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
-        🌍 {t.country}
+        ğŸŒ {t.country}
       </label>
       <select
         value={placeCountry}
@@ -308,7 +308,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
         }}
       >
         <div style={{ fontWeight: 700, marginBottom: 8 }}>
-          📷 {t.photo}
+          ğŸ“· {t.photo}
         </div>
         <input
           type="file"
@@ -352,7 +352,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
                   cursor: "pointer",
                 }}
               >
-                🗑️ {t.removePhoto}
+                ğŸ—‘ï¸ {t.removePhoto}
               </button>
             )}
           </div>
@@ -369,7 +369,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
         }}
       >
         <div style={{ fontWeight: 700, marginBottom: 6 }}>
-          📍 {t.location}
+          ğŸ“ {t.location}
         </div>
 
         {selectedLocation &&
@@ -400,7 +400,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
               cursor: "pointer",
             }}
           >
-            🗺️ {t.chooseLocationFromMap}
+            ğŸ—ºï¸ {t.chooseLocationFromMap}
           </button>
         )}
       </div>
@@ -423,7 +423,7 @@ const AddPlaceForm: React.FC<AddPlaceFormProps> = ({
             submitting || imageUploading ? "not-allowed" : "pointer",
         }}
       >
-        {submitting ? `⏳ ${t.saving}` : `➕ ${t.savePlace}`}
+        {submitting ? `â³ ${t.saving}` : `â• ${t.savePlace}`}
       </button>
     </section>
   );
