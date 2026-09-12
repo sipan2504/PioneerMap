@@ -935,11 +935,11 @@ function createCategoryIcon(
 
   return L.divIcon({
     className: "pioneer-place-marker",
-    html: \`
+    html: `
       <div style="
         width:48px;
         height:48px;
-        background:\${item.color};
+        background:${item.color};
         border:4px solid white;
         border-radius:50% 50% 50% 0;
         transform:rotate(-45deg);
@@ -952,10 +952,10 @@ function createCategoryIcon(
           transform:rotate(45deg);
           font-size:23px;
         ">
-          \${item.icon}
+          ${item.icon}
         </span>
       </div>
-    \`,
+    `,
     iconSize: [56, 56],
     iconAnchor: [28, 56],
     popupAnchor: [0, -55],
@@ -965,7 +965,7 @@ function createCategoryIcon(
 function createUserIcon() {
   return L.divIcon({
     className: "pioneer-user-marker",
-    html: \`
+    html: `
       <div style="
         width:22px;
         height:22px;
@@ -976,7 +976,7 @@ function createUserIcon() {
           0 0 0 8px rgba(25,118,210,.20),
           0 3px 10px rgba(0,0,0,.35);
       "></div>
-    \`,
+    `,
     iconSize: [30, 30],
     iconAnchor: [15, 15],
   });
@@ -1051,7 +1051,7 @@ function PioneerMapPage() {
       return "Turkish";
     });
 
-  const [mapInteractive, setMapInteractive] = useState(false);
+  const [, setMapInteractive] = useState(false);
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
@@ -1100,12 +1100,12 @@ function PioneerMapPage() {
       English: {
         "Yerler": placeTitle.English,
         "sonuç": "results",
-        "📍 Gör": \`📍 \${extraTranslations.English.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.English.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.English.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.English.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.English.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.English.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.English.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.English.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.English.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.English.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.English.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.English.delete}`,
         "Dil:": "Language:",
         "Ülke:": "Country:",
         "👤 Ekleyen:": "👤 Added by:",
@@ -1120,12 +1120,12 @@ function PioneerMapPage() {
       Arabic: {
         "Yerler": placeTitle.Arabic,
         "sonuç": "نتيجة",
-        "📍 Gör": \`📍 \${extraTranslations.Arabic.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.Arabic.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.Arabic.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.Arabic.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.Arabic.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.Arabic.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.Arabic.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Arabic.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Arabic.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Arabic.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Arabic.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Arabic.delete}`,
         "Dil:": "اللغة:",
         "Ülke:": "الدولة:",
         "👤 Ekleyen:": "👤 أضافه:",
@@ -1140,12 +1140,12 @@ function PioneerMapPage() {
       Spanish: {
         "Yerler": placeTitle.Spanish,
         "sonuç": "resultados",
-        "📍 Gör": \`📍 \${extraTranslations.Spanish.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.Spanish.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.Spanish.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.Spanish.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.Spanish.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.Spanish.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.Spanish.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Spanish.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Spanish.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Spanish.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Spanish.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Spanish.delete}`,
         "Dil:": "Idioma:",
         "Ülke:": "País:",
         "👤 Ekleyen:": "👤 Añadido por:",
@@ -1160,12 +1160,12 @@ function PioneerMapPage() {
       French: {
         "Yerler": placeTitle.French,
         "sonuç": "résultats",
-        "📍 Gör": \`📍 \${extraTranslations.French.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.French.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.French.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.French.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.French.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.French.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.French.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.French.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.French.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.French.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.French.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.French.delete}`,
         "Dil:": "Langue:",
         "Ülke:": "Pays:",
         "👤 Ekleyen:": "👤 Ajouté par:",
@@ -1180,12 +1180,12 @@ function PioneerMapPage() {
       German: {
         "Yerler": placeTitle.German,
         "sonuç": "Ergebnisse",
-        "📍 Gör": \`📍 \${extraTranslations.German.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.German.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.German.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.German.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.German.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.German.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.German.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.German.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.German.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.German.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.German.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.German.delete}`,
         "Dil:": "Sprache:",
         "Ülke:": "Land:",
         "👤 Ekleyen:": "👤 Hinzugefügt von:",
@@ -1200,12 +1200,12 @@ function PioneerMapPage() {
       Portuguese: {
         "Yerler": placeTitle.Portuguese,
         "sonuç": "resultados",
-        "📍 Gör": \`📍 \${extraTranslations.Portuguese.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.Portuguese.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.Portuguese.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.Portuguese.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.Portuguese.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.Portuguese.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.Portuguese.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Portuguese.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Portuguese.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Portuguese.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Portuguese.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Portuguese.delete}`,
         "Dil:": "Idioma:",
         "Ülke:": "País:",
         "👤 Ekleyen:": "👤 Adicionado por:",
@@ -1220,12 +1220,12 @@ function PioneerMapPage() {
       Russian: {
         "Yerler": placeTitle.Russian,
         "sonuç": "результатов",
-        "📍 Gör": \`📍 \${extraTranslations.Russian.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.Russian.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.Russian.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.Russian.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.Russian.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.Russian.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.Russian.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Russian.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Russian.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Russian.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Russian.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Russian.delete}`,
         "Dil:": "Язык:",
         "Ülke:": "Страна:",
         "👤 Ekleyen:": "👤 Добавил:",
@@ -1240,12 +1240,12 @@ function PioneerMapPage() {
       Chinese: {
         "Yerler": placeTitle.Chinese,
         "sonuç": "个结果",
-        "📍 Gör": \`📍 \${extraTranslations.Chinese.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.Chinese.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.Chinese.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.Chinese.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.Chinese.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.Chinese.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.Chinese.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Chinese.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Chinese.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Chinese.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Chinese.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Chinese.delete}`,
         "Dil:": "语言:",
         "Ülke:": "国家:",
         "👤 Ekleyen:": "👤 添加者:",
@@ -1260,12 +1260,12 @@ function PioneerMapPage() {
       Hindi: {
         "Yerler": placeTitle.Hindi,
         "sonuç": "परिणाम",
-        "📍 Gör": \`📍 \${extraTranslations.Hindi.viewDetails}\`,
-        "⭐ Favorilere Ekle": \`⭐ \${extraTranslations.Hindi.addFavorite}\`,
-        "⭐ Favorilerden Çıkar": \`⭐ \${extraTranslations.Hindi.removeFavorite}\`,
-        "📤 Yeri Paylaş": \`📤 \${extraTranslations.Hindi.share}\`,
-        "🗺️ Haritada Göster": \`🗺️ \${extraTranslations.Hindi.showOnMap}\`,
-        "🗑️ Sil": \`🗑️ \${extraTranslations.Hindi.delete}\`,
+        "📍 Gör": `📍 ${extraTranslations.Hindi.viewDetails}`,
+        "⭐ Favorilere Ekle": `⭐ ${extraTranslations.Hindi.addFavorite}`,
+        "⭐ Favorilerden Çıkar": `⭐ ${extraTranslations.Hindi.removeFavorite}`,
+        "📤 Yeri Paylaş": `📤 ${extraTranslations.Hindi.share}`,
+        "🗺️ Haritada Göster": `🗺️ ${extraTranslations.Hindi.showOnMap}`,
+        "🗑️ Sil": `🗑️ ${extraTranslations.Hindi.delete}`,
         "Dil:": "भाषा:",
         "Ülke:": "देश:",
         "👤 Ekleyen:": "👤 जोड़ा गया:",
@@ -1396,7 +1396,7 @@ function PioneerMapPage() {
 
   const getPlaceKey = (place: Place) =>
     place._id ||
-    \`\${place.name}|\${place.lat}|\${place.lng}\`;
+    `${place.name}|${place.lat}|${place.lng}`;
 
   const isFavorite = (place: Place) =>
     favorites.some(
@@ -1431,10 +1431,10 @@ function PioneerMapPage() {
   };
 
   const sharePlace = async (place: Place) => {
-    const shareUrl = \`\${window.location.origin}\${window.location.pathname}?place=\${encodeURIComponent(
-      place._id || \`\${place.name}|\${place.lat}|\${place.lng}\`
-    )}\`;
-    const shareText = \`📍 \${place.name} — PioneerMap\`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}?place=${encodeURIComponent(
+      place._id || `${place.name}|${place.lat}|${place.lng}`
+    )}`;
+    const shareText = `📍 ${place.name} — PioneerMap`;
 
     try {
       if (navigator.share) {
@@ -1564,7 +1564,7 @@ function PioneerMapPage() {
 
       const response =
         await fetch(
-          \`\${backendUrl}/user/signin\`,
+          `${backendUrl}/user/signin`,
           {
             method: "POST",
             headers: {
@@ -1617,7 +1617,7 @@ function PioneerMapPage() {
           : "स्वागत है";
 
       setStatus(
-        \`✅ \${welcome} @\${auth.user.username}\`
+        `✅ ${welcome} @${auth.user.username}`
       );
     } catch (error) {
       console.error(
@@ -1643,7 +1643,7 @@ function PioneerMapPage() {
               ? "❌ Pi izinleri kontrol edilemedi. Pi Browser'ı yeniden açıp tekrar dene."
               : t("loginFailed"))
           : message
-          ? \`❌ \${message}\`
+          ? `❌ ${message}`
           : t("loginFailed")
       );
     }
@@ -1658,7 +1658,7 @@ function PioneerMapPage() {
       try {
         const response =
           await fetch(
-            \`\${backendUrl}/api/places\`,
+            `${backendUrl}/api/places`,
             {
               credentials: "include",
             }
@@ -1666,7 +1666,7 @@ function PioneerMapPage() {
 
         if (!response.ok) {
           throw new Error(
-            \`HTTP \${response.status}\`
+            `HTTP ${response.status}`
           );
         }
 
@@ -1861,9 +1861,9 @@ function PioneerMapPage() {
 
     const confirmed =
       window.confirm(
-        \`"\${place.name}" \${t(
+        `"${place.name}" ${t(
           "confirmDelete"
-        )}\`
+        )}`
       );
 
     if (!confirmed) return;
@@ -1875,7 +1875,7 @@ function PioneerMapPage() {
 
       const response =
         await fetch(
-          \`\${backendUrl}/api/places/\${place._id}\`,
+          `${backendUrl}/api/places/${place._id}`,
           {
             method: "DELETE",
             credentials: "include",
@@ -1903,14 +1903,14 @@ function PioneerMapPage() {
       setSelectedPlace(null);
 
       setStatus(
-        \`✅ \${place.name} \${t(
+        `✅ ${place.name} ${t(
           "deleted"
-        )}\`
+        )}`
       );
     } catch (error) {
       setStatus(
         error instanceof Error
-          ? \`❌ \${error.message}\`
+          ? `❌ ${error.message}`
           : "❌ Place could not be deleted."
       );
     }
@@ -2045,7 +2045,7 @@ function PioneerMapPage() {
             }
           ).addTo(map);
 
-        marker.bindPopup(\`
+        marker.bindPopup(`
           <div style="
             min-width:230px;
             text-align:center;
@@ -2054,7 +2054,7 @@ function PioneerMapPage() {
             <div style="
               font-size:34px;
             ">
-              \${category.icon}
+              ${category.icon}
             </div>
 
             <div style="
@@ -2062,7 +2062,7 @@ function PioneerMapPage() {
               font-weight:700;
               margin:6px 0;
             ">
-              \${place.name}
+              ${place.name}
             </div>
 
             <div style="
@@ -2070,20 +2070,20 @@ function PioneerMapPage() {
               font-size:14px;
               line-height:1.4;
             ">
-              \${place.description}
+              ${place.description}
             </div>
 
-            \${
+            ${
               place.username
-                ? \`
+                ? `
                   <div style="
                     margin-top:8px;
                     color:#7b1fa2;
                     font-weight:700;
                   ">
-                    👤 @\${place.username}
+                    👤 @${place.username}
                   </div>
-                \`
+                `
                 : ""
             }
 
@@ -2092,13 +2092,13 @@ function PioneerMapPage() {
               margin-top:8px;
               padding:5px 12px;
               border-radius:20px;
-              background:\${category.color};
+              background:${category.color};
               color:white;
               font-weight:700;
               font-size:12px;
             ">
-              \${category.icon}
-              \${
+              ${category.icon}
+              ${
                 place.category ===
                 "Stays"
                   ? t("stays")
@@ -2115,45 +2115,45 @@ function PioneerMapPage() {
               }
             </div>
 
-            \${
+            ${
               place.language
-                ? \`
+                ? `
                   <div style="
                     margin-top:7px;
                     font-size:13px;
                   ">
-                    🗣️ \${place.language}
+                    🗣️ ${place.language}
                   </div>
-                \`
+                `
                 : ""
             }
 
-            \${
+            ${
               place.country
-                ? \`
+                ? `
                   <div style="
                     margin-top:5px;
                     font-size:13px;
                   ">
-                    🌍 \${place.country}
+                    🌍 ${place.country}
                   </div>
-                \`
+                `
                 : ""
             }
 
-            \${
+            ${
               distance !== null
-                ? \`
+                ? `
                   <div style="
                     margin-top:8px;
                     color:#1976D2;
                     font-weight:700;
                   ">
-                    📍 \${distance.toFixed(
+                    📍 ${distance.toFixed(
                       1
                     )} km
                   </div>
-                \`
+                `
                 : ""
             }
 
@@ -2173,10 +2173,10 @@ function PioneerMapPage() {
                 cursor:pointer;
               "
             >
-              \${t("details")}
+              ${t("details")}
             </button>
           </div>
-        \`);
+        `);
 
         marker.on(
           "click",
@@ -2304,7 +2304,7 @@ function PioneerMapPage() {
 
       const response =
         await fetch(
-          \`\${backendUrl}/api/places\`,
+          `${backendUrl}/api/places`,
           {
             method: "POST",
             headers: {
@@ -2395,9 +2395,9 @@ function PioneerMapPage() {
       setShowForm(false);
 
       setStatus(
-        \`✅ \${savedPlace.name} \${t(
+        `✅ ${savedPlace.name} ${t(
           "saved"
-        )}\`
+        )}`
       );
     } catch (error) {
       console.error(
@@ -2407,7 +2407,7 @@ function PioneerMapPage() {
 
       setStatus(
         error instanceof Error
-          ? \`❌ \${error.message}\`
+          ? `❌ ${error.message}`
           : "❌ Place could not be saved."
       );
     }
@@ -2993,18 +2993,19 @@ function PioneerMapPage() {
           padding: "15px",
         }}
       >
-        {mapInteractive && (
-          <div
-            ref={mapRef}
-            style={{
-              width: "100%",
-              height: "500px",
-              borderRadius: "14px",
-              overflow: "hidden",
-              background: "#ddd",
-            }}
-          />
-        )}
+        <div
+          ref={mapRef}
+          style={{
+            width: "100%",
+            height: "500px",
+            borderRadius:
+              "14px",
+            overflow:
+              "hidden",
+            background:
+              "#ddd",
+          }}
+        />
 
         {selectedPlace && (
           <PlaceDetails
@@ -3077,25 +3078,25 @@ function PioneerMapPage() {
                 "nearbyPlaces"
               )
             : searchText.trim()
-            ? \`🔎 "\${searchText}" \${t(
+            ? `🔎 "${searchText}" ${t(
                 "results"
-              )}\`
+              )}`
             : activeLanguage !==
               "All"
-            ? \`🗣️ \${activeLanguage}\`
+            ? `🗣️ ${activeLanguage}`
             : activeCountry !==
               "All"
-            ? \`🌍 \${activeCountry}\`
+            ? `🌍 ${activeCountry}`
             : activeCategory ===
               "All"
             ? t("places")
-            : \`\${
+            : `${
                 categoryIcons[
                   activeCategory
                 ].icon
-              } \${categoryLabel(
+              } ${categoryLabel(
                 activeCategory
-              )}\`}
+              )}`}
         </div>
       </main>
 
@@ -3259,8 +3260,8 @@ function PioneerMapPage() {
                 ) {
                   setStatus(
                     signedIn
-                      ? \`👤 @\${username}\`
-                      : \`👤 \${t("signInFirst").replace("❌ ", "")}\`
+                      ? `👤 @${username}`
+                      : `👤 ${t("signInFirst").replace("❌ ", "")}`
                   );
                 }
               }}
