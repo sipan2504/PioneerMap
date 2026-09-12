@@ -1010,6 +1010,24 @@ const initialPlaces: Place[] = [
     language: "Turkish",
     country: "Türkiye",
   },
+  {
+    name: "Pi Services",
+    category: "Services",
+    lat: 39.928,
+    lng: 32.862,
+    description: "Pi-powered local services",
+    language: "Turkish",
+    country: "Türkiye",
+  },
+  {
+    name: "Pi Jobs",
+    category: "Jobs",
+    lat: 39.936,
+    lng: 32.846,
+    description: "Pi-powered job opportunities",
+    language: "Turkish",
+    country: "Türkiye",
+  },
 ];
 
 function PioneerMapPage() {
@@ -1533,7 +1551,12 @@ function PioneerMapPage() {
   PI LOGIN
   ======================================================= */
 
+  const [loginBusy, setLoginBusy] = useState(false);
+
   const loginWithPi = async () => {
+    if (loginBusy) return;
+
+    setLoginBusy(true);
     try {
       const pi = (window as any).Pi;
 
@@ -1542,15 +1565,47 @@ function PioneerMapPage() {
         return;
       }
 
-      await pi.init({
-        version: "2.0",
-        sandbox: false,
-      });
+      const withTimeout = <T,>(promise: Promise<T>, ms = 15000) =>
+        new Promise<T>((resolve, reject) => {
+          const timer = window.setTimeout(() => {
+            reject(
+              new Error(
+                appLanguage === "Turkish"
+                  ? "Pi giriş isteği zaman aşımına uğradı. Pi Browser'ı yeniden açıp tekrar dene."
+                  : "Pi sign-in timed out. Please reopen Pi Browser and try again."
+              )
+            );
+          }, ms);
+
+          promise.then(
+            (value) => {
+              window.clearTimeout(timer);
+              resolve(value);
+            },
+            (error) => {
+              window.clearTimeout(timer);
+              reject(error);
+            }
+          );
+        });
+
+      await withTimeout(
+        Promise.resolve(
+          pi.init({
+            version: "2.0",
+            sandbox: false,
+          })
+        )
+      );
 
       const auth =
-        await pi.authenticate(
-          ["username"],
-          () => true
+        await withTimeout(
+          Promise.resolve(
+            pi.authenticate(
+              ["username"],
+              () => true
+            )
+          )
         );
 
       if (
@@ -1562,8 +1617,16 @@ function PioneerMapPage() {
         );
       }
 
-      const response =
-        await fetch(
+      const controller =
+        new AbortController();
+      const backendTimer =
+        window.setTimeout(() =>
+          controller.abort(),
+        15000);
+
+      let response: Response;
+      try {
+        response = await fetch(
           `${backendUrl}/user/signin`,
           {
             method: "POST",
@@ -1572,11 +1635,15 @@ function PioneerMapPage() {
                 "application/json",
             },
             credentials: "include",
+            signal: controller.signal,
             body: JSON.stringify({
               authResult: auth,
             }),
           }
         );
+      } finally {
+        window.clearTimeout(backendTimer);
+      }
 
       const data =
         await response
@@ -1633,10 +1700,20 @@ function PioneerMapPage() {
           ? error.message
           : "";
 
+      const timeoutError =
+        error instanceof DOMException &&
+        error.name === "AbortError";
+
       const consentError = /consent|scope|network error/i.test(message);
 
       setStatus(
-        consentError
+        timeoutError
+          ? (appLanguage === "English"
+              ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
+              : appLanguage === "Turkish"
+              ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
+              : t("loginFailed"))
+          : consentError
           ? (appLanguage === "English"
               ? "❌ Pi consent could not be checked. Please reopen Pi Browser and try again."
               : appLanguage === "Turkish"
@@ -1646,6 +1723,8 @@ function PioneerMapPage() {
           ? `❌ ${message}`
           : t("loginFailed")
       );
+    } finally {
+      setLoginBusy(false);
     }
   };
 
@@ -1656,13 +1735,21 @@ function PioneerMapPage() {
   useEffect(() => {
     const loadPlaces = async () => {
       try {
-        const response =
-          await fetch(
+        const controller = new AbortController();
+        const timer = window.setTimeout(() => controller.abort(), 12000);
+
+        let response: Response;
+        try {
+          response = await fetch(
             `${backendUrl}/api/places`,
             {
               credentials: "include",
+              signal: controller.signal,
             }
           );
+        } finally {
+          window.clearTimeout(timer);
+        }
 
         if (!response.ok) {
           throw new Error(
@@ -1847,7 +1934,7 @@ function PioneerMapPage() {
   ) => {
     if (!place._id) {
       setStatus(
-        "❌ Place ID not found."
+        "❌ Bu örnek kayıt silinemez."
       );
       return;
     }
@@ -1896,7 +1983,7 @@ function PioneerMapPage() {
         (current) =>
           current.filter(
             (item) =>
-              item._id !== place._id
+              getPlaceKey(item) !== getPlaceKey(place)
           )
       );
 
@@ -2588,9 +2675,11 @@ function PioneerMapPage() {
 
         {!signedIn ? (
           <button
+            type="button"
             onClick={
               loginWithPi
             }
+            disabled={loginBusy}
             style={{
               padding:
                 "13px 25px",
@@ -2903,63 +2992,6 @@ function PioneerMapPage() {
       {/* ADD PLACE FORM */}
       {showForm && (
         <>
-          <section
-            style={{
-              margin: "15px",
-              padding: "14px",
-              background: "#f8f9fa",
-              borderRadius: "12px",
-              border: "1px solid #e0e0e0",
-            }}
-          >
-            <div style={{ fontWeight: 800, marginBottom: "8px" }}>{extraTranslations[appLanguage].placeImage}</div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                if (!file.type.startsWith("image/")) {
-                  setStatus(t("nameRequired"));
-                  return;
-                }
-                if (file.size > 10 * 1024 * 1024) {
-                  setStatus(extraTranslations[appLanguage].photoTooLarge);
-                  return;
-                }
-                try {
-                  setImageUploading(true);
-                  const compressed = await compressPlaceImage(file);
-                  setPlaceImage(compressed);
-                  setStatus(extraTranslations[appLanguage].photoAdded);
-                } catch (error) {
-                  console.error("Photo error:", error);
-                  setStatus(t("backendError"));
-                } finally {
-                  setImageUploading(false);
-                }
-              }}
-              style={{ width: "100%", boxSizing: "border-box" }}
-            />
-            {imageUploading && <div style={{ marginTop: "8px", fontWeight: 700 }}>{extraTranslations[appLanguage].preparingPhoto}</div>}
-            {placeImage && (
-              <div style={{ marginTop: "12px" }}>
-                <img
-                  src={placeImage}
-                  alt={extraTranslations[appLanguage].placeImage}
-                  style={{ width: "100%", maxHeight: "220px", objectFit: "cover", borderRadius: "10px", display: "block" }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setPlaceImage("")}
-                  style={{ marginTop: "8px", padding: "8px 12px", border: "none", borderRadius: "8px", background: "#eee", cursor: "pointer", fontWeight: 700 }}
-                >
-                  {extraTranslations[appLanguage].removeImage}
-                </button>
-              </div>
-            )}
-          </section>
-
           <AddPlaceForm
           placeName={placeName}
           setPlaceName={setPlaceName}
@@ -2983,6 +3015,24 @@ function PioneerMapPage() {
             setPlaceImage("");
           }}
           submitting={imageUploading}
+          placeImage={placeImage}
+          setPlaceImage={setPlaceImage}
+          imageUploading={imageUploading}
+          labels={{
+            title: extraTranslations[appLanguage].addPlace,
+            name: t("placeName"),
+            category: extraTranslations[appLanguage].category,
+            description: t("description"),
+            language: extraTranslations[appLanguage].language,
+            country: extraTranslations[appLanguage].country,
+            photo: extraTranslations[appLanguage].placeImage,
+            photoPreparing: extraTranslations[appLanguage].preparingPhoto,
+            removePhoto: extraTranslations[appLanguage].removeImage,
+            location: extraTranslations[appLanguage].location,
+            saving: t("saving"),
+            savePlace: extraTranslations[appLanguage].savePlace,
+            imageTooLarge: extraTranslations[appLanguage].photoTooLarge,
+          }}
         />
         </>
       )}
@@ -3026,6 +3076,16 @@ function PioneerMapPage() {
               }
             }}
             onDelete={() => deletePlace(selectedPlace)}
+            labels={{
+              language: extraTranslations[appLanguage].language,
+              country: extraTranslations[appLanguage].country,
+              anonymous: t("anonymous"),
+              addFavorite: extraTranslations[appLanguage].addFavorite,
+              removeFavorite: extraTranslations[appLanguage].removeFavorite,
+              share: extraTranslations[appLanguage].share,
+              showOnMap: extraTranslations[appLanguage].showOnMap,
+              delete: extraTranslations[appLanguage].delete,
+            }}
             isFavorite={isFavorite(selectedPlace)}
             onToggleFavorite={() => toggleFavorite(selectedPlace)}
             onShare={() => sharePlace(selectedPlace)}
@@ -3051,12 +3111,34 @@ function PioneerMapPage() {
               Jobs: "💼",
             }}
             onSelect={(place) => {
-              setSelectedPlace(places.find((item) => item._id === place._id) || null);
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              const found = places.find(
+                (item) => getPlaceKey(item) === getPlaceKey(place)
+              );
+
+              setSelectedPlace(found || place);
+
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
             }}
             onDelete={(place) => {
-              const found = places.find((item) => item._id === place._id);
-              if (found) deletePlace(found);
+              const found = places.find(
+                (item) => getPlaceKey(item) === getPlaceKey(place)
+              );
+
+              if (found?._id) {
+                deletePlace(found);
+              } else {
+                setStatus("❌ Bu örnek kayıt silinemez.");
+              }
+            }}
+            labels={{
+              view: extraTranslations[appLanguage].viewDetails,
+              favorite: extraTranslations[appLanguage].addFavorite,
+              favorited: extraTranslations[appLanguage].removeFavorite,
+              delete: extraTranslations[appLanguage].delete,
+              anonymous: t("anonymous"),
             }}
           />
         </section>
@@ -3116,6 +3198,12 @@ function PioneerMapPage() {
         >
           <Favorites
             favorites={favorites}
+            labels={{
+              title: extraTranslations[appLanguage].favorites,
+              empty: extraTranslations[appLanguage].emptyFavorites,
+              view: extraTranslations[appLanguage].viewDetails,
+              remove: extraTranslations[appLanguage].removeFavorite,
+            }}
             onRemove={(id) => {
               setFavorites((current) =>
                 current.filter((place) => place._id !== id)
