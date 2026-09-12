@@ -309,7 +309,6 @@ const translations = {
     locationChosen: "📍 Konum seçildi. Yer bilgilerini gir.",
     location: "📍 Konum",
     anonymous: "Kullanıcı",
-    share: "Paylaş",
   },
 
   English: {
@@ -371,7 +370,6 @@ const translations = {
       "📍 Location selected. Enter the place information.",
     location: "📍 Location",
     anonymous: "User",
-    share: "Share",
   },
 
   Arabic: {
@@ -432,7 +430,6 @@ const translations = {
     locationChosen: "📍 تم اختيار الموقع. أدخل معلومات المكان.",
     location: "📍 الموقع",
     anonymous: "مستخدم",
-    share: "مشاركة",
   },
 
   Spanish: {
@@ -494,7 +491,6 @@ const translations = {
       "📍 Ubicación seleccionada. Introduce la información.",
     location: "📍 Ubicación",
     anonymous: "Usuario",
-    share: "Compartir",
   },
 
   French: {
@@ -560,7 +556,6 @@ const translations = {
       "📍 Emplacement sélectionné. Saisissez les informations.",
     location: "📍 Emplacement",
     anonymous: "Utilisateur",
-    share: "Partager",
   },
 
   German: {
@@ -624,7 +619,6 @@ const translations = {
       "📍 Standort ausgewählt. Gib die Informationen ein.",
     location: "📍 Standort",
     anonymous: "Benutzer",
-    share: "Teilen",
   },
 
   Portuguese: {
@@ -690,7 +684,6 @@ const translations = {
       "📍 Local selecionado. Digite as informações.",
     location: "📍 Localização",
     anonymous: "Usuário",
-    share: "Compartilhar",
   },
 
   Russian: {
@@ -757,7 +750,6 @@ const translations = {
       "📍 Место выбрано. Введите информацию.",
     location: "📍 Местоположение",
     anonymous: "Пользователь",
-    share: "Поделиться",
   },
 
   Chinese: {
@@ -820,7 +812,6 @@ const translations = {
       "📍 已选择位置。请输入地点信息。",
     location: "📍 位置",
     anonymous: "用户",
-    share: "分享",
   },
 
   Hindi: {
@@ -889,7 +880,6 @@ const translations = {
       "📍 स्थान चुना गया। स्थान की जानकारी दर्ज करें।",
     location: "📍 स्थान",
     anonymous: "उपयोगकर्ता",
-    share: "साझा करें",
   },
 } as const;
 type ExtraTranslation = {
@@ -1062,6 +1052,7 @@ function PioneerMapPage() {
     });
 
   const [mapInteractive, setMapInteractive] = useState(false);
+  void mapInteractive;
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
