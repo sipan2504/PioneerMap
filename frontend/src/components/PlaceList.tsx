@@ -1,5 +1,8 @@
 import type { CSSProperties } from "react";
-import PlaceCard, { type PlaceCardLabels, type PlaceCardPlace } from "./PlaceCard";
+import PlaceCard, {
+  type PlaceCardLabels,
+  type PlaceCardPlace,
+} from "./PlaceCard";
 
 export type PlaceListLabels = PlaceCardLabels & {
   title?: string;
@@ -71,8 +74,8 @@ const PlaceList = ({
 }: PlaceListProps) => {
   const text = {
     title: labels?.title ?? "Yerler",
-    empty: labels?.empty ?? "Henüz gösterilecek yer yok.",
-    results: labels?.results ?? "sonuç",
+    empty: labels?.empty ?? "HenÃ¼z gÃ¶sterilecek yer yok.",
+    results: labels?.results ?? "sonuÃ§",
   };
 
   return (
@@ -97,8 +100,8 @@ const PlaceList = ({
                 place={place}
                 icon={
                   place.category
-                    ? categoryIcons[place.category] ?? "•"
-                    : "•"
+                    ? categoryIcons[place.category] ?? "â€¢"
+                    : "â€¢"
                 }
                 onSelect={onSelect}
                 onDelete={onDelete}
