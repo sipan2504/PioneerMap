@@ -1051,6 +1051,7 @@ function PioneerMapPage() {
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
+  const shareLabel = t("share") || "Paylaş";
 
   /* =======================================================
      GLOBAL UI LANGUAGE BRIDGE
@@ -1380,7 +1381,7 @@ function PioneerMapPage() {
       return [];
     }
   });
-  const [mapInteractive, setMapInteractive] = useState(false);
+  const [, setMapInteractive] = useState(false);
 
   useEffect(() => {
     try {
@@ -3063,7 +3064,7 @@ function PioneerMapPage() {
                   const map = mapInstance.current;
                   if (map && Number.isFinite(Number(selectedPlace.lat)) && Number.isFinite(Number(selectedPlace.lng))) {
                     map.setView([Number(selectedPlace.lat), Number(selectedPlace.lng)], 15);
-                    setMapInteractive(true);
+                    
                   }
                 }} style={{ border: "none", borderRadius: "15px", padding: "13px 8px", background: "#eef3ff", color: "#3157bd", fontWeight: 800, cursor: "pointer" }}>🗺️ {t("map")}</button>
                 <button type="button" onClick={() => sharePlace(selectedPlace)} style={{ border: "none", borderRadius: "15px", padding: "13px 8px", background: "#f2efff", color: "#5838a8", fontWeight: 800, cursor: "pointer" }}>📤 {shareLabel}</button>
