@@ -5,8 +5,8 @@ export type PlaceCardPlace = {
   name: string;
   lat: number;
   lng: number;
-  category: "Stays" | "Shops" | "Food" | "Services" | "Jobs";
-  description?: string;
+  category: string;
+  description: string;
   language?: string;
   country?: string;
   username?: string;
@@ -19,7 +19,7 @@ export type PlaceCardLabels = {
   favorited?: string;
   delete?: string;
   anonymous?: string;
-  category?: string;
+  category: string;
   language?: string;
   country?: string;
 };
