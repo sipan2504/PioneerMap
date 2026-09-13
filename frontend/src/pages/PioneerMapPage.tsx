@@ -1,4 +1,4 @@
-PioneerMapPage.tsximport { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
