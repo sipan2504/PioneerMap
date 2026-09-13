@@ -3079,7 +3079,7 @@ function PioneerMapPage() {
               Services: "🔧",
               Jobs: "💼",
             }}
-            onSelect={(place) => {
+            onSelect={(place: PlaceCardPlace) => {
               const found = places.find(
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
@@ -3091,7 +3091,7 @@ function PioneerMapPage() {
                 behavior: "smooth",
               });
             }}
-            onDelete={(place) => {
+            onDelete={(place: PlaceCardPlace) => {
               const found = places.find(
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
