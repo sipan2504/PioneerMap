@@ -40,38 +40,6 @@ type AppLanguage =
   | "Chinese"
   | "Hindi";
 
-const compressPlaceImage = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Fotoğraf okunamadı."));
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error("Fotoğraf yüklenemedi."));
-      img.onload = () => {
-        const maxSize = 900;
-        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(img.width * scale));
-        canvas.height = Math.max(1, Math.round(img.height * scale));
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          reject(new Error("Fotoğraf işlenemedi."));
-          return;
-        }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const result = canvas.toDataURL("image/jpeg", 0.72);
-        if (result.length > 2300000) {
-          resolve(canvas.toDataURL("image/jpeg", 0.55));
-        } else {
-          resolve(result);
-        }
-      };
-      img.src = String(reader.result);
-    };
-    reader.readAsDataURL(file);
-  });
-};
-
 const categoryIcons: Record<
   Exclude<Category, "All">,
   { icon: string; color: string }
@@ -883,6 +851,7 @@ const translations = {
   },
 } as const;
 type ExtraTranslation = {
+  addPlace?: string;
   home:string; nearby:string; add:string; favorites:string; profile:string; share:string; removeFavorite:string; addFavorite:string; showOnMap:string; delete:string; close:string; emptyFavorites:string; noPlaces:string; viewDetails:string; placeImage:string; removeImage:string; preparingPhoto:string; photoAdded:string; choosePhoto:string; savePlace:string; cancel:string; location:string; category:string; language:string; country:string; photoTooLarge:string;
 };
 const extraTranslations: Record<AppLanguage, ExtraTranslation> = {
@@ -3019,7 +2988,7 @@ function PioneerMapPage() {
           setPlaceImage={setPlaceImage}
           imageUploading={imageUploading}
           labels={{
-            title: extraTranslations[appLanguage].addPlace,
+            title: t("addPlace"),
             name: t("placeName"),
             category: extraTranslations[appLanguage].category,
             description: t("description"),
@@ -3115,7 +3084,7 @@ function PioneerMapPage() {
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
 
-              setSelectedPlace(found || place);
+              setSelectedPlace(found || (place as Place));
 
               window.scrollTo({
                 top: 0,
