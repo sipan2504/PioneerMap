@@ -1544,29 +1544,56 @@ function PioneerMapPage() {
   const [loginBusy, setLoginBusy] = useState(false);
   const piReadyRef = useRef<Promise<any> | null>(null);
 
-  // Pi SDK yalnızca bir kez hazırlanır; giriş butonunda tekrar init edilmez.
+  // Pi SDK'yi butona basılmasını beklemeden önceden hazırla.
+  // Böylece ilk tıklama SDK'nın yüklenme/init zamanlamasına takılmaz.
   const getPiReady = () => {
     if (piReadyRef.current) return piReadyRef.current;
-    const pi = (window as any).Pi;
-    if (!pi) return Promise.reject(new Error(t("piSdkError")));
-    piReadyRef.current = Promise.resolve(
-      pi.init({ version: "2.0", sandbox: false })
-    );
+
+    piReadyRef.current = new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 100;
+
+      const waitForPi = () => {
+        const pi = (window as any).Pi;
+
+        if (pi) {
+          try {
+            Promise.resolve(
+              pi.init({ version: "2.0", sandbox: false })
+            ).then(resolve).catch(reject);
+          } catch (error) {
+            reject(error);
+          }
+          return;
+        }
+
+        attempts += 1;
+        if (attempts >= maxAttempts) {
+          reject(new Error(t("piSdkError")));
+          return;
+        }
+
+        window.setTimeout(waitForPi, 100);
+      };
+
+      waitForPi();
+    });
+
     return piReadyRef.current;
   };
+
+  // SDK sayfa açılır açılmaz hazırlanır; kullanıcı ilk tıklamada beklemez.
+  useEffect(() => {
+    getPiReady().catch((error) => {
+      console.warn("Pi SDK init:", error);
+    });
+  }, []);
 
   const loginWithPi = async () => {
     if (loginBusy) return;
 
     setLoginBusy(true);
     try {
-      const pi = (window as any).Pi;
-
-      if (!pi) {
-        setStatus(t("piSdkError"));
-        return;
-      }
-
       const withTimeout = <T,>(promise: Promise<T>, ms = 15000) =>
         new Promise<T>((resolve, reject) => {
           const timer = window.setTimeout(() => {
@@ -1591,15 +1618,26 @@ function PioneerMapPage() {
           );
         });
 
-      // Init önceden hazırlanır; burada tekrar çalıştırılmaz.
-      await withTimeout(getPiReady(), 10000);
+      // İlk tıklamada da SDK hazır değilse burada bekler;
+      // kullanıcıdan tekrar tekrar butona basması gerekmez.
+      await withTimeout(getPiReady(), 15000);
+
+      const pi = (window as any).Pi;
+      if (!pi) {
+        throw new Error(t("piSdkError"));
+      }
 
       const auth =
         await withTimeout(
           Promise.resolve(
             pi.authenticate(
               ["username"],
-              () => true
+              (payment) => {
+                console.warn(
+                  "Incomplete Pi payment found during authentication:",
+                  payment?.identifier
+                );
+              }
             )
           )
         );
