@@ -16,6 +16,7 @@ type FavoritesLabels = {
   empty?: string;
   view?: string;
   remove?: string;
+  favorite?: string;
 };
 
 type FavoritesProps = {
