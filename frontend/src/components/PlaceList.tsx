@@ -74,8 +74,8 @@ const PlaceList = ({
 }: PlaceListProps) => {
   const text = {
     title: labels?.title ?? "Yerler",
-    empty: labels?.empty ?? "HenÃ¼z gÃ¶sterilecek yer yok.",
-    results: labels?.results ?? "sonuÃ§",
+    empty: labels?.empty ?? "Henüz gösterilecek yer yok.",
+    results: labels?.results ?? "sonuç",
   };
 
   return (
@@ -100,8 +100,8 @@ const PlaceList = ({
                 place={place}
                 icon={
                   place.category
-                    ? categoryIcons[place.category] ?? "â€¢"
-                    : "â€¢"
+                    ? categoryIcons[place.category] ?? "•"
+                    : "•"
                 }
                 onSelect={onSelect}
                 onDelete={onDelete}
