@@ -3,12 +3,25 @@ import React from "react";
 type Place = {
   _id?: string;
   name: string;
+  lat?: number;
+  lng?: number;
   category?: string;
   description?: string;
   language?: string;
   country?: string;
   username?: string;
   image?: string;
+};
+
+type PlaceDetailsLabels = {
+  language?: string;
+  country?: string;
+  anonymous?: string;
+  addFavorite?: string;
+  removeFavorite?: string;
+  share?: string;
+  showOnMap?: string;
+  delete?: string;
 };
 
 type PlaceDetailsProps = {
@@ -19,6 +32,7 @@ type PlaceDetailsProps = {
   isFavorite?: boolean;
   onToggleFavorite?: (place: Place) => void;
   onShare?: (place: Place) => void;
+  labels?: PlaceDetailsLabels;
 };
 
 const PlaceDetails: React.FC<PlaceDetailsProps> = ({
@@ -29,7 +43,16 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
   isFavorite = false,
   onToggleFavorite,
   onShare,
+  labels = {},
 }) => {
+  const languageLabel = labels.language ?? "Dil";
+  const countryLabel = labels.country ?? "Ülke";
+  const anonymousLabel = labels.anonymous ?? "Anonim";
+  const addFavoriteLabel = labels.addFavorite ?? "Favorilere Ekle";
+  const removeFavoriteLabel = labels.removeFavorite ?? "Favorilerden Çıkar";
+  const shareLabel = labels.share ?? "Yeri Paylaş";
+  const showOnMapLabel = labels.showOnMap ?? "Haritada Göster";
+  const deleteLabel = labels.delete ?? "Sil";
   return (
     <section
       id="pioneer-detail-card"
@@ -61,10 +84,16 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
-            gap: 10,
+            gap: 12,
+            flexWrap: "wrap",
           }}
         >
-          <div style={{ flex: 1 }}>
+          <div
+            style={{
+              flex: "1 1 220px",
+              minWidth: 0,
+            }}
+          >
             <h2
               style={{
                 margin: 0,
@@ -140,13 +169,13 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
 
         {place.language && (
           <div style={{ marginBottom: 6 }}>
-            🌐 <strong>Dil:</strong> {place.language}
+            🌐 <strong>{languageLabel}:</strong> {place.language}
           </div>
         )}
 
         {place.country && (
           <div style={{ marginBottom: 6 }}>
-            🌍 <strong>Ülke:</strong> {place.country}
+            🌍 <strong>{countryLabel}:</strong> {place.country}
           </div>
         )}
 
@@ -158,7 +187,7 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
               fontSize: 13,
             }}
           >
-            👤 Ekleyen: @{place.username.replace(/^@/, "")}
+            👤 {place.username ? `@${place.username.replace(/^@/, "")}` : anonymousLabel}
           </div>
         )}
 
@@ -189,8 +218,8 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
               }}
             >
               {isFavorite
-                ? "⭐ Favorilerden Çıkar"
-                : "⭐ Favorilere Ekle"}
+                ? `⭐ ${removeFavoriteLabel}`
+                : `⭐ ${addFavoriteLabel}`}
             </button>
           )}
 
@@ -210,7 +239,7 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
                 cursor: "pointer",
               }}
             >
-              📤 Yeri Paylaş
+              📤 {shareLabel}
             </button>
           )}
 
@@ -228,7 +257,7 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
                 fontWeight: 700,
               }}
             >
-              🗺️ Haritada Göster
+              🗺️ {showOnMapLabel}
             </button>
           )}
 
@@ -246,7 +275,7 @@ const PlaceDetails: React.FC<PlaceDetailsProps> = ({
                 fontWeight: 700,
               }}
             >
-              🗑️ Sil
+              🗑️ {deleteLabel}
             </button>
           )}
         </div>
