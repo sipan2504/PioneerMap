@@ -46,9 +46,7 @@ export default function Toast({
         gap: "10px",
       }}
     >
-      <span style={{ flex: 1 }}>
-        {message}
-      </span>
+      <span style={{ flex: 1 }}>{message}</span>
 
       {onClose && (
         <button
