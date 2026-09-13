@@ -1542,159 +1542,125 @@ function PioneerMapPage() {
   ======================================================= */
 
   const [loginBusy, setLoginBusy] = useState(false);
-  const piReadyRef = useRef<Promise<any> | null>(null);
 
-  // Pi SDK'yi butona basılmasını beklemeden önceden hazırla.
-  // Böylece ilk tıklama SDK'nın yüklenme/init zamanlamasına takılmaz.
-  const getPiReady = () => {
-    if (piReadyRef.current) return piReadyRef.current;
-
-    piReadyRef.current = new Promise((resolve, reject) => {
-      let attempts = 0;
-      const maxAttempts = 100;
-
-      const waitForPi = () => {
-        const pi = (window as any).Pi;
-
-        if (pi) {
-          try {
-            Promise.resolve(
-              pi.init({ version: "2.0", sandbox: false })
-            ).then(resolve).catch(reject);
-          } catch (error) {
-            reject(error);
-          }
-          return;
-        }
-
-        attempts += 1;
-        if (attempts >= maxAttempts) {
-          reject(new Error(t("piSdkError")));
-          return;
-        }
-
-        window.setTimeout(waitForPi, 100);
-      };
-
-      waitForPi();
-    });
-
-    return piReadyRef.current;
-  };
-
-  // SDK sayfa açılır açılmaz hazırlanır; kullanıcı ilk tıklamada beklemez.
+  // Prepare Pi once when the page loads. The login button itself only
+  // waits for the SDK to exist; it never calls Pi.init repeatedly.
   useEffect(() => {
-    getPiReady().catch((error) => {
-      console.warn("Pi SDK init:", error);
-    });
+    let cancelled = false;
+    let attempts = 0;
+
+    const preparePi = () => {
+      if (cancelled) return;
+
+      const pi = (window as any).Pi;
+      if (pi) {
+        try {
+          Promise.resolve(pi.init({ version: "2.0", sandbox: false }))
+            .catch((error) => console.warn("Pi SDK init:", error));
+        } catch (error) {
+          console.warn("Pi SDK init:", error);
+        }
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < 100) {
+        window.setTimeout(preparePi, 100);
+      }
+    };
+
+    preparePi();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const loginWithPi = async () => {
     if (loginBusy) return;
 
     setLoginBusy(true);
-    try {
-      const withTimeout = <T,>(promise: Promise<T>, ms = 15000) =>
-        new Promise<T>((resolve, reject) => {
-          const timer = window.setTimeout(() => {
-            reject(
-              new Error(
-                appLanguage === "Turkish"
-                  ? "Pi giriş isteği zaman aşımına uğradı. Pi Browser'ı yeniden açıp tekrar dene."
-                  : "Pi sign-in timed out. Please reopen Pi Browser and try again."
-              )
-            );
-          }, ms);
 
-          promise.then(
-            (value) => {
-              window.clearTimeout(timer);
-              resolve(value);
-            },
-            (error) => {
-              window.clearTimeout(timer);
-              reject(error);
+    try {
+      const waitForPi = () =>
+        new Promise<any>((resolve, reject) => {
+          let attempts = 0;
+
+          const check = () => {
+            const pi = (window as any).Pi;
+
+            if (pi) {
+              resolve(pi);
+              return;
             }
-          );
+
+            attempts += 1;
+            if (attempts >= 150) {
+              reject(new Error(t("piSdkError")));
+              return;
+            }
+
+            window.setTimeout(check, 100);
+          };
+
+          check();
         });
 
-      // İlk tıklamada da SDK hazır değilse burada bekler;
-      // kullanıcıdan tekrar tekrar butona basması gerekmez.
-      await withTimeout(getPiReady(), 15000);
-
-      const pi = (window as any).Pi;
-      if (!pi) {
-        throw new Error(t("piSdkError"));
-      }
-
-      const auth =
-        await withTimeout(
-          Promise.resolve(
-            pi.authenticate(
-              ["username"],
-              (payment) => {
-                console.warn(
-                  "Incomplete Pi payment found during authentication:",
-                  payment?.identifier
-                );
-              }
-            )
+      const pi = await Promise.race([
+        waitForPi(),
+        new Promise((_, reject) =>
+          window.setTimeout(
+            () => reject(new Error("Pi SDK timeout")),
+            15000
           )
-        );
+        ),
+      ]);
 
-      if (
-        !auth?.user?.username ||
-        !auth?.accessToken
-      ) {
-        throw new Error(
-          t("piUserError")
-        );
+      const auth = await pi.authenticate(
+        ["username"],
+        (payment: any) => {
+          console.warn(
+            "Incomplete Pi payment found during authentication:",
+            payment?.identifier
+          );
+        }
+      );
+
+      if (!auth?.user?.username || !auth?.accessToken) {
+        throw new Error(t("piUserError"));
       }
 
-      const controller =
-        new AbortController();
-      const backendTimer =
-        window.setTimeout(() =>
-          controller.abort(),
-        10000);
+      const controller = new AbortController();
+      const backendTimer = window.setTimeout(
+        () => controller.abort(),
+        10000
+      );
 
       let response: Response;
       try {
-        response = await fetch(
-          `${backendUrl}/user/signin`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            credentials: "include",
-            signal: controller.signal,
-            body: JSON.stringify({
-              authResult: auth,
-            }),
-          }
-        );
+        response = await fetch(`${backendUrl}/user/signin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          signal: controller.signal,
+          body: JSON.stringify({
+            authResult: auth,
+          }),
+        });
       } finally {
         window.clearTimeout(backendTimer);
       }
 
-      const data =
-        await response
-          .json()
-          .catch(() => ({}));
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(
-          data?.message ||
-            t("backendError")
-        );
+        throw new Error(data?.message || t("backendError"));
       }
 
       setSignedIn(true);
-      setUsername(
-        auth.user.username
-      );
+      setUsername(auth.user.username);
 
       const welcome =
         appLanguage === "Turkish"
@@ -1717,42 +1683,25 @@ function PioneerMapPage() {
           ? "欢迎"
           : "स्वागत है";
 
-      setStatus(
-        `✅ ${welcome} @${auth.user.username}`
-      );
+      setStatus(`✅ ${welcome} @${auth.user.username}`);
     } catch (error) {
-      console.error(
-        "Pi login error:",
-        error
-      );
+      console.error("Pi login error:", error);
 
       setSignedIn(false);
       setUsername("");
 
-      const message =
-        error instanceof Error
-          ? error.message
-          : "";
-
+      const message = error instanceof Error ? error.message : "";
       const timeoutError =
-        error instanceof DOMException &&
-        error.name === "AbortError";
-
+        error instanceof DOMException && error.name === "AbortError";
       const consentError = /consent|scope|network error/i.test(message);
 
       setStatus(
         timeoutError
-          ? (appLanguage === "English"
-              ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
-              : appLanguage === "Turkish"
-              ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
-              : t("loginFailed"))
+          ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
           : consentError
-          ? (appLanguage === "English"
-              ? "❌ Pi consent could not be checked. Please reopen Pi Browser and try again."
-              : appLanguage === "Turkish"
-              ? "❌ Pi izinleri kontrol edilemedi. Pi Browser'ı yeniden açıp tekrar dene."
-              : t("loginFailed"))
+          ? "❌ Pi izinleri kontrol edilemedi. Pi Browser'ı yeniden açıp tekrar dene."
+          : message === "Pi SDK timeout"
+          ? t("piSdkError")
           : message
           ? `❌ ${message}`
           : t("loginFailed")
