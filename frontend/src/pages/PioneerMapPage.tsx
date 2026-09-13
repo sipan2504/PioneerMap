@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+PioneerMapPage.tsximport { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
@@ -3079,7 +3079,7 @@ function PioneerMapPage() {
               Services: "🔧",
               Jobs: "💼",
             }}
-            onSelect={(place) => {
+            onSelect={(place: Place) => {
               const found = places.find(
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
@@ -3091,7 +3091,7 @@ function PioneerMapPage() {
                 behavior: "smooth",
               });
             }}
-            onDelete={(place) => {
+            onDelete={(place: Place) => {
               const found = places.find(
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
@@ -3104,7 +3104,6 @@ function PioneerMapPage() {
             }}
             labels={{
               view: extraTranslations[appLanguage].viewDetails,
-              favorite: extraTranslations[appLanguage].addFavorite,
               favorited: extraTranslations[appLanguage].removeFavorite,
               delete: extraTranslations[appLanguage].delete,
               anonymous: t("anonymous"),
