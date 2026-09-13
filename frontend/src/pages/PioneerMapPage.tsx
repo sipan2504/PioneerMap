@@ -3053,6 +3053,7 @@ function PioneerMapPage() {
               removeFavorite: extraTranslations[appLanguage].removeFavorite,
               share: extraTranslations[appLanguage].share,
               showOnMap: extraTranslations[appLanguage].showOnMap,
+              delete: extraTranslations[appLanguage].delete,
             }}
             isFavorite={isFavorite(selectedPlace)}
             onToggleFavorite={() => toggleFavorite(selectedPlace)}
@@ -3078,7 +3079,7 @@ function PioneerMapPage() {
               Services: "🔧",
               Jobs: "💼",
             }}
-            onSelect={(place: Place) => {
+            onSelect={(place) => {
               const found = places.find(
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
@@ -3090,7 +3091,7 @@ function PioneerMapPage() {
                 behavior: "smooth",
               });
             }}
-            onDelete={(place: Place) => {
+            onDelete={(place) => {
               const found = places.find(
                 (item) => getPlaceKey(item) === getPlaceKey(place)
               );
@@ -3100,10 +3101,6 @@ function PioneerMapPage() {
               } else {
                 setStatus("❌ Bu örnek kayıt silinemez.");
               }
-            }}
-            labels={{
-              view: extraTranslations[appLanguage].viewDetails,
-              anonymous: t("anonymous"),
             }}
           />
         </section>
