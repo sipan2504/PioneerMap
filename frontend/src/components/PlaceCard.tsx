@@ -3,6 +3,8 @@ import type { CSSProperties } from "react";
 export type PlaceCardPlace = {
   _id?: string;
   name: string;
+  lat?: number;
+  lng?: number;
   category?: string;
   description?: string;
   language?: string;
@@ -35,14 +37,15 @@ type PlaceCardProps = {
 const buttonBase: CSSProperties = {
   border: "none",
   borderRadius: 10,
-  padding: "10px 12px",
+  padding: "11px 13px",
+  minHeight: 44,
   fontWeight: 800,
   cursor: "pointer",
 };
 
 const PlaceCard = ({
   place,
-  icon = "📍",
+  icon = "ğŸ“",
   onSelect,
   onDelete,
   onToggleFavorite,
@@ -157,9 +160,9 @@ const PlaceCard = ({
                   lineHeight: 1.6,
                 }}
               >
-                {place.language && <>🌐 {place.language}</>}
-                {place.language && place.country && " • "}
-                {place.country && <>🌍 {place.country}</>}
+                {place.language && <>ğŸŒ {place.language}</>}
+                {place.language && place.country && " â€¢ "}
+                {place.country && <>ğŸŒ {place.country}</>}
               </div>
             )}
 
@@ -170,7 +173,7 @@ const PlaceCard = ({
                 color: "#9ca3af",
               }}
             >
-              👤{" "}
+              ğŸ‘¤{" "}
               {place.username
                 ? `@${place.username.replace(/^@/, "")}`
                 : anonymous}
@@ -214,7 +217,7 @@ const PlaceCard = ({
                 color: isFavorite ? "#92400e" : "#374151",
               }}
             >
-              {isFavorite ? `★ ${favorited}` : `☆ ${favorite}`}
+              {isFavorite ? `â˜… ${favorited}` : `â˜† ${favorite}`}
             </button>
           )}
 
