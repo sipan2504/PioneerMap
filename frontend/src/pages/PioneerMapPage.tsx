@@ -1292,15 +1292,12 @@ function PioneerMapPage() {
       });
     };
 
+    // IMPORTANT: Do not observe characterData here.
+    // Replacing text nodes inside a characterData MutationObserver
+    // creates an endless mutation loop and freezes the whole page.
     replaceTextNodes();
-    const observer = new MutationObserver(() => replaceTextNodes());
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
 
-    return () => observer.disconnect();
+    return undefined;
   }, [appLanguage]);
 
   useEffect(() => {
