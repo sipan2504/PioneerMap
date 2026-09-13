@@ -2585,7 +2585,7 @@ function PioneerMapPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f7fa",
+        background: "linear-gradient(180deg, #f7f9ff 0%, #eef2ff 100%)",
         color: "#222",
         paddingBottom: "90px",
       }}
@@ -2593,18 +2593,19 @@ function PioneerMapPage() {
       {/* HEADER */}
       <header
         style={{
-          background: "#fff",
+          background: "rgba(255,255,255,0.96)",
           padding: "22px 16px",
           textAlign: "center",
           borderBottom:
-            "1px solid #eee",
+            "1px solid #dfe5ff",
+          boxShadow: "0 8px 24px rgba(66, 78, 150, 0.08)",
         }}
       >
         <h1
           style={{
             margin:
               "0 0 10px",
-            fontSize: "30px",
+            fontSize: "32px",
              letterSpacing: "-0.8px",
           }}
         >
