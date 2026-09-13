@@ -3053,7 +3053,6 @@ function PioneerMapPage() {
               removeFavorite: extraTranslations[appLanguage].removeFavorite,
               share: extraTranslations[appLanguage].share,
               showOnMap: extraTranslations[appLanguage].showOnMap,
-              delete: extraTranslations[appLanguage].delete,
             }}
             isFavorite={isFavorite(selectedPlace)}
             onToggleFavorite={() => toggleFavorite(selectedPlace)}
@@ -3104,7 +3103,6 @@ function PioneerMapPage() {
             }}
             labels={{
               view: extraTranslations[appLanguage].viewDetails,
-              delete: extraTranslations[appLanguage].delete,
               anonymous: t("anonymous"),
             }}
           />
