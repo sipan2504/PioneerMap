@@ -3104,7 +3104,6 @@ function PioneerMapPage() {
             }}
             labels={{
               view: extraTranslations[appLanguage].viewDetails,
-              favorited: extraTranslations[appLanguage].removeFavorite,
               delete: extraTranslations[appLanguage].delete,
               anonymous: t("anonymous"),
             }}
