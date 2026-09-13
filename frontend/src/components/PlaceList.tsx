@@ -1,120 +1,60 @@
-import type { CSSProperties } from "react";
-import PlaceCard, {
-  type PlaceCardLabels,
-  type PlaceCardPlace,
-} from "./PlaceCard";
+type FavoritePlace = {
+  _id?: string;
+  name: string;
+  lat?: number;
+  lng?: number;
+  category?: string;
+  description?: string;
+  language?: string;
+  country?: string;
+  username?: string;
+  image?: string;
+};
 
-export type PlaceListLabels = PlaceCardLabels & {
+type FavoritesLabels = {
   title?: string;
   empty?: string;
-  results?: string;
+  view?: string;
+  remove?: string;
 };
 
-type PlaceListProps = {
-  places: PlaceCardPlace[];
-  categoryIcons?: Record<string, string>;
-  onSelect?: (place: PlaceCardPlace) => void;
-  onDelete?: (place: PlaceCardPlace) => void;
-  onToggleFavorite?: (place: PlaceCardPlace) => void;
-  isFavorite?: (place: PlaceCardPlace) => boolean;
-  labels?: PlaceListLabels;
+type FavoritesProps = {
+  favorites: FavoritePlace[];
+  onRemove: (id: string) => void;
+  onPlaceClick?: (place: FavoritePlace) => void;
+  labels?: FavoritesLabels;
 };
 
-const styles: Record<string, CSSProperties> = {
-  section: {
-    width: "100%",
-    boxSizing: "border-box",
-    marginTop: 18,
-  },
-  header: {
-    display: "flex",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 14,
-  },
-  title: {
-    margin: 0,
-    color: "#111827",
-    fontSize: 21,
-    fontWeight: 850,
-    letterSpacing: "-0.03em",
-  },
-  count: {
-    color: "#64748b",
-    fontSize: 12,
-    fontWeight: 700,
-    whiteSpace: "nowrap",
-  },
-  list: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 0,
-  },
-  empty: {
-    padding: "28px 18px",
-    textAlign: "center",
-    border: "1px dashed #cbd5e1",
-    borderRadius: 18,
-    background: "#f8fafc",
-    color: "#64748b",
-    fontSize: 14,
-    fontWeight: 650,
-  },
-};
+const Favorites = ({ favorites, onRemove, onPlaceClick, labels = {} }: FavoritesProps) => {
+  const title = labels.title ?? "Favoriler";
+  const empty = labels.empty ?? "Henüz favori eklenmedi.";
+  const view = labels.view ?? "Gör";
+  const remove = labels.remove ?? "Kaldır";
 
-const PlaceList = ({
-  places,
-  categoryIcons = {},
-  onSelect,
-  onDelete,
-  onToggleFavorite,
-  isFavorite,
-  labels,
-}: PlaceListProps) => {
-  const text = {
-    title: labels?.title ?? "Yerler",
-    empty: labels?.empty ?? "Henüz gösterilecek yer yok.",
-    results: labels?.results ?? "sonuç",
-  };
+  if (favorites.length === 0) {
+    return <div style={{ padding: 24, textAlign: "center", color: "#777" }}>⭐ {empty}</div>;
+  }
 
   return (
-    <section style={styles.section} aria-label={text.title}>
-      <div style={styles.header}>
-        <h2 style={styles.title}>{text.title}</h2>
-        <span style={styles.count}>
-          {places.length} {text.results}
-        </span>
-      </div>
-
-      {places.length === 0 ? (
-        <div style={styles.empty}>{text.empty}</div>
-      ) : (
-        <div style={styles.list}>
-          {places.map((place, index) => {
-            const key = place._id || `${place.name}-${index}`;
-
-            return (
-              <PlaceCard
-                key={key}
-                place={place}
-                icon={
-                  place.category
-                    ? categoryIcons[place.category] ?? "•"
-                    : "•"
-                }
-                onSelect={onSelect}
-                onDelete={onDelete}
-                onToggleFavorite={onToggleFavorite}
-                isFavorite={isFavorite ? isFavorite(place) : false}
-                labels={labels}
-              />
-            );
-          })}
-        </div>
-      )}
-    </section>
+    <div style={{ padding: 16 }}>
+      <h2 style={{ marginTop: 0 }}>⭐ {title}</h2>
+      {favorites.map((place, index) => {
+        const id = place._id || `${place.name}-${index}`;
+        return (
+          <div key={id} style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 14, padding: 12, marginBottom: 10 }}>
+            {place.image && <img src={place.image} alt={place.name} style={{ width: "100%", height: 150, objectFit: "cover", borderRadius: 10, marginBottom: 10 }} />}
+            <div style={{ fontWeight: 700, fontSize: 16 }}>📍 {place.name}</div>
+            {place.category && <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>{place.category}</div>}
+            {place.country && <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>🌍 {place.country}</div>}
+            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+              {onPlaceClick && <button type="button" onClick={() => onPlaceClick(place)} style={{ flex: 1, border: "none", borderRadius: 9, padding: 10, background: "#2563eb", color: "#fff", fontWeight: 700 }}>📍 {view}</button>}
+              {place._id && <button type="button" onClick={() => onRemove(place._id!)} style={{ border: "none", borderRadius: 9, padding: "10px 14px", background: "#ef4444", color: "#fff", fontWeight: 700 }}>🗑️ {remove}</button>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 
-export default PlaceList;
+export default Favorites;
