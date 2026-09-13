@@ -1038,10 +1038,34 @@ function PioneerMapPage() {
       return "Turkish";
     });
 
-  const [, setMapInteractive] = useState(false);
+  const [mapInteractive, setMapInteractive] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem("pioneerMapInteractive") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const mapControlLabels: Record<AppLanguage, { on: string; off: string }> = {
+    Turkish: { on: "🗺️ Harita AÇIK", off: "🗺️ Harita KAPALI" },
+    English: { on: "🗺️ Map ON", off: "🗺️ Map OFF" },
+    Arabic: { on: "🗺️ الخريطة مفعلة", off: "🗺️ الخريطة متوقفة" },
+    Spanish: { on: "🗺️ Mapa ACTIVADO", off: "🗺️ Mapa DESACTIVADO" },
+    French: { on: "🗺️ Carte ACTIVÉE", off: "🗺️ Carte DÉSACTIVÉE" },
+    German: { on: "🗺️ Karte AN", off: "🗺️ Karte AUS" },
+    Portuguese: { on: "🗺️ Mapa LIGADO", off: "🗺️ Mapa DESLIGADO" },
+    Russian: { on: "🗺️ Карта ВКЛ", off: "🗺️ Карта ВЫКЛ" },
+    Chinese: { on: "🗺️ 地图开启", off: "🗺️ 地图关闭" },
+    Hindi: { on: "🗺️ मानचित्र चालू", off: "🗺️ मानचित्र बंद" },
+  };
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
+
+  const mapInteractiveRef = useRef(mapInteractive);
+  useEffect(() => {
+    mapInteractiveRef.current = mapInteractive;
+  }, [mapInteractive]);
 
   /* =======================================================
      GLOBAL UI LANGUAGE BRIDGE
@@ -1779,6 +1803,8 @@ function PioneerMapPage() {
     map.on(
       "click",
       (event) => {
+        if (!mapInteractiveRef.current) return;
+
         setSelectedLocation({
           lat: event.latlng.lat,
           lng: event.latlng.lng,
@@ -2536,6 +2562,34 @@ function PioneerMapPage() {
   };
 
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "pioneerMapInteractive",
+        String(mapInteractive)
+      );
+    } catch {}
+
+    const map = mapInstance.current;
+    if (!map) return;
+
+    if (mapInteractive) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+      map.doubleClickZoom.enable();
+      map.scrollWheelZoom.enable();
+      map.boxZoom.enable();
+      map.keyboard.enable();
+    } else {
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+    }
+  }, [mapInteractive]);
+
   /* =======================================================
   UI
   ======================================================= */
@@ -2644,6 +2698,62 @@ function PioneerMapPage() {
             )}
           </select>
         </div>
+
+        {/* MAP ON / OFF */}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={mapInteractive}
+          onClick={() => setMapInteractive((value) => !value)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            maxWidth: "420px",
+            margin: "0 auto 15px",
+            padding: "11px 14px",
+            border: "1px solid #d5d5d5",
+            borderRadius: "12px",
+            background: mapInteractive ? "#e8f5e9" : "#f5f5f5",
+            color: mapInteractive ? "#2e7d32" : "#666",
+            fontSize: "15px",
+            fontWeight: "700",
+            cursor: "pointer",
+            boxSizing: "border-box",
+          }}
+        >
+          <span>
+            {mapInteractive
+              ? mapControlLabels[appLanguage].on
+              : mapControlLabels[appLanguage].off}
+          </span>
+          <span
+            aria-hidden="true"
+            style={{
+              width: "42px",
+              height: "24px",
+              borderRadius: "999px",
+              background: mapInteractive ? "#43a047" : "#bdbdbd",
+              padding: "3px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: mapInteractive ? "flex-end" : "flex-start",
+              boxSizing: "border-box",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <span
+              style={{
+                width: "18px",
+                height: "18px",
+                borderRadius: "50%",
+                background: "#fff",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+              }}
+            />
+          </span>
+        </button>
 
         {!signedIn ? (
           <button
