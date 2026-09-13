@@ -1,6 +1,8 @@
 type FavoritePlace = {
   _id?: string;
   name: string;
+  lat?: number;
+  lng?: number;
   category?: string;
   description?: string;
   language?: string;
@@ -9,20 +11,33 @@ type FavoritePlace = {
   image?: string;
 };
 
+type FavoritesLabels = {
+  title?: string;
+  empty?: string;
+  view?: string;
+  remove?: string;
+};
+
 type FavoritesProps = {
   favorites: FavoritePlace[];
   onRemove: (id: string) => void;
   onPlaceClick?: (place: FavoritePlace) => void;
+  labels?: FavoritesLabels;
 };
 
-const Favorites = ({ favorites, onRemove, onPlaceClick }: FavoritesProps) => {
+const Favorites = ({ favorites, onRemove, onPlaceClick, labels = {} }: FavoritesProps) => {
+  const title = labels.title ?? "Favoriler";
+  const empty = labels.empty ?? "Henüz favori eklenmedi.";
+  const view = labels.view ?? "Gör";
+  const remove = labels.remove ?? "Kaldır";
+
   if (favorites.length === 0) {
-    return <div style={{ padding: 24, textAlign: "center", color: "#777" }}>⭐ Henüz favori eklenmedi.</div>;
+    return <div style={{ padding: 24, textAlign: "center", color: "#777" }}>⭐ {empty}</div>;
   }
 
   return (
     <div style={{ padding: 16 }}>
-      <h2 style={{ marginTop: 0 }}>⭐ Favoriler</h2>
+      <h2 style={{ marginTop: 0 }}>⭐ {title}</h2>
       {favorites.map((place, index) => {
         const id = place._id || `${place.name}-${index}`;
         return (
@@ -32,8 +47,8 @@ const Favorites = ({ favorites, onRemove, onPlaceClick }: FavoritesProps) => {
             {place.category && <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>{place.category}</div>}
             {place.country && <div style={{ color: "#666", fontSize: 13, marginTop: 4 }}>🌍 {place.country}</div>}
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-              {onPlaceClick && <button type="button" onClick={() => onPlaceClick(place)} style={{ flex: 1, border: "none", borderRadius: 9, padding: 10, background: "#2563eb", color: "#fff", fontWeight: 700 }}>📍 Gör</button>}
-              {place._id && <button type="button" onClick={() => onRemove(place._id!)} style={{ border: "none", borderRadius: 9, padding: "10px 14px", background: "#ef4444", color: "#fff", fontWeight: 700 }}>🗑️</button>}
+              {onPlaceClick && <button type="button" onClick={() => onPlaceClick(place)} style={{ flex: 1, border: "none", borderRadius: 9, padding: 10, background: "#2563eb", color: "#fff", fontWeight: 700 }}>📍 {view}</button>}
+              {place._id && <button type="button" onClick={() => onRemove(place._id!)} style={{ border: "none", borderRadius: 9, padding: "10px 14px", background: "#ef4444", color: "#fff", fontWeight: 700 }}>🗑️ {remove}</button>}
             </div>
           </div>
         );
