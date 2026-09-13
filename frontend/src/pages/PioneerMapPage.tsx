@@ -1521,6 +1521,18 @@ function PioneerMapPage() {
   ======================================================= */
 
   const [loginBusy, setLoginBusy] = useState(false);
+  const piReadyRef = useRef<Promise<any> | null>(null);
+
+  // Pi SDK yalnızca bir kez hazırlanır; giriş butonunda tekrar init edilmez.
+  const getPiReady = () => {
+    if (piReadyRef.current) return piReadyRef.current;
+    const pi = (window as any).Pi;
+    if (!pi) return Promise.reject(new Error(t("piSdkError")));
+    piReadyRef.current = Promise.resolve(
+      pi.init({ version: "2.0", sandbox: false })
+    );
+    return piReadyRef.current;
+  };
 
   const loginWithPi = async () => {
     if (loginBusy) return;
@@ -1558,14 +1570,8 @@ function PioneerMapPage() {
           );
         });
 
-      await withTimeout(
-        Promise.resolve(
-          pi.init({
-            version: "2.0",
-            sandbox: false,
-          })
-        )
-      );
+      // Init önceden hazırlanır; burada tekrar çalıştırılmaz.
+      await withTimeout(getPiReady(), 10000);
 
       const auth =
         await withTimeout(
@@ -1591,7 +1597,7 @@ function PioneerMapPage() {
       const backendTimer =
         window.setTimeout(() =>
           controller.abort(),
-        15000);
+        10000);
 
       let response: Response;
       try {
