@@ -1464,10 +1464,10 @@ function PioneerMapPage() {
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
-  const [activeLanguage, setActiveLanguage] =
+  const [activeLanguage] =
     useState("All");
 
-  const [activeCountry, setActiveCountry] =
+  const [activeCountry] =
     useState("All");
 
   const [searchText, setSearchText] =
