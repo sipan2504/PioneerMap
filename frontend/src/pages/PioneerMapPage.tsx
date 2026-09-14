@@ -3163,7 +3163,6 @@ function PioneerMapPage() {
               share: extraTranslations[appLanguage].share,
               showOnMap: extraTranslations[appLanguage].showOnMap,
               delete: extraTranslations[appLanguage].delete,
-              close: extraTranslations[appLanguage].close,
             }}
             isFavorite={isFavorite(selectedPlace)}
             onToggleFavorite={() => toggleFavorite(selectedPlace)}
