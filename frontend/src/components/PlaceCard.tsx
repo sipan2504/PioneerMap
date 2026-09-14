@@ -78,7 +78,7 @@ const PlaceCard = ({
           }}
           style={{
             width: "100%",
-            height: 190,
+            height: 150,
             objectFit: "cover",
             display: "block",
           }}
@@ -88,7 +88,7 @@ const PlaceCard = ({
           aria-label={place.name}
           style={{
             width: "100%",
-            height: 120,
+            height: 90,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
