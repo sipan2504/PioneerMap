@@ -2672,4 +2672,6 @@ function PioneerMapPage() {
     </div>
   );
 
+};
+
 export default PioneerMapPage;
