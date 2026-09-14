@@ -998,13 +998,6 @@ const initialPlaces: Place[] = [
   },
 ];
 
-const piNewsItems = [
-  { tag: "Pi Güncellemesi", title: "Pi ekosistemi haberleri burada dönüşür", body: "Yeni duyurular, topluluk gelişmeleri ve uygulama güncellemeleri bu alanda gösterilir." },
-  { tag: "Topluluk", title: "Yeni Pi uygulamalarını keşfet", body: "PioneerMap üzerinde yeni yerler, işletmeler ve Pi ekosistemi bağlantıları keşfet." },
-  { tag: "Geliştiriciler", title: "Pi uygulama dünyası büyüyor", body: "Uygulama sahipleri yerlerini ekleyebilir; kullanıcılar yakınındaki hizmetleri bulabilir." },
-  { tag: "PioneerMap", title: "Daha fazla yer, daha yakın bağlantı", body: "Konaklama, mağaza, yemek, hizmet ve iş ilanlarını tek haritada keşfet." },
-];
-
 function PioneerMapPage() {
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL ||
@@ -1046,7 +1039,7 @@ function PioneerMapPage() {
 
   const [mapInteractive, setMapInteractive] = useState<boolean>(() => {
     try {
-      return true;
+      return localStorage.getItem("pioneerMapInteractive") === "true";
     } catch {
       return false;
     }
@@ -1464,10 +1457,10 @@ function PioneerMapPage() {
   const [activeCategory, setActiveCategory] =
     useState<Category>("All");
 
-  const [activeLanguage] =
+  const [activeLanguage, setActiveLanguage] =
     useState("All");
 
-  const [activeCountry] =
+  const [activeCountry, setActiveCountry] =
     useState("All");
 
   const [searchText, setSearchText] =
@@ -1516,15 +1509,6 @@ function PioneerMapPage() {
 
   const [imageUploading, setImageUploading] =
     useState(false);
-
-  const [activeNewsIndex, setActiveNewsIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveNewsIndex((current) => (current + 1) % piNewsItems.length);
-    }, 7000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   const mapRef =
     useRef<HTMLDivElement | null>(
@@ -1629,46 +1613,41 @@ function PioneerMapPage() {
         }
       );
 
-      if (!auth?.user?.username) {
+      if (!auth?.user?.username || !auth?.accessToken) {
         throw new Error(t("piUserError"));
       }
 
-      // Pi authentication is successful at this point. Keep the UI usable even
-      // if the optional backend session request is temporarily unavailable.
+      const controller = new AbortController();
+      const backendTimer = window.setTimeout(
+        () => controller.abort(),
+        10000
+      );
+
+      let response: Response;
+      try {
+        response = await fetch(`${backendUrl}/user/signin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          signal: controller.signal,
+          body: JSON.stringify({
+            authResult: auth,
+          }),
+        });
+      } finally {
+        window.clearTimeout(backendTimer);
+      }
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.message || t("backendError"));
+      }
+
       setSignedIn(true);
       setUsername(auth.user.username);
-
-      try {
-        const controller = new AbortController();
-        const backendTimer = window.setTimeout(
-          () => controller.abort(),
-          10000
-        );
-
-        let response: Response;
-        try {
-          response = await fetch(`${backendUrl}/user/signin`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            signal: controller.signal,
-            body: JSON.stringify({
-              authResult: auth,
-            }),
-          });
-        } finally {
-          window.clearTimeout(backendTimer);
-        }
-
-        if (!response.ok) {
-          setStatus(`⚠️ @${auth.user.username} ${t("connected")}`);
-        }
-      } catch (backendError) {
-        console.warn("Optional backend sign-in failed:", backendError);
-        setStatus(`✅ @${auth.user.username} ${t("connected")}`);
-      }
 
       const welcome =
         appLanguage === "Turkish"
@@ -2620,19 +2599,23 @@ function PioneerMapPage() {
         .pm-pill{border:0;border-radius:32px;padding:15px 20px;background:#fff;color:#24345e;font-weight:800;cursor:pointer;white-space:nowrap}
         .pm-main{background:#eef3fb;padding:0 0 28px}
         .pm-map-wrap{position:relative;margin:0;border-radius:0 0 30px 30px;overflow:hidden;background:#cce3d6}
-        .pm-map{height:520px;width:100%}.pm-control,.pm-controls,.pm-map-controls,.pm-map-toolbar,.pm-left{display:none!important}
-                .pm-legend{position:relative;right:auto;bottom:auto;z-index:1;background:#fff;border-radius:0 0 24px 24px;padding:18px 22px;box-shadow:0 8px 24px #14234a12;display:grid;gap:13px;min-width:0;width:100%;}
+        .pm-map{height:520px;width:100%}
+        .pm-left{position:absolute;left:28px;top:28px;z-index:500;display:flex;flex-direction:column;gap:12px;width:250px}
+        .pm-control{border:0;background:#fff;border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 24px #14234a20;color:#24345e;font-weight:800;cursor:pointer}
+        .pm-control small{font-weight:700;color:#71809b}
+        .pm-switch{width:54px;height:30px;border-radius:30px;background:#13ad69;position:relative;flex:none}.pm-switch:after{content:"";position:absolute;width:24px;height:24px;right:3px;top:3px;border-radius:50%;background:#fff}
+        .pm-legend{position:absolute;right:28px;bottom:28px;z-index:500;background:#fff;border-radius:24px;padding:20px 22px;box-shadow:0 8px 24px #14234a20;display:grid;gap:13px;min-width:230px}
         .pm-legend-row{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:800;color:#344261}.pm-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff}
         .pm-categories{display:flex;gap:14px;overflow-x:auto;padding:18px 28px;background:#fff;border-radius:0 0 28px 28px;box-shadow:0 10px 30px #14234a12}
         .pm-cat{min-width:155px;border:1px solid #e8edf6;background:#fff;border-radius:22px;padding:15px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#344261;font-weight:900}.pm-cat small{display:block;font-weight:600;color:#8290a9;margin-top:3px}.pm-cat.active{background:linear-gradient(135deg,#6330e8,#4b17c8);color:#fff;border-color:transparent}.pm-cat.active small{color:#e7ddff}
         .pm-cat-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:25px;background:#f1eaff}.pm-cat.active .pm-cat-icon{background:#ffffff30}
         .pm-content{padding:26px 28px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
-        .pm-promo{background:linear-gradient(145deg,#111b40,#172653);color:#fff;border-radius:24px;padding:28px;min-height:265px}.pm-promo h2{font-size:26px;line-height:1.15;margin:0 0 18px}.pm-promo p{color:#d2daf1;line-height:1.6}.pm-script{font-size:25px;color:#ffd35b;font-style:italic;font-weight:900;margin-top:25px}.pm-news{margin-top:22px;padding:16px;border:1px solid #ffffff30;border-radius:18px;background:#ffffff0d}.pm-news-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;font-weight:800;color:#ffd35b}.pm-news-head button{border:1px solid #ffffff55;background:#ffffff12;color:#fff;border-radius:20px;padding:7px 11px;font-weight:800;cursor:pointer}.pm-news h3{font-size:18px;line-height:1.25;margin:12px 0 7px}.pm-news p{font-size:13px;margin:0;color:#d2daf1}.pm-news-dots{display:flex;gap:6px;margin-top:13px}.pm-news-dots button{width:8px;height:8px;border:0;border-radius:50%;background:#ffffff55;padding:0;cursor:pointer}.pm-news-dots button.active{background:#ffd35b;width:22px;border-radius:8px}
+        .pm-promo{background:linear-gradient(145deg,#111b40,#172653);color:#fff;border-radius:24px;padding:28px;min-height:265px}.pm-promo h2{font-size:26px;line-height:1.15;margin:0 0 18px}.pm-promo p{color:#d2daf1;line-height:1.6}.pm-script{font-size:25px;color:#ffd35b;font-style:italic;font-weight:900;margin-top:25px}
         .pm-feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.pm-feature{border-radius:22px;padding:22px;color:#fff;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;font-weight:900}.pm-feature span{font-size:32px}.pm-feature small{font-size:13px}
         .pm-list-panel{background:#fff;border-radius:24px;padding:20px;min-width:0}.pm-section-title{display:flex;justify-content:space-between;align-items:center;margin:0 0 15px;font-size:22px}.pm-section-title span{font-size:13px;color:#8290a9}
         .pm-bottom{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-top:1px solid #e6ebf5;display:grid;grid-template-columns:repeat(5,1fr);padding:9px 10px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -8px 28px #14234a22}.pm-nav{border:0;background:transparent;color:#65728c;font-weight:800;cursor:pointer;padding:7px;border-radius:16px}.pm-nav.active{color:#5424d9;background:#f0eaff}.pm-nav span{display:block;font-size:25px;margin-bottom:3px}.pm-add{background:linear-gradient(135deg,#6c32f2,#4d18d1);color:#fff;border-radius:50%;width:58px;height:58px;margin:-32px auto 0;border:6px solid #eef3fb;font-size:30px}
-        @media(max-width:900px){.pm-header-grid{grid-template-columns:1fr;gap:14px}.pm-logo{font-size:28px}.pm-tagline{margin-left:70px}.pm-legend{right:auto;bottom:auto;min-width:0}.pm-content{grid-template-columns:1fr;padding:20px 14px}.pm-categories{padding:14px}.pm-map{height:500px}}
-        @media(max-width:560px){.pm-header{padding:16px}.pm-logo{font-size:25px}.pm-pin{width:45px;height:56px}.pm-pin span{font-size:22px}.pm-tagline{margin-left:57px;font-size:13px}.pm-legend{position:relative;right:auto;bottom:auto;margin:0;background:#fff;min-width:0;padding:14px 16px;gap:9px}.pm-legend-row{font-size:13px}.pm-map-wrap{border-radius:0}.pm-map{height:400px}.pm-control,.pm-controls,.pm-map-controls,.pm-map-toolbar{display:none!important}.pm-cat{min-width:135px}.pm-feature-grid{gap:10px}.pm-feature{padding:16px}.pm-promo h2{font-size:22px}}
+        @media(max-width:900px){.pm-header-grid{grid-template-columns:1fr;gap:14px}.pm-logo{font-size:28px}.pm-tagline{margin-left:70px}.pm-left{left:14px;top:14px;width:220px}.pm-legend{right:14px;bottom:14px;min-width:180px}.pm-content{grid-template-columns:1fr;padding:20px 14px}.pm-categories{padding:14px}.pm-map{height:500px}}
+        @media(max-width:560px){.pm-header{padding:16px}.pm-logo{font-size:25px}.pm-pin{width:45px;height:56px}.pm-pin span{font-size:22px}.pm-tagline{margin-left:57px;font-size:13px}.pm-left{width:178px;left:10px;top:10px;gap:8px}.pm-control{padding:10px 12px;font-size:12px;border-radius:20px}.pm-switch{width:46px;height:26px}.pm-switch:after{width:20px;height:20px}.pm-legend{position:relative;right:auto;bottom:auto;margin:10px;background:#fff;min-width:0;padding:14px 16px;gap:9px}.pm-legend-row{font-size:13px}.pm-map-wrap{border-radius:0}.pm-map{height:400px}.pm-cat{min-width:135px}.pm-feature-grid{gap:10px}.pm-feature{padding:16px}.pm-promo h2{font-size:22px}}
       `}</style>
       <header className="pm-header">
         <div className="pm-shell pm-header-grid">
@@ -2653,6 +2636,12 @@ function PioneerMapPage() {
         <div className="pm-shell">
           <section className="pm-map-wrap">
             <div className="pm-map" ref={mapRef}/>
+            <div className="pm-left">
+              <button className="pm-control" onClick={()=>setMapInteractive(v=>!v)}><span>🗺️ &nbsp; Harita</span><span style={{display:"flex",alignItems:"center",gap:8}}><small>{mapInteractive?"Açık":"Kapalı"}</small><span className="pm-switch" style={{background:mapInteractive?"#13ad69":"#aab4c6"}}/></span></button>
+              <button className="pm-control" onClick={findNearbyPlaces}>➤ &nbsp; {t("nearby").replace("📍 ","")}</button>
+              <button className="pm-control" onClick={()=>setStatus(t("allPlaces"))}>☷ &nbsp; Filtrele</button>
+              <button className="pm-control" onClick={()=>{setActiveLanguage(activeLanguage==="All"?"Turkish":"All");setActiveCountry("All")}}>🌐 &nbsp; Dil + Ülke <small>{activeLanguage==="All"?"TR":activeLanguage}</small></button>
+            </div>
             <div className="pm-legend">
               {["Stays","Shops","Food","Services","Jobs"].map((cat)=><div className="pm-legend-row" key={cat}><span className="pm-dot" style={{background:categoryIcons[cat as Exclude<Category,"All">].color}}>{categoryIcons[cat as Exclude<Category,"All">].icon}</span>{categoryLabel(cat as Exclude<Category,"All">)}</div>)}
             </div>
@@ -2661,17 +2650,7 @@ function PioneerMapPage() {
             {categories.map((cat)=><button key={cat.name} className={`pm-cat ${activeCategory===cat.name?"active":""}`} onClick={()=>setActiveCategory(cat.name)}><span className="pm-cat-icon">{cat.icon}</span><span>{categoryLabel(cat.name)}<small>{cat.name=== "All" ? "Tüm kategoriler" : cat.name}</small></span></button>)}
           </div>
           <div className="pm-content">
-            <section className="pm-promo">
-              <h2>Daha Fazlasını<br/>Keşfet, Daha Yakın<br/>Bağlantılar Kur!</h2>
-              <p>PioneerMap ile seyahat ederken, ihtiyaç duyduğun her şeyi bul, Pi ekosistemiyle güvenle keşfet.</p>
-              <div className="pm-script">Pi ile Gelecek<br/>Daha Yakın</div>
-              <div className="pm-news">
-                <div className="pm-news-head"><span>📰 {piNewsItems[activeNewsIndex].tag}</span><button type="button" onClick={() => setActiveNewsIndex((current) => (current + 1) % piNewsItems.length)}>Haberler ↻</button></div>
-                <h3>{piNewsItems[activeNewsIndex].title}</h3>
-                <p>{piNewsItems[activeNewsIndex].body}</p>
-                <div className="pm-news-dots">{piNewsItems.map((item, index) => <button type="button" aria-label={`Haber ${index + 1}`} key={item.tag} className={index === activeNewsIndex ? "active" : ""} onClick={() => setActiveNewsIndex(index)} />)}</div>
-              </div>
-            </section>
+            <section className="pm-promo"><h2>Daha Fazlasını<br/>Keşfet, Daha Yakın<br/>Bağlantılar Kur!</h2><p>PioneerMap ile seyahat ederken, ihtiyaç duyduğun her şeyi bul, Pi ekosistemiyle güvenle keşfet.</p><div className="pm-script">Pi ile Gelecek<br/>Daha Yakın</div></section>
             <section className="pm-feature-grid">
               {[{c:"#6530e9",i:"🏠",k:"Stays"},{c:"#ed4a92",i:"🛍️",k:"Shops"},{c:"#ff8518",i:"🍴",k:"Food"},{c:"#08b875",i:"🔧",k:"Services"},{c:"#1676e8",i:"💼",k:"Jobs"}].map(item=><button key={item.k} className="pm-feature" style={{background:item.c}} onClick={()=>setActiveCategory(item.k as Category)}><span>{item.i}</span><div>{categoryLabel(item.k as Exclude<Category,"All">)}<small style={{display:"block",opacity:.8}}>{item.k}</small></div></button>)}
             </section>
