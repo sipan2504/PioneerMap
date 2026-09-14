@@ -2561,6 +2561,29 @@ function PioneerMapPage() {
     }
   }, [mapInteractive]);
 
+  const filteredPlaces = places.filter((place) => {
+    const categoryMatch = activeCategory === "All" || place.category === activeCategory;
+    const languageMatch = activeLanguage === "All" || (place.language || "") === activeLanguage;
+    const countryMatch = activeCountry === "All" || (place.country || "") === activeCountry;
+    const query = searchText.trim().toLowerCase();
+    const text = [
+      place.name,
+      place.description,
+      place.username || "",
+      place.category,
+      place.language || "",
+      place.country || "",
+    ].join(" ").toLowerCase();
+    const searchMatch = query === "" || text.includes(query);
+    const nearbyMatch = !nearbyOnly || !userLocation ||
+      distanceInKm(userLocation.lat, userLocation.lng, place.lat, place.lng) <= 50;
+    return categoryMatch && languageMatch && countryMatch && searchMatch && nearbyMatch;
+  }).sort((a, b) => {
+    if (!userLocation) return 0;
+    return distanceInKm(userLocation.lat, userLocation.lng, a.lat, a.lng) -
+      distanceInKm(userLocation.lat, userLocation.lng, b.lat, b.lng);
+  });
+
   return (
     <div style={{ minHeight: "100vh", background: "#07112f", color: "#17213d", paddingBottom: 96, fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" }}>
       <style>{`
