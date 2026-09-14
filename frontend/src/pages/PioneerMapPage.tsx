@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
-import Toast from "../components/Toast";
 import "leaflet/dist/leaflet.css";
 import Favorites from "../components/Favorites";
 import PlaceDetails from "../components/PlaceDetails";
@@ -1046,18 +1045,6 @@ function PioneerMapPage() {
     }
   });
 
-  const mapControlLabels: Record<AppLanguage, { on: string; off: string }> = {
-    Turkish: { on: "🗺️ Harita AÇIK", off: "🗺️ Harita KAPALI" },
-    English: { on: "🗺️ Map ON", off: "🗺️ Map OFF" },
-    Arabic: { on: "🗺️ الخريطة مفعلة", off: "🗺️ الخريطة متوقفة" },
-    Spanish: { on: "🗺️ Mapa ACTIVADO", off: "🗺️ Mapa DESACTIVADO" },
-    French: { on: "🗺️ Carte ACTIVÉE", off: "🗺️ Carte DÉSACTIVÉE" },
-    German: { on: "🗺️ Karte AN", off: "🗺️ Karte AUS" },
-    Portuguese: { on: "🗺️ Mapa LIGADO", off: "🗺️ Mapa DESLIGADO" },
-    Russian: { on: "🗺️ Карта ВКЛ", off: "🗺️ Карта ВЫКЛ" },
-    Chinese: { on: "🗺️ 地图开启", off: "🗺️ 地图关闭" },
-    Hindi: { on: "🗺️ मानचित्र चालू", off: "🗺️ मानचित्र बंद" },
-  };
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
@@ -1897,18 +1884,7 @@ function PioneerMapPage() {
     );
   };
 
-  const showAllPlaces = () => {
-    setNearbyOnly(false);
-    setUserLocation(null);
-    setSelectedPlace(null);
 
-    if (userMarkerRef.current) {
-      userMarkerRef.current.remove();
-      userMarkerRef.current = null;
-    }
-
-    setStatus(t("allPlaces"));
-  };
 
   /* =======================================================
   DELETE PLACE
@@ -2633,7 +2609,7 @@ function PioneerMapPage() {
           </div>
         </div>
       </header>
-      <main className="pm-main">
+      <main className="pm-main"><div aria-live="polite" style={{display:"none"}}>{status}</div>
         <div className="pm-shell">
           <section className="pm-map-wrap">
             <div className="pm-map" ref={mapRef}/>
