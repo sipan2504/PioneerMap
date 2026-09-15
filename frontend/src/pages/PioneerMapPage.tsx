@@ -2674,3 +2674,5 @@ function PioneerMapPage() {
 };
 
 export default PioneerMapPage;
+
+// PioneerMap repaired version - replace the existing PioneerMapPage.tsx with this file.
