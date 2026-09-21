@@ -1038,7 +1038,7 @@ function PioneerMapPage() {
     });
 
   const [mapInteractive, setMapInteractive] = useState<boolean>(true);
-
+  const [showMap, setShowMap] = useState<boolean>(true);
 
   const t = (key: TranslationKey) =>
     translations[appLanguage][key];
@@ -1344,7 +1344,7 @@ function PioneerMapPage() {
   STATE
   ======================================================= */
 
-  const [, setStatus] =
+  const [status, setStatus] =
     useState("");
 
   const [activeNav, setActiveNav] =
@@ -1754,8 +1754,8 @@ function PioneerMapPage() {
 
     const map =
       L.map(mapRef.current).setView(
-        [39.9334, 32.8597],
-        6
+        [41.0082, 28.9784],
+        10
       );
 
     L.tileLayer(
@@ -1807,6 +1807,8 @@ function PioneerMapPage() {
       return;
     }
 
+    setShowMap(true);
+    setMapInteractive(true);
     setStatus(
       t("searchingLocation")
     );
@@ -2553,6 +2555,13 @@ function PioneerMapPage() {
     }
   }, [mapInteractive]);
 
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map || !showMap) return;
+    const timer = window.setTimeout(() => map.invalidateSize(), 180);
+    return () => window.clearTimeout(timer);
+  }, [showMap]);
+
   const filteredPlaces = places.filter((place) => {
     const categoryMatch = activeCategory === "All" || place.category === activeCategory;
     const languageMatch = activeLanguage === "All" || (place.language || "") === activeLanguage;
@@ -2579,33 +2588,36 @@ function PioneerMapPage() {
   return (
     <div className="pm-app">
       <style>{`
-        .pm-app{min-height:100vh;background:#f5f7fb;color:#18243d;padding-bottom:88px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+        .pm-app{min-height:100vh;background:#061326;color:#eaf2ff;padding-bottom:92px;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
         .pm-shell{width:min(1180px,100%);margin:0 auto}
-        .pm-header{background:linear-gradient(135deg,#082d70 0%,#0a61c9 58%,#0b89d9 100%);color:#fff;padding:18px 20px 20px;position:relative;overflow:hidden}
-        .pm-header:after{content:"";position:absolute;inset:auto -10% -55% 35%;height:180px;background:radial-gradient(circle at center,rgba(255,255,255,.14),transparent 68%);pointer-events:none}
-        .pm-header-row{display:flex;justify-content:space-between;align-items:center;gap:16px;position:relative;z-index:1}
-        .pm-brand{display:flex;align-items:center;gap:11px;min-width:0}
-        .pm-brand-mark{width:44px;height:50px;border-radius:50% 50% 50% 0;background:#ffc33d;transform:rotate(-45deg);display:grid;place-items:center;box-shadow:0 8px 20px rgba(0,0,0,.2);flex:none}
-        .pm-brand-mark span{transform:rotate(45deg);font-size:22px;color:#fff}
-        .pm-brand-name{font-size:28px;font-weight:900;letter-spacing:-1px;white-space:nowrap}.pm-brand-name b{color:#ffc33d}
-        .pm-actions{display:flex;align-items:center;gap:8px}.pm-pill{border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:10px 13px;background:rgba(255,255,255,.14);color:#fff;font-weight:800;cursor:pointer;white-space:nowrap;backdrop-filter:blur(8px)}.pm-pill option{color:#18243d;background:#fff}
-        .pm-search{position:relative;z-index:1;margin:16px auto 0;display:flex;align-items:center;gap:10px;background:#fff;border-radius:18px;padding:13px 16px;max-width:780px;box-shadow:0 8px 22px rgba(0,0,0,.15)}
-        .pm-search span{font-size:22px;color:#6e7d96}.pm-search input{width:100%;border:0;outline:0;background:transparent;font-size:15px;color:#18243d}
-        .pm-main{padding:14px 14px 24px}.pm-map-card{position:relative;overflow:hidden;border-radius:22px;background:#dcebf7;box-shadow:0 10px 30px rgba(26,55,100,.12)}.pm-map{height:470px;width:100%}
-        .pm-map-controls{position:absolute;left:14px;top:14px;z-index:500;display:flex;flex-direction:column;gap:8px;width:170px}.pm-map-control{border:0;background:rgba(255,255,255,.94);color:#17305b;border-radius:15px;padding:11px 13px;display:flex;align-items:center;justify-content:flex-start;gap:8px;box-shadow:0 6px 18px rgba(18,46,88,.16);font-weight:800;cursor:pointer;text-align:left}.pm-map-control:hover{background:#fff}
-        .pm-map-legend{position:absolute;right:14px;top:14px;z-index:500;background:rgba(255,255,255,.95);border-radius:18px;padding:11px;display:grid;gap:5px;box-shadow:0 6px 18px rgba(18,46,88,.16)}.pm-legend-item{border:0;background:transparent;color:#17305b;padding:7px 9px;display:flex;align-items:center;gap:8px;font-weight:800;cursor:pointer;border-radius:10px;text-align:left}.pm-legend-item:hover{background:#f0f5fb}.pm-legend-dot{width:12px;height:12px;border-radius:50%;flex:none}
-        .pm-categories{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}.pm-cat{border:1px solid #e4e9f2;background:#fff;border-radius:16px;padding:13px 10px;display:flex;align-items:center;justify-content:center;gap:8px;color:#253553;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(31,58,99,.06)}.pm-cat.active{border-color:#0b63e5;background:#eef6ff;color:#0b63e5}.pm-cat-icon{font-size:20px}
-        .pm-list-panel{margin-top:14px;background:#fff;border-radius:18px;padding:16px;box-shadow:0 8px 24px rgba(25,55,100,.08)}
-        .pm-bottom{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:rgba(255,255,255,.97);border-top:1px solid #e5eaf2;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 8px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -7px 22px rgba(20,42,74,.12);backdrop-filter:blur(10px)}.pm-nav{border:0;background:transparent;color:#6a7890;font-size:11px;font-weight:800;cursor:pointer;padding:6px 3px;border-radius:12px}.pm-nav.active{color:#0b63e5;background:#edf5ff}.pm-nav span{display:block;font-size:20px;margin-bottom:2px}.pm-add{background:#0b63e5;color:#fff;border-radius:50%;width:44px;height:44px;margin:-21px auto 0;border:4px solid #f5f7fb;font-size:23px;display:grid!important;place-items:center}
-        @media(max-width:720px){.pm-header{padding:14px}.pm-brand-name{font-size:23px}.pm-brand-mark{width:38px;height:44px}.pm-actions{gap:5px}.pm-pill{padding:8px 10px;font-size:11px}.pm-map{height:410px}.pm-map-controls{width:148px}.pm-map-control{padding:9px 10px;font-size:11px}.pm-map-legend{top:auto;bottom:10px;right:10px}.pm-categories{grid-template-columns:repeat(2,1fr)}.pm-cat:last-child{grid-column:1/-1}.pm-main{padding:10px 10px 20px}}
-        @media(max-width:430px){.pm-header-row{align-items:flex-start}.pm-actions{flex-direction:column;align-items:stretch}.pm-pill{max-width:150px}.pm-map{height:380px}.pm-map-legend{max-width:150px}.pm-legend-item{font-size:11px;padding:6px}.pm-bottom{padding-left:4px;padding-right:4px}}
+        .pm-header{position:relative;overflow:hidden;background:linear-gradient(135deg,#06152d 0%,#0a2f62 48%,#0a75d8 100%);padding:18px 20px 22px;border-bottom:1px solid rgba(255,255,255,.12)}
+        .pm-header:before{content:"";position:absolute;left:-5%;right:-5%;bottom:-42px;height:120px;background:linear-gradient(165deg,transparent 0 30%,rgba(16,75,132,.85) 31% 48%,transparent 49%),linear-gradient(15deg,transparent 0 35%,rgba(8,45,88,.9) 36% 56%,transparent 57%);opacity:.8;pointer-events:none}
+        .pm-header-row{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:18px}
+        .pm-brand{display:flex;align-items:center;gap:11px;min-width:0}.pm-brand-mark{width:46px;height:52px;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,#ffd34d,#ffb600);clip-path:path("M23 0C10 0 0 10 0 23c0 17 23 29 23 29s23-12 23-29C46 10 36 0 23 0Z")}.pm-brand-mark span{width:18px;height:18px;border-radius:50%;background:#fff}.pm-brand-name{font-size:30px;letter-spacing:-1.2px;font-weight:900;color:#fff;white-space:nowrap}.pm-brand-name b{color:#ffbd20}
+        .pm-actions{display:flex;align-items:center;gap:8px}.pm-pill{appearance:none;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.11);color:#fff;border-radius:28px;padding:11px 15px;font-weight:800;font-size:13px;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.15)}.pm-pill option{color:#16233a;background:#fff}.pm-pill:focus{outline:2px solid #7fc3ff;outline-offset:2px}
+        .pm-search{position:relative;z-index:3;display:flex;align-items:center;gap:10px;margin:18px auto 0;background:#fff;color:#70809a;border-radius:18px;padding:0 18px;height:62px;box-shadow:0 14px 35px rgba(0,0,0,.2);max-width:1080px}.pm-search span{font-size:27px}.pm-search input{width:100%;border:0;outline:0;background:transparent;color:#17243c;font-size:17px}.pm-search input::placeholder{color:#8995a8}
+        .pm-main{padding:14px 14px 26px;background:linear-gradient(180deg,#07182f 0%,#061326 100%)}
+        .pm-map-card{position:relative;overflow:hidden;border:1px solid rgba(126,171,222,.2);background:#0b203d;border-radius:20px;box-shadow:0 18px 42px rgba(0,0,0,.3)}
+        .pm-map-card.collapsed{min-height:60px}.pm-map-card.collapsed .pm-map{height:0;min-height:0;border:0}.pm-map-card.collapsed .pm-map-overlay{display:block}.pm-map-card.collapsed .pm-map-controls{left:10px;top:10px}.pm-map-card.collapsed .pm-map-legend,.pm-map-card.collapsed .pm-map-status{display:none}
+        .pm-map{height:475px;width:100%;transition:height .25s ease}.pm-map .leaflet-control-zoom{margin:14px}.pm-map .leaflet-control-attribution{font-size:10px}
+        .pm-map-overlay{position:absolute;inset:0;pointer-events:none;z-index:500}.pm-map-controls{position:absolute;left:14px;top:14px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}.pm-map-control{border:1px solid rgba(255,255,255,.18);background:rgba(5,20,42,.88);color:#fff;border-radius:12px;padding:10px 13px;font-weight:800;font-size:12px;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.22);backdrop-filter:blur(9px)}.pm-map-control:hover{background:#0d3568}.pm-map-control.active{background:#1475e5;border-color:#4da0ff}
+        .pm-map-legend{position:absolute;right:14px;top:14px;width:155px;padding:10px;background:rgba(4,17,35,.9);border:1px solid rgba(255,255,255,.16);border-radius:16px;box-shadow:0 12px 28px rgba(0,0,0,.24);pointer-events:auto}.pm-legend-item{width:100%;border:0;background:transparent;color:#eaf2ff;padding:8px 7px;display:flex;align-items:center;gap:9px;font-weight:800;cursor:pointer;border-radius:9px;text-align:left}.pm-legend-item:hover{background:rgba(255,255,255,.08)}.pm-legend-dot{width:11px;height:11px;border-radius:50%;flex:none}
+        .pm-map-status{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(5,18,36,.9);color:#fff;border:1px solid rgba(255,255,255,.14);padding:8px 13px;border-radius:10px;font-size:11px;font-weight:800;pointer-events:none;white-space:nowrap}
+        .pm-category-strip{display:flex;gap:10px;overflow-x:auto;padding:14px 2px 3px;scrollbar-width:none}.pm-category-strip::-webkit-scrollbar{display:none}.pm-cat{flex:1 0 120px;min-height:76px;border:1px solid rgba(125,170,220,.15);background:#0b1d36;color:#dbe8fa;border-radius:15px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;box-shadow:0 7px 18px rgba(0,0,0,.15)}.pm-cat:hover{background:#102b4e}.pm-cat.active{background:linear-gradient(145deg,#0874e8,#0d4eb1);border-color:#3b9cff;color:#fff}.pm-cat-icon{font-size:22px;line-height:1}.pm-cat-label{font-size:12px;font-weight:900}
+        .pm-content-grid{display:grid;grid-template-columns:1.25fr .9fr .9fr;gap:12px;margin-top:14px}.pm-discover,.pm-mini-card,.pm-user-card{border:1px solid rgba(123,169,220,.16);background:#0b1d36;border-radius:16px;overflow:hidden;box-shadow:0 10px 24px rgba(0,0,0,.16)}.pm-discover{min-height:190px;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(145deg,rgba(16,92,177,.9),rgba(8,31,59,.96))}.pm-discover h2{font-size:25px;line-height:1.05;margin:0 0 8px}.pm-discover p{margin:0 0 14px;color:#b8c9df;font-size:13px;line-height:1.45}.pm-discover button{align-self:flex-start;border:0;background:#1683ff;color:#fff;border-radius:10px;padding:10px 15px;font-weight:900;cursor:pointer}.pm-mini-card{padding:10px}.pm-mini-image{height:112px;border-radius:11px;background:linear-gradient(135deg,#164d86,#0b213f);display:grid;place-items:center;font-size:42px}.pm-mini-card h3{font-size:15px;margin:10px 5px 3px;color:#fff}.pm-mini-card p{font-size:11px;color:#9fb2ca;margin:0 5px}.pm-user-row{display:flex;gap:10px;align-items:center;padding:13px}.pm-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(145deg,#ffb800,#ff7a00);display:grid;place-items:center;font-weight:900;color:#08152a}.pm-user-row strong{display:block}.pm-user-row span{font-size:11px;color:#9fb2ca}.pm-arrow{margin-left:auto;color:#91a8c5;font-size:20px}
+        .pm-list-panel{margin-top:14px;background:#0b1d36;border:1px solid rgba(123,169,220,.16);border-radius:16px;padding:15px;box-shadow:0 10px 24px rgba(0,0,0,.16)}.pm-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.pm-list-head strong{font-size:16px}.pm-count{font-size:11px;color:#91a8c5}
+        .pm-status{position:fixed;left:50%;bottom:98px;transform:translateX(-50%);z-index:10050;max-width:calc(100% - 30px);background:#102b4e;color:#fff;border:1px solid rgba(120,175,235,.3);padding:10px 15px;border-radius:11px;box-shadow:0 12px 30px rgba(0,0,0,.3);font-size:12px;font-weight:800}
+        .pm-bottom{position:fixed;left:0;right:0;bottom:0;z-index:10000;background:rgba(5,18,35,.96);border-top:1px solid rgba(135,181,230,.16);display:grid;grid-template-columns:repeat(5,1fr);padding:7px 8px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -12px 30px rgba(0,0,0,.25);backdrop-filter:blur(12px)}.pm-nav{border:0;background:transparent;color:#91a3bd;font-size:11px;font-weight:800;cursor:pointer;padding:5px 3px;border-radius:12px}.pm-nav.active{color:#54a8ff;background:rgba(18,109,220,.13)}.pm-nav span{display:block;font-size:21px;margin-bottom:2px}.pm-add{background:#1179ed;color:#fff;border-radius:50%;width:46px;height:46px;margin:-25px auto 0;border:4px solid #061326;font-size:24px;display:grid!important;place-items:center;box-shadow:0 7px 18px rgba(17,121,237,.4)}
+        .pm-overlay-panel{position:fixed;inset:0;bottom:78px;z-index:9000;overflow-y:auto;background:#07162a;padding:14px}
+        @media(max-width:800px){.pm-content-grid{grid-template-columns:1fr 1fr}.pm-discover{grid-column:1/-1}.pm-map{height:430px}}
+        @media(max-width:560px){.pm-header{padding:14px 12px 18px}.pm-brand-name{font-size:24px}.pm-brand-mark{width:40px;height:46px}.pm-actions{gap:5px}.pm-pill{padding:9px 10px;font-size:11px;max-width:145px}.pm-search{height:56px;margin-top:14px;border-radius:16px}.pm-search input{font-size:15px}.pm-main{padding:10px}.pm-map{height:390px}.pm-map-legend{width:132px;right:9px;top:9px}.pm-legend-item{font-size:10px;padding:7px 5px}.pm-map-controls{left:9px;top:9px}.pm-map-control{font-size:10px;padding:9px 10px}.pm-map-status{bottom:9px;font-size:10px}.pm-content-grid{grid-template-columns:1fr 1fr}.pm-mini-image{height:88px}.pm-discover{min-height:165px}.pm-discover h2{font-size:22px}}
       `}</style>
 
       <header className="pm-header">
         <div className="pm-shell">
           <div className="pm-header-row">
             <div className="pm-brand">
-              <div className="pm-brand-mark"><span>●</span></div>
+              <div className="pm-brand-mark"><span /></div>
               <div className="pm-brand-name">Pioneer<b>Map</b></div>
             </div>
             <div className="pm-actions">
@@ -2624,55 +2636,82 @@ function PioneerMapPage() {
 
       <main className="pm-main">
         <div className="pm-shell">
-          <section className="pm-map-card">
-            <div className="pm-map" ref={mapRef}/>
-            <div className="pm-map-controls">
-              <button className="pm-map-control" onClick={()=>setMapInteractive(true)}>🗺️ {t("map").replace("🗺️ ","")}</button>
-              <button className="pm-map-control" onClick={findNearbyPlaces}>📍 {t("nearby").replace("📍 ","")}</button>
-              <button className="pm-map-control" onClick={()=>setStatus(t("allPlaces"))}>⌕ {t("allPlaces").replace("🌍 ","")}</button>
-            </div>
-            <div className="pm-map-legend">
-              {["Stays","Shops","Food","Services","Jobs"].map((cat)=>(
-                <button className="pm-legend-item" key={cat} onClick={()=>setActiveCategory(cat as Category)}>
-                  <span className="pm-legend-dot" style={{background:categoryIcons[cat as Exclude<Category,"All">].color}} />
-                  {categoryLabel(cat as Exclude<Category,"All">)}
+          <section className={`pm-map-card ${showMap ? "" : "collapsed"}`}>
+            <div className="pm-map" ref={mapRef} />
+            <div className="pm-map-overlay">
+              <div className="pm-map-controls">
+                <button className={`pm-map-control ${showMap ? "active" : ""}`} onClick={()=>setShowMap(v=>!v)}>
+                  {showMap ? "▣" : "□"} {t("map").replace("🗺️ ","")}
                 </button>
-              ))}
+                <button className="pm-map-control" onClick={findNearbyPlaces}>⌖ {t("nearby").replace("📍 ","")}</button>
+                <button className="pm-map-control" onClick={()=>{setActiveCategory("All");setSearchText("");setNearbyOnly(false);setStatus(t("allPlaces"));const map=mapInstance.current;if(map){map.setView([41.0082,28.9784],10);map.invalidateSize()}}}>⌕ {t("allPlaces").replace("🌍 ","")}</button>
+              </div>
+              <div className="pm-map-legend">
+                {["Stays","Shops","Food","Services","Jobs"].map((cat)=>(
+                  <button className="pm-legend-item" key={cat} onClick={()=>{setActiveCategory(cat as Category);setShowMap(true)}}>
+                    <span className="pm-legend-dot" style={{background:categoryIcons[cat as Exclude<Category,"All">].color}} />
+                    {categoryLabel(cat as Exclude<Category,"All">)}
+                  </button>
+                ))}
+              </div>
+              {showMap && <div className="pm-map-status">{mapInteractive ? "●" : "○"} {t("map").replace("🗺️ ","")}</div>}
             </div>
           </section>
 
-          <div className="pm-categories">
-            {categories.filter(cat=>cat.name!=="All").map((cat)=>(
-              <button key={cat.name} className={`pm-cat ${activeCategory===cat.name?"active":""}`} onClick={()=>setActiveCategory(cat.name)}>
-                <span className="pm-cat-icon">{cat.icon}</span>
-                <span>{categoryLabel(cat.name)}</span>
+          <div className="pm-category-strip">
+            {categories.map((cat)=> (
+              <button key={cat.name} className={`pm-cat ${activeCategory===cat.name ? "active" : ""}`} onClick={()=>{setActiveCategory(cat.name);setShowMap(true)}}>
+                <span className="pm-cat-icon">{cat.name === "All" ? "▦" : cat.icon}</span>
+                <span className="pm-cat-label">{categoryLabel(cat.name)}</span>
               </button>
             ))}
           </div>
 
-          {showForm && <AddPlaceForm placeName={placeName} setPlaceName={setPlaceName} placeDescription={placeDescription} setPlaceDescription={setPlaceDescription} placeCategory={placeCategory} setPlaceCategory={(value:string)=>setPlaceCategory(value as Exclude<Category,"All">)} placeLanguage={placeLanguage} setPlaceLanguage={setPlaceLanguage} placeCountry={placeCountry} setPlaceCountry={setPlaceCountry} categories={["Stays","Shops","Food","Services","Jobs"]} languages={languages.map(x=>x.value)} countries={countries.map(x=>x.value)} selectedLocation={selectedLocation} onMapSelect={()=>setMapInteractive(true)} onSubmit={addPlace} onCancel={()=>{setShowForm(false);setSelectedLocation(null);setPlaceImage("")}} submitting={imageUploading} placeImage={placeImage} setPlaceImage={setPlaceImage} imageUploading={imageUploading} labels={{title:t("addPlace"),name:t("placeName"),category:extraTranslations[appLanguage].category,description:t("description"),language:extraTranslations[appLanguage].language,country:extraTranslations[appLanguage].country,photo:extraTranslations[appLanguage].placeImage,photoPreparing:extraTranslations[appLanguage].preparingPhoto,removePhoto:extraTranslations[appLanguage].removeImage,location:extraTranslations[appLanguage].location,saving:t("saving"),savePlace:extraTranslations[appLanguage].savePlace,imageTooLarge:extraTranslations[appLanguage].photoTooLarge}}/>}
+          <section className="pm-content-grid">
+            <div className="pm-discover">
+              <h2>{t("allPlaces").replace("🌍 ", "")}</h2>
+              <p>{t("appDescription")}</p>
+              <button onClick={()=>{setShowMap(true);setActiveCategory("All");setSearchText("")}}>{t("allPlaces").replace("🌍 ","")} →</button>
+            </div>
+            {(["Stays","Shops","Food","Services"] as const).map((cat)=> (
+              <button key={cat} className="pm-mini-card" onClick={()=>{setActiveCategory(cat);setShowMap(true)}}>
+                <div className="pm-mini-image">{categoryIcons[cat].icon}</div>
+                <h3>{categoryLabel(cat)}</h3>
+                <p>{places.filter(p=>p.category===cat).length} {t("results")}</p>
+              </button>
+            ))}
+          </section>
 
-          {selectedPlace && <PlaceDetails place={selectedPlace} onClose={()=>setSelectedPlace(null)} onShowOnMap={()=>{const map=mapInstance.current;if(map){map.setView([Number(selectedPlace.lat),Number(selectedPlace.lng)],15);setMapInteractive(true)}}} onDelete={()=>deletePlace(selectedPlace)} labels={{language:extraTranslations[appLanguage].language,country:extraTranslations[appLanguage].country,anonymous:t("anonymous"),addFavorite:extraTranslations[appLanguage].addFavorite,removeFavorite:extraTranslations[appLanguage].removeFavorite,share:extraTranslations[appLanguage].share,showOnMap:extraTranslations[appLanguage].showOnMap,delete:extraTranslations[appLanguage].delete}} isFavorite={isFavorite(selectedPlace)} onToggleFavorite={()=>toggleFavorite(selectedPlace)} onShare={()=>sharePlace(selectedPlace)}/>}
+          <section className="pm-user-card" style={{marginTop:12}}>
+            <div className="pm-user-row">
+              <div className="pm-avatar">P</div>
+              <div><strong>{signedIn ? `@${username}` : "Pioneer"}</strong><span>{signedIn ? t("connected") : t("appDescription")}</span></div>
+              <span className="pm-arrow">›</span>
+            </div>
+          </section>
+
+          {showForm && <AddPlaceForm placeName={placeName} setPlaceName={setPlaceName} placeDescription={placeDescription} setPlaceDescription={setPlaceDescription} placeCategory={placeCategory} setPlaceCategory={(value:string)=>setPlaceCategory(value as Exclude<Category,"All">)} placeLanguage={placeLanguage} setPlaceLanguage={setPlaceLanguage} placeCountry={placeCountry} setPlaceCountry={setPlaceCountry} categories={["Stays","Shops","Food","Services","Jobs"]} languages={languages.map(x=>x.value)} countries={countries.map(x=>x.value)} selectedLocation={selectedLocation} onMapSelect={()=>{setShowMap(true);setMapInteractive(true)}} onSubmit={addPlace} onCancel={()=>{setShowForm(false);setSelectedLocation(null);setPlaceImage("")}} submitting={imageUploading} placeImage={placeImage} setPlaceImage={setPlaceImage} imageUploading={imageUploading} labels={{title:t("addPlace"),name:t("placeName"),category:extraTranslations[appLanguage].category,description:t("description"),language:extraTranslations[appLanguage].language,country:extraTranslations[appLanguage].country,photo:extraTranslations[appLanguage].placeImage,photoPreparing:extraTranslations[appLanguage].preparingPhoto,removePhoto:extraTranslations[appLanguage].removeImage,location:extraTranslations[appLanguage].location,saving:t("saving"),savePlace:extraTranslations[appLanguage].savePlace,imageTooLarge:extraTranslations[appLanguage].photoTooLarge}}/>}
+
+          {selectedPlace && <PlaceDetails place={selectedPlace} onClose={()=>setSelectedPlace(null)} onShowOnMap={()=>{const map=mapInstance.current;if(map){setShowMap(true);setMapInteractive(true);map.setView([Number(selectedPlace.lat),Number(selectedPlace.lng)],15);window.setTimeout(()=>map.invalidateSize(),120)}}} onDelete={()=>deletePlace(selectedPlace)} labels={{language:extraTranslations[appLanguage].language,country:extraTranslations[appLanguage].country,anonymous:t("anonymous"),addFavorite:extraTranslations[appLanguage].addFavorite,removeFavorite:extraTranslations[appLanguage].removeFavorite,share:extraTranslations[appLanguage].share,showOnMap:extraTranslations[appLanguage].showOnMap,delete:extraTranslations[appLanguage].delete}} isFavorite={isFavorite(selectedPlace)} onToggleFavorite={()=>toggleFavorite(selectedPlace)} onShare={()=>sharePlace(selectedPlace)}/>} 
 
           <section className="pm-list-panel">
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,marginBottom:12}}>
-              <strong>{t("places")}</strong>
-              <span style={{fontSize:12,color:"#7a879d"}}>{filteredPlaces.length} {t("results")}</span>
-            </div>
+            <div className="pm-list-head"><strong>{t("places")}</strong><span className="pm-count">{filteredPlaces.length} {t("results")}</span></div>
             <PlaceList places={filteredPlaces} categoryIcons={{Stays:"🏠",Shops:"🛍️",Food:"🍔",Services:"🔧",Jobs:"💼"}} onSelect={(place)=>setSelectedPlace(places.find(item=>getPlaceKey(item)===getPlaceKey(place))||(place as Place))} onDelete={(place)=>deletePlace(place as Place)} onToggleFavorite={(place)=>toggleFavorite(place as Place)} isFavorite={(place)=>isFavorite(place as Place)} labels={{title:t("places"),empty:extraTranslations[appLanguage].noPlaces,results:t("results"),view:extraTranslations[appLanguage].viewDetails,favorite:extraTranslations[appLanguage].addFavorite,favorited:extraTranslations[appLanguage].removeFavorite,delete:extraTranslations[appLanguage].delete,anonymous:t("anonymous")}}/>
           </section>
         </div>
       </main>
 
+      {status && <div className="pm-status" role="status">{status}</div>}
+
       <nav className="pm-bottom">
         <button className={`pm-nav ${activeNav==="home"?"active":""}`} onClick={()=>{setActiveNav("home");setSelectedPlace(null);setNearbyOnly(false)}}><span>⌂</span>{extraTranslations[appLanguage].home}</button>
         <button className={`pm-nav ${activeNav==="nearby"?"active":""}`} onClick={()=>{setActiveNav("nearby");findNearbyPlaces()}}><span>⌖</span>{extraTranslations[appLanguage].nearby}</button>
-        <button className="pm-nav" onClick={()=>{setActiveNav("add");setShowForm(true)}}><span className="pm-add">+</span>{extraTranslations[appLanguage].add}</button>
+        <button className="pm-nav" onClick={()=>{setActiveNav("add");setShowForm(true);setShowMap(true)}}><span className="pm-add">+</span>{extraTranslations[appLanguage].add}</button>
         <button className={`pm-nav ${activeNav==="favorites"?"active":""}`} onClick={()=>setActiveNav("favorites")}><span>★</span>{extraTranslations[appLanguage].favorites}</button>
         <button className={`pm-nav ${activeNav==="profile"?"active":""}`} onClick={()=>{setActiveNav("profile");setStatus(signedIn?`@${username}`:t("signInFirst"))}}><span>♙</span>{extraTranslations[appLanguage].profile}</button>
       </nav>
 
-      {activeNav==="favorites" && <div style={{position:"fixed",inset:0,bottom:80,zIndex:9000,overflowY:"auto",background:"#f5f7fb",padding:18}}><Favorites favorites={favorites} labels={{title:extraTranslations[appLanguage].favorites,empty:extraTranslations[appLanguage].emptyFavorites,view:extraTranslations[appLanguage].viewDetails,remove:extraTranslations[appLanguage].removeFavorite}} onRemove={(id)=>setFavorites(current=>current.filter(place=>place._id!==id))} onPlaceClick={(place)=>{const found=places.find(item=>item._id===place._id);if(found){setSelectedPlace(found);setActiveNav("home")}}}/></div>}
+      {activeNav==="favorites" && <div className="pm-overlay-panel"><Favorites favorites={favorites} labels={{title:extraTranslations[appLanguage].favorites,empty:extraTranslations[appLanguage].emptyFavorites,view:extraTranslations[appLanguage].viewDetails,remove:extraTranslations[appLanguage].removeFavorite}} onRemove={(id)=>setFavorites(current=>current.filter(place=>place._id!==id))} onPlaceClick={(place)=>{const found=places.find(item=>item._id===place._id);if(found){setSelectedPlace(found);setActiveNav("home")}}}/></div>}
     </div>
   );
 
