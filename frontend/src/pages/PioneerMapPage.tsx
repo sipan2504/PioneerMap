@@ -1039,7 +1039,8 @@ function PioneerMapPage() {
 
   const [mapInteractive, setMapInteractive] = useState<boolean>(() => {
     try {
-      return localStorage.getItem("pioneerMapInteractive") === "true";
+      const saved = localStorage.getItem("pioneerMapInteractive");
+      return saved === null ? true : saved === "true";
     } catch {
       return false;
     }
@@ -1760,8 +1761,8 @@ function PioneerMapPage() {
 
     const map =
       L.map(mapRef.current).setView(
-        [39.9334, 32.8597],
-        6
+        [41.0082, 28.9784],
+        11
       );
 
     L.tileLayer(
@@ -2040,624 +2041,111 @@ function PioneerMapPage() {
         }
 
         return (
-          categoryMatch &&
-          languageMatch &&
-          countryMatch &&
-          searchMatch &&
-          nearbyMatch
-        );
-      });
-
-    if (userLocation) {
-      filteredPlaces = [
-        ...filteredPlaces,
-      ].sort(
-        (a, b) =>
-          distanceInKm(
-            userLocation.lat,
-            userLocation.lng,
-            a.lat,
-            a.lng
-          ) -
-          distanceInKm(
-            userLocation.lat,
-            userLocation.lng,
-            b.lat,
-            b.lng
-          )
-      );
-    }
-
-    filteredPlaces.forEach(
-      (place) => {
-        const category =
-          categoryIcons[
-            place.category
-          ];
-
-        const distance =
-          userLocation
-            ? distanceInKm(
-                userLocation.lat,
-                userLocation.lng,
-                place.lat,
-                place.lng
-              )
-            : null;
-
-        const marker =
-          L.marker(
-            [
-              place.lat,
-              place.lng,
-            ],
-            {
-              icon:
-                createCategoryIcon(
-                  place.category
-                ),
-            }
-          ).addTo(map);
-
-        marker.bindPopup(`
-          <div style="
-            min-width:230px;
-            text-align:center;
-            font-family:Arial,sans-serif;
-          ">
-            <div style="
-              font-size:34px;
-            ">
-              ${category.icon}
-            </div>
-
-            <div style="
-              font-size:19px;
-              font-weight:700;
-              margin:6px 0;
-            ">
-              ${place.name}
-            </div>
-
-            <div style="
-              color:#666;
-              font-size:14px;
-              line-height:1.4;
-            ">
-              ${place.description}
-            </div>
-
-            ${
-              place.username
-                ? `
-                  <div style="
-                    margin-top:8px;
-                    color:#7b1fa2;
-                    font-weight:700;
-                  ">
-                    👤 @${place.username}
-                  </div>
-                `
-                : ""
-            }
-
-            <div style="
-              display:inline-block;
-              margin-top:8px;
-              padding:5px 12px;
-              border-radius:20px;
-              background:${category.color};
-              color:white;
-              font-weight:700;
-              font-size:12px;
-            ">
-              ${category.icon}
-              ${
-                place.category ===
-                "Stays"
-                  ? t("stays")
-                  : place.category ===
-                    "Shops"
-                  ? t("shops")
-                  : place.category ===
-                    "Food"
-                  ? t("food")
-                  : place.category ===
-                    "Services"
-                  ? t("services")
-                  : t("jobs")
-              }
-            </div>
-
-            ${
-              place.language
-                ? `
-                  <div style="
-                    margin-top:7px;
-                    font-size:13px;
-                  ">
-                    🗣️ ${place.language}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              place.country
-                ? `
-                  <div style="
-                    margin-top:5px;
-                    font-size:13px;
-                  ">
-                    🌍 ${place.country}
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              distance !== null
-                ? `
-                  <div style="
-                    margin-top:8px;
-                    color:#1976D2;
-                    font-weight:700;
-                  ">
-                    📍 ${distance.toFixed(
-                      1
-                    )} km
-                  </div>
-                `
-                : ""
-            }
-
-            <button
-              class="pioneer-details-button"
-              type="button"
-              style="
-                width:100%;
-                margin-top:12px;
-                padding:10px;
-                border:0;
-                border-radius:9px;
-                background:#1976D2;
-                color:white;
-                font-size:14px;
-                font-weight:700;
-                cursor:pointer;
-              "
-            >
-              ${t("details")}
-            </button>
-          </div>
-        `);
-
-        marker.on(
-          "click",
-          () => {
-            setSelectedPlace(place);
-          }
-        );
-
-        marker.on(
-          "popupopen",
-          (event) => {
-            const popupElement =
-              event.popup.getElement();
-
-            if (!popupElement)
-              return;
-
-            const button =
-              popupElement.querySelector(
-                ".pioneer-details-button"
-              ) as HTMLButtonElement | null;
-
-            if (!button) return;
-
-            L.DomEvent.off(
-              button
-            );
-
-            L.DomEvent.on(
-              button,
-              "click",
-              (clickEvent) => {
-                L.DomEvent.stopPropagation(
-                  clickEvent
-                );
-
-                setSelectedPlace(
-                  place
-                );
-
-                map.closePopup();
-
-                setTimeout(() => {
-                  document
-                    .getElementById(
-                      "pioneer-detail-card"
-                    )
-                    ?.scrollIntoView({
-                      behavior:
-                        "smooth",
-                      block: "start",
-                    });
-                }, 100);
-              }
-            );
-          }
-        );
-
-        markersRef.current.push(
-          marker
-        );
-      }
-    );
-  }, [
-    places,
-    activeCategory,
-    activeLanguage,
-    activeCountry,
-    searchText,
-    nearbyOnly,
-    userLocation,
-    appLanguage,
-  ]);
-
-  /* =======================================================
-  ADD PLACE
-  ======================================================= */
-
-  const addPlace = async () => {
-    if (!signedIn) {
-      setStatus(
-        t("signInFirst")
-      );
-      return;
-    }
-
-    if (!placeName.trim()) {
-      setStatus(
-        t("nameRequired")
-      );
-      return;
-    }
-
-    const map =
-      mapInstance.current;
-
-    const location =
-      selectedLocation ||
-      (map
-        ? map.getCenter()
-        : {
-            lat: 39.9334,
-            lng: 32.8597,
-          });
-
-    const newPlace = {
-      name: placeName.trim(),
-      category: placeCategory,
-      lat: location.lat,
-      lng: location.lng,
-      description:
-        placeDescription.trim() ||
-        "Pi Economy place",
-      language: placeLanguage,
-      country: placeCountry,
-      image: placeImage || undefined,
-      username:
-        username || undefined,
-    };
-
-    try {
-      setStatus(
-        t("saving")
-      );
-
-      const response =
-        await fetch(
-          `${backendUrl}/api/places`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify(
-              newPlace
-            ),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data?.message ||
-            "Place could not be saved."
-        );
-      }
-
-      const savedPlace: Place = {
-        _id: data._id,
-        name:
-          data.name ||
-          newPlace.name,
-        category:
-          data.category ||
-          newPlace.category,
-        lat:
-          typeof data.lat ===
-          "number"
-            ? data.lat
-            : newPlace.lat,
-        lng:
-          typeof data.lng ===
-          "number"
-            ? data.lng
-            : newPlace.lng,
-        description:
-          data.description ||
-          newPlace.description,
-        username:
-          data.username ||
-          newPlace.username,
-        user_id:
-          data.user_id || null,
-        language:
-          data.language ||
-          newPlace.language,
-        country:
-          data.country ||
-          newPlace.country,
-        image:
-          data.image ||
-          newPlace.image,
-      };
-
-      setPlaces(
-        (current) => [
-          ...current,
-          savedPlace,
-        ]
-      );
-
-      setSelectedPlace(
-        savedPlace
-      );
-
-      setPlaceName("");
-      setPlaceDescription("");
-      setPlaceCategory(
-        "Stays"
-      );
-      setPlaceLanguage(
-        "Turkish"
-      );
-      setPlaceCountry(
-        "Türkiye"
-      );
-      setPlaceImage("");
-      setImageUploading(false);
-      setSelectedLocation(
-        null
-      );
-      setShowForm(false);
-
-      setStatus(
-        `✅ ${savedPlace.name} ${t(
-          "saved"
-        )}`
-      );
-    } catch (error) {
-      console.error(
-        "Add place error:",
-        error
-      );
-
-      setStatus(
-        error instanceof Error
-          ? `❌ ${error.message}`
-          : "❌ Place could not be saved."
-      );
-    }
-  };
-
-  /* =======================================================
-  CATEGORIES
-  ======================================================= */
-
-  const categories: Array<{
-    name: Category;
-    icon: string;
-  }> = [
-    {
-      name: "All",
-      icon: "🌍",
-    },
-    {
-      name: "Stays",
-      icon: "🏠",
-    },
-    {
-      name: "Shops",
-      icon: "🛍️",
-    },
-    {
-      name: "Food",
-      icon: "🍔",
-    },
-    {
-      name: "Services",
-      icon: "🔧",
-    },
-    {
-      name: "Jobs",
-      icon: "💼",
-    },
-  ];
-
-  const categoryLabel = (
-    category: Category
-  ) => {
-    if (category === "All")
-      return t("all");
-
-    if (
-      category === "Stays"
-    )
-      return t("stays");
-
-    if (
-      category === "Shops"
-    )
-      return t("shops");
-
-    if (
-      category === "Food"
-    )
-      return t("food");
-
-    if (
-      category === "Services"
-    )
-      return t("services");
-
-    return t("jobs");
-  };
-
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(
-        "pioneerMapInteractive",
-        String(mapInteractive)
-      );
-    } catch {}
-
-    const map = mapInstance.current;
-    if (!map) return;
-
-    if (mapInteractive) {
-      map.dragging.enable();
-      map.touchZoom.enable();
-      map.doubleClickZoom.enable();
-      map.scrollWheelZoom.enable();
-      map.boxZoom.enable();
-      map.keyboard.enable();
-    } else {
-      map.dragging.disable();
-      map.touchZoom.disable();
-      map.doubleClickZoom.disable();
-      map.scrollWheelZoom.disable();
-      map.boxZoom.disable();
-      map.keyboard.disable();
-    }
-  }, [mapInteractive]);
-
-  const filteredPlaces = places.filter((place) => {
-    const categoryMatch = activeCategory === "All" || place.category === activeCategory;
-    const languageMatch = activeLanguage === "All" || (place.language || "") === activeLanguage;
-    const countryMatch = activeCountry === "All" || (place.country || "") === activeCountry;
-    const query = searchText.trim().toLowerCase();
-    const text = [
-      place.name,
-      place.description,
-      place.username || "",
-      place.category,
-      place.language || "",
-      place.country || "",
-    ].join(" ").toLowerCase();
-    const searchMatch = query === "" || text.includes(query);
-    const nearbyMatch = !nearbyOnly || !userLocation ||
-      distanceInKm(userLocation.lat, userLocation.lng, place.lat, place.lng) <= 50;
-    return categoryMatch && languageMatch && countryMatch && searchMatch && nearbyMatch;
-  }).sort((a, b) => {
-    if (!userLocation) return 0;
-    return distanceInKm(userLocation.lat, userLocation.lng, a.lat, a.lng) -
-      distanceInKm(userLocation.lat, userLocation.lng, b.lat, b.lng);
-  });
-
-  return (
-    <div style={{ minHeight: "100vh", background: "#07112f", color: "#17213d", paddingBottom: 96, fontFamily: "Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" }}>
+    <div className="pm-app">
       <style>{`
-        .pm-shell{max-width:1440px;margin:0 auto}
-        .pm-header{background:linear-gradient(115deg,#0756d8 0%,#1744a7 48%,#ffb84d 100%);padding:22px 28px;color:#fff}
-        .pm-header-grid{display:grid;grid-template-columns:280px minmax(240px,1fr) auto;gap:22px;align-items:center}
-        .pm-logo{display:flex;align-items:center;gap:12px;font-weight:900;font-size:32px;letter-spacing:-1.5px}
-        .pm-pin{width:58px;height:70px;border-radius:50% 50% 50% 0;background:#ffc33d;transform:rotate(-45deg);display:grid;place-items:center;box-shadow:0 8px 20px #00194b55}
-        .pm-pin span{transform:rotate(45deg);font-size:27px;color:#fff}
-        .pm-tagline{margin-left:70px;margin-top:-8px;font-size:16px;font-style:italic;opacity:.9}
-        .pm-search{display:flex;align-items:center;gap:12px;background:#fff;color:#71809b;border-radius:40px;padding:16px 22px;font-size:15px;box-shadow:0 8px 24px #00194b22}
-        .pm-search input{border:0;outline:0;width:100%;font-size:15px;background:transparent;color:#17213d}
-        .pm-pill{border:0;border-radius:32px;padding:15px 20px;background:#fff;color:#24345e;font-weight:800;cursor:pointer;white-space:nowrap}
-        .pm-main{background:#eef3fb;padding:0 0 28px}
-        .pm-map-wrap{position:relative;margin:0;border-radius:0 0 30px 30px;overflow:hidden;background:#cce3d6}
-        .pm-map{height:520px;width:100%}
-        .pm-left{position:absolute;left:28px;top:28px;z-index:500;display:flex;flex-direction:column;gap:12px;width:250px}
-        .pm-control{border:0;background:#fff;border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 8px 24px #14234a20;color:#24345e;font-weight:800;cursor:pointer}
-        .pm-control small{font-weight:700;color:#71809b}
-        .pm-switch{width:54px;height:30px;border-radius:30px;background:#13ad69;position:relative;flex:none}.pm-switch:after{content:"";position:absolute;width:24px;height:24px;right:3px;top:3px;border-radius:50%;background:#fff}
-        .pm-legend{position:absolute;right:28px;bottom:28px;z-index:500;background:#fff;border-radius:24px;padding:20px 22px;box-shadow:0 8px 24px #14234a20;display:grid;gap:13px;min-width:230px}
-        .pm-legend-row{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:800;color:#344261}.pm-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff}
-        .pm-categories{display:flex;gap:14px;overflow-x:auto;padding:18px 28px;background:#fff;border-radius:0 0 28px 28px;box-shadow:0 10px 30px #14234a12}
-        .pm-cat{min-width:155px;border:1px solid #e8edf6;background:#fff;border-radius:22px;padding:15px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;color:#344261;font-weight:900}.pm-cat small{display:block;font-weight:600;color:#8290a9;margin-top:3px}.pm-cat.active{background:linear-gradient(135deg,#6330e8,#4b17c8);color:#fff;border-color:transparent}.pm-cat.active small{color:#e7ddff}
-        .pm-cat-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:25px;background:#f1eaff}.pm-cat.active .pm-cat-icon{background:#ffffff30}
-        .pm-content{padding:26px 28px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
-        .pm-promo{background:linear-gradient(145deg,#111b40,#172653);color:#fff;border-radius:24px;padding:28px;min-height:265px}.pm-promo h2{font-size:26px;line-height:1.15;margin:0 0 18px}.pm-promo p{color:#d2daf1;line-height:1.6}.pm-script{font-size:25px;color:#ffd35b;font-style:italic;font-weight:900;margin-top:25px}
-        .pm-feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.pm-feature{border-radius:22px;padding:22px;color:#fff;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;font-weight:900}.pm-feature span{font-size:32px}.pm-feature small{font-size:13px}
-        .pm-list-panel{background:#fff;border-radius:24px;padding:20px;min-width:0}.pm-section-title{display:flex;justify-content:space-between;align-items:center;margin:0 0 15px;font-size:22px}.pm-section-title span{font-size:13px;color:#8290a9}
-        .pm-bottom{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-top:1px solid #e6ebf5;display:grid;grid-template-columns:repeat(5,1fr);padding:9px 10px calc(9px + env(safe-area-inset-bottom));box-shadow:0 -8px 28px #14234a22}.pm-nav{border:0;background:transparent;color:#65728c;font-weight:800;cursor:pointer;padding:7px;border-radius:16px}.pm-nav.active{color:#5424d9;background:#f0eaff}.pm-nav span{display:block;font-size:25px;margin-bottom:3px}.pm-add{background:linear-gradient(135deg,#6c32f2,#4d18d1);color:#fff;border-radius:50%;width:58px;height:58px;margin:-32px auto 0;border:6px solid #eef3fb;font-size:30px}
-        @media(max-width:900px){.pm-header-grid{grid-template-columns:1fr;gap:14px}.pm-logo{font-size:28px}.pm-tagline{margin-left:70px}.pm-left{left:14px;top:14px;width:220px}.pm-legend{right:14px;bottom:14px;min-width:180px}.pm-content{grid-template-columns:1fr;padding:20px 14px}.pm-categories{padding:14px}.pm-map{height:500px}}
-        @media(max-width:560px){.pm-header{padding:16px}.pm-logo{font-size:25px}.pm-pin{width:45px;height:56px}.pm-pin span{font-size:22px}.pm-tagline{margin-left:57px;font-size:13px}.pm-left{width:178px;left:10px;top:10px;gap:8px}.pm-control{padding:10px 12px;font-size:12px;border-radius:20px}.pm-switch{width:46px;height:26px}.pm-switch:after{width:20px;height:20px}.pm-legend{position:relative;right:auto;bottom:auto;margin:10px;background:#fff;min-width:0;padding:14px 16px;gap:9px}.pm-legend-row{font-size:13px}.pm-map-wrap{border-radius:0}.pm-map{height:400px}.pm-cat{min-width:135px}.pm-feature-grid{gap:10px}.pm-feature{padding:16px}.pm-promo h2{font-size:22px}}
+        .pm-app{min-height:100vh;background:#f4f7fb;color:#14213d;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:88px}
+        .pm-shell{width:100%;max-width:1180px;margin:0 auto}
+        .pm-header{background:linear-gradient(135deg,#082c66,#0b5ed7);color:#fff;padding:18px 20px 20px}
+        .pm-header-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}
+        .pm-logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:27px;letter-spacing:-1.2px}
+        .pm-pin{width:42px;height:50px;border-radius:50% 50% 50% 0;background:#ffc33d;transform:rotate(-45deg);display:grid;place-items:center;box-shadow:0 5px 16px #001a4930}
+        .pm-pin span{transform:rotate(45deg);font-size:19px;color:#fff}
+        .pm-actions{display:flex;align-items:center;gap:8px}
+        .pm-pill{border:0;border-radius:18px;padding:10px 13px;background:#ffffff18;color:#fff;font-weight:800;cursor:pointer;white-space:nowrap;border:1px solid #ffffff2d}
+        .pm-pill option{color:#14213d;background:#fff}
+        .pm-search{display:flex;align-items:center;gap:10px;background:#fff;color:#6b7891;border-radius:18px;padding:13px 16px;box-shadow:0 8px 24px #001a4920}
+        .pm-search input{border:0;outline:0;width:100%;font-size:15px;background:transparent;color:#14213d}
+        .pm-main{padding:14px;background:#f4f7fb}
+        .pm-map-card{position:relative;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 10px 32px #18335c18}
+        .pm-map{height:500px;width:100%}
+        .pm-map-controls{position:absolute;z-index:700;left:14px;top:14px;display:flex;flex-direction:column;gap:8px;width:190px}
+        .pm-map-control{border:0;background:#fff;color:#14213d;border-radius:14px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 5px 18px #102a4a20;font-weight:800;cursor:pointer}
+        .pm-map-control:hover{transform:translateY(-1px)}
+        .pm-switch{width:38px;height:22px;border-radius:99px;position:relative;flex:none;transition:.2s}
+        .pm-switch:after{content:"";position:absolute;width:16px;height:16px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0003;transition:.2s}
+        .pm-switch.on:after{right:3px}.pm-switch.off:after{left:3px}
+        .pm-map-legend{position:absolute;z-index:700;right:14px;top:14px;background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 5px 18px #102a4a20;display:flex;gap:7px;flex-wrap:wrap;max-width:230px}
+        .pm-legend-item{border:0;background:#f5f7fb;border-radius:999px;padding:6px 9px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#33415c;cursor:pointer}
+        .pm-legend-dot{width:9px;height:9px;border-radius:50%}
+        .pm-categories{display:flex;gap:9px;overflow-x:auto;padding:13px 2px 2px;scrollbar-width:none}
+        .pm-categories::-webkit-scrollbar{display:none}
+        .pm-cat{border:1px solid #e3e9f2;background:#fff;border-radius:14px;padding:10px 13px;display:flex;align-items:center;gap:8px;min-width:max-content;color:#33415c;font-weight:800;cursor:pointer;box-shadow:0 3px 10px #18335c0b}
+        .pm-cat.active{background:#0b63e5;color:#fff;border-color:#0b63e5}
+        .pm-cat-icon{font-size:19px}
+        .pm-section{margin-top:14px;background:#fff;border-radius:20px;padding:17px;box-shadow:0 8px 24px #18335c10}
+        .pm-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+        .pm-section-head h2{font-size:18px;margin:0}.pm-section-head span{font-size:12px;color:#7a879d}
+        .pm-mini-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+        .pm-mini{border:1px solid #e7ebf2;background:#f8fafc;border-radius:15px;padding:12px 8px;text-align:left;cursor:pointer;color:#263754;font-weight:800}
+        .pm-mini:hover{border-color:#b9d3f7;background:#f2f7ff}
+        .pm-mini-icon{font-size:22px;display:block;margin-bottom:6px}.pm-mini small{display:block;color:#7a879d;margin-top:2px;font-weight:600}
+        .pm-list-panel{margin-top:14px;background:#fff;border-radius:20px;padding:17px;box-shadow:0 8px 24px #18335c10}
+        .pm-bottom{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-top:1px solid #e4e9f1;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -8px 25px #102a4a18}
+        .pm-nav{border:0;background:transparent;color:#68758b;font-weight:800;cursor:pointer;padding:7px 3px;border-radius:13px;font-size:11px}.pm-nav.active{color:#0b63e5;background:#edf5ff}.pm-nav span{display:block;font-size:20px;margin-bottom:2px}.pm-add{background:#0b63e5;color:#fff;border-radius:50%;width:46px;height:46px;margin:-22px auto 1px;border:5px solid #f4f7fb;font-size:24px;display:grid!important;place-items:center}
+        @media(max-width:700px){.pm-header{padding:14px 14px 16px}.pm-logo{font-size:22px}.pm-pin{width:36px;height:43px}.pm-actions{gap:6px}.pm-pill{padding:8px 9px;font-size:12px}.pm-map{height:430px}.pm-map-controls{width:165px}.pm-map-control{font-size:12px;padding:10px}.pm-map-legend{right:10px;top:auto;bottom:10px;max-width:205px}.pm-mini-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:430px){.pm-header-row{align-items:flex-start}.pm-actions{flex-direction:column;align-items:stretch}.pm-map{height:390px}.pm-map-controls{width:150px}.pm-map-control{font-size:11px}.pm-map-legend{max-width:175px}.pm-mini-grid{grid-template-columns:repeat(2,1fr)}}
       `}</style>
+
       <header className="pm-header">
-        <div className="pm-shell pm-header-grid">
-          <div>
-            <div className="pm-logo"><div className="pm-pin"><span>●</span></div><span>Pioneer<span style={{color:"#ffc33d"}}>Map</span></span></div>
-            <div className="pm-tagline">Explore · Connect · Grow</div>
+        <div className="pm-shell">
+          <div className="pm-header-row">
+            <div className="pm-logo">
+              <div className="pm-pin"><span>●</span></div>
+              <span>Pioneer<span style={{color:"#ffc33d"}}>Map</span></span>
+            </div>
+            <div className="pm-actions">
+              <select className="pm-pill" value={appLanguage} onChange={(e)=>setAppLanguage(e.target.value as AppLanguage)} aria-label={t("languageSelector")}>
+                {appLanguages.map((language)=><option key={language.value} value={language.value}>{language.label}</option>)}
+              </select>
+              <button className="pm-pill" onClick={loginWithPi}>{signedIn ? `✓ @${username}` : t("signIn")}</button>
+            </div>
           </div>
-          <label className="pm-search"><span style={{fontSize:22}}>⌕</span><input value={searchText} onChange={(e)=>setSearchText(e.target.value)} placeholder={t("search").replace("🔎 ","")} /></label>
-          <div style={{display:"flex",gap:10,alignItems:"center",justifyContent:"flex-end"}}>
-            <select className="pm-pill" value={appLanguage} onChange={(e)=>setAppLanguage(e.target.value as AppLanguage)} aria-label={t("languageSelector")}>
-              {appLanguages.map((language)=><option key={language.value} value={language.value}>{language.label}</option>)}
-            </select>
-            <button className="pm-pill" onClick={loginWithPi}>{signedIn ? `✓ @${username}` : t("signIn")}</button>
-          </div>
+          <label className="pm-search">
+            <span style={{fontSize:22}}>⌕</span>
+            <input value={searchText} onChange={(e)=>setSearchText(e.target.value)} placeholder={t("search").replace("🔎 ","")} />
+          </label>
         </div>
       </header>
-      <main className="pm-main"><div aria-live="polite" style={{display:"none"}}>{status}</div>
+
+      <main className="pm-main">
         <div className="pm-shell">
-          <section className="pm-map-wrap">
+          <section className="pm-map-card">
             <div className="pm-map" ref={mapRef}/>
-            <div className="pm-left">
-              <button className="pm-control" onClick={()=>setMapInteractive(v=>!v)}><span>🗺️ &nbsp; Harita</span><span style={{display:"flex",alignItems:"center",gap:8}}><small>{mapInteractive?"Açık":"Kapalı"}</small><span className="pm-switch" style={{background:mapInteractive?"#13ad69":"#aab4c6"}}/></span></button>
-              <button className="pm-control" onClick={findNearbyPlaces}>➤ &nbsp; {t("nearby").replace("📍 ","")}</button>
-              <button className="pm-control" onClick={()=>setStatus(t("allPlaces"))}>☷ &nbsp; Filtrele</button>
-              <button className="pm-control" onClick={()=>{setActiveLanguage(activeLanguage==="All"?"Turkish":"All");setActiveCountry("All")}}>🌐 &nbsp; Dil + Ülke <small>{activeLanguage==="All"?"TR":activeLanguage}</small></button>
+
+            <div className="pm-map-controls">
+              <button className="pm-map-control" onClick={()=>setMapInteractive(v=>!v)}>
+                <span>🗺️ {t("map").replace("🗺️ ","")}</span>
+                <span className={`pm-switch ${mapInteractive?"on":"off"}`} style={{background:mapInteractive?"#0b63e5":"#aeb8c8"}} />
+              </button>
+              <button className="pm-map-control" onClick={findNearbyPlaces}>📍 {t("nearby").replace("📍 ","")}</button>
+              <button className="pm-map-control" onClick={()=>setStatus(t("allPlaces"))}>☷ {t("allPlaces").replace("🌍 ","")}</button>
             </div>
-            <div className="pm-legend">
-              {["Stays","Shops","Food","Services","Jobs"].map((cat)=><div className="pm-legend-row" key={cat}><span className="pm-dot" style={{background:categoryIcons[cat as Exclude<Category,"All">].color}}>{categoryIcons[cat as Exclude<Category,"All">].icon}</span>{categoryLabel(cat as Exclude<Category,"All">)}</div>)}
+
+            <div className="pm-map-legend">
+              {["Stays","Shops","Food","Services","Jobs"].map((cat)=><button className="pm-legend-item" key={cat} onClick={()=>setActiveCategory(cat as Category)}><span className="pm-legend-dot" style={{background:categoryIcons[cat as Exclude<Category,"All">].color}} />{categoryLabel(cat as Exclude<Category,"All">)}</button>)}
             </div>
           </section>
+
           <div className="pm-categories">
-            {categories.map((cat)=><button key={cat.name} className={`pm-cat ${activeCategory===cat.name?"active":""}`} onClick={()=>setActiveCategory(cat.name)}><span className="pm-cat-icon">{cat.icon}</span><span>{categoryLabel(cat.name)}<small>{cat.name=== "All" ? "Tüm kategoriler" : cat.name}</small></span></button>)}
+            {categories.filter(cat=>cat.name!=="All").map((cat)=><button key={cat.name} className={`pm-cat ${activeCategory===cat.name?"active":""}`} onClick={()=>setActiveCategory(cat.name)}><span className="pm-cat-icon">{cat.icon}</span><span>{categoryLabel(cat.name)}</span></button>)}
           </div>
-          <div className="pm-content">
-            <section className="pm-promo"><h2>Daha Fazlasını<br/>Keşfet, Daha Yakın<br/>Bağlantılar Kur!</h2><p>PioneerMap ile seyahat ederken, ihtiyaç duyduğun her şeyi bul, Pi ekosistemiyle güvenle keşfet.</p><div className="pm-script">Pi ile Gelecek<br/>Daha Yakın</div></section>
-            <section className="pm-feature-grid">
-              {[{c:"#6530e9",i:"🏠",k:"Stays"},{c:"#ed4a92",i:"🛍️",k:"Shops"},{c:"#ff8518",i:"🍴",k:"Food"},{c:"#08b875",i:"🔧",k:"Services"},{c:"#1676e8",i:"💼",k:"Jobs"}].map(item=><button key={item.k} className="pm-feature" style={{background:item.c}} onClick={()=>setActiveCategory(item.k as Category)}><span>{item.i}</span><div>{categoryLabel(item.k as Exclude<Category,"All">)}<small style={{display:"block",opacity:.8}}>{item.k}</small></div></button>)}
-            </section>
-          </div>
+
+          <section className="pm-section">
+            <div className="pm-section-head">
+              <h2>{t("places")}</h2>
+              <span>{filteredPlaces.length} {t("results")}</span>
+            </div>
+            <div className="pm-mini-grid">
+              {["Stays","Shops","Food","Services","Jobs"].map((cat)=><button key={cat} className="pm-mini" onClick={()=>setActiveCategory(cat as Category)}><span className="pm-mini-icon">{categoryIcons[cat as Exclude<Category,"All">].icon}</span>{categoryLabel(cat as Exclude<Category,"All">)}<small>{places.filter(p=>p.category===cat).length}</small></button>)}
+            </div>
+          </section>
+
           {showForm && <AddPlaceForm placeName={placeName} setPlaceName={setPlaceName} placeDescription={placeDescription} setPlaceDescription={setPlaceDescription} placeCategory={placeCategory} setPlaceCategory={(value:string)=>setPlaceCategory(value as Exclude<Category,"All">)} placeLanguage={placeLanguage} setPlaceLanguage={setPlaceLanguage} placeCountry={placeCountry} setPlaceCountry={setPlaceCountry} categories={["Stays","Shops","Food","Services","Jobs"]} languages={languages.map(x=>x.value)} countries={countries.map(x=>x.value)} selectedLocation={selectedLocation} onMapSelect={()=>setMapInteractive(true)} onSubmit={addPlace} onCancel={()=>{setShowForm(false);setSelectedLocation(null);setPlaceImage("")}} submitting={imageUploading} placeImage={placeImage} setPlaceImage={setPlaceImage} imageUploading={imageUploading} labels={{title:t("addPlace"),name:t("placeName"),category:extraTranslations[appLanguage].category,description:t("description"),language:extraTranslations[appLanguage].language,country:extraTranslations[appLanguage].country,photo:extraTranslations[appLanguage].placeImage,photoPreparing:extraTranslations[appLanguage].preparingPhoto,removePhoto:extraTranslations[appLanguage].removeImage,location:extraTranslations[appLanguage].location,saving:t("saving"),savePlace:extraTranslations[appLanguage].savePlace,imageTooLarge:extraTranslations[appLanguage].photoTooLarge}}/>}
           {selectedPlace && <PlaceDetails place={selectedPlace} onClose={()=>setSelectedPlace(null)} onShowOnMap={()=>{const map=mapInstance.current;if(map){map.setView([Number(selectedPlace.lat),Number(selectedPlace.lng)],15);setMapInteractive(true)}}} onDelete={()=>deletePlace(selectedPlace)} labels={{language:extraTranslations[appLanguage].language,country:extraTranslations[appLanguage].country,anonymous:t("anonymous"),addFavorite:extraTranslations[appLanguage].addFavorite,removeFavorite:extraTranslations[appLanguage].removeFavorite,share:extraTranslations[appLanguage].share,showOnMap:extraTranslations[appLanguage].showOnMap,delete:extraTranslations[appLanguage].delete}} isFavorite={isFavorite(selectedPlace)} onToggleFavorite={()=>toggleFavorite(selectedPlace)} onShare={()=>sharePlace(selectedPlace)}/>} 
           <section className="pm-list-panel"><PlaceList places={filteredPlaces} categoryIcons={{Stays:"🏠",Shops:"🛍️",Food:"🍔",Services:"🔧",Jobs:"💼"}} onSelect={(place)=>setSelectedPlace(places.find(item=>getPlaceKey(item)===getPlaceKey(place))||(place as Place))} onDelete={(place)=>deletePlace(place as Place)} onToggleFavorite={(place)=>toggleFavorite(place as Place)} isFavorite={(place)=>isFavorite(place as Place)} labels={{title:t("places"),empty:extraTranslations[appLanguage].noPlaces,results:t("results"),view:extraTranslations[appLanguage].viewDetails,favorite:extraTranslations[appLanguage].addFavorite,favorited:extraTranslations[appLanguage].removeFavorite,delete:extraTranslations[appLanguage].delete,anonymous:t("anonymous")}}/></section>
         </div>
       </main>
+
       <nav className="pm-bottom">
         <button className={`pm-nav ${activeNav==="home"?"active":""}`} onClick={()=>{setActiveNav("home");setSelectedPlace(null);setNearbyOnly(false)}}><span>⌂</span>{extraTranslations[appLanguage].home}</button>
         <button className={`pm-nav ${activeNav==="nearby"?"active":""}`} onClick={()=>{setActiveNav("nearby");findNearbyPlaces()}}><span>⌖</span>{extraTranslations[appLanguage].nearby}</button>
@@ -2665,12 +2153,11 @@ function PioneerMapPage() {
         <button className={`pm-nav ${activeNav==="favorites"?"active":""}`} onClick={()=>setActiveNav("favorites")}><span>★</span>{extraTranslations[appLanguage].favorites}</button>
         <button className={`pm-nav ${activeNav==="profile"?"active":""}`} onClick={()=>{setActiveNav("profile");setStatus(signedIn?`@${username}`:t("signInFirst"))}}><span>♙</span>{extraTranslations[appLanguage].profile}</button>
       </nav>
-      {activeNav==="favorites" && <div style={{position:"fixed",inset:0,bottom:80,zIndex:9000,overflowY:"auto",background:"#eef3fb",padding:20}}><Favorites favorites={favorites} labels={{title:extraTranslations[appLanguage].favorites,empty:extraTranslations[appLanguage].emptyFavorites,view:extraTranslations[appLanguage].viewDetails,remove:extraTranslations[appLanguage].removeFavorite}} onRemove={(id)=>setFavorites(current=>current.filter(place=>place._id!==id))} onPlaceClick={(place)=>{const found=places.find(item=>item._id===place._id);if(found){setSelectedPlace(found);setActiveNav("home")}}}/></div>}
+
+      {activeNav==="favorites" && <div style={{position:"fixed",inset:0,bottom:80,zIndex:9000,overflowY:"auto",background:"#f4f7fb",padding:20}}><Favorites favorites={favorites} labels={{title:extraTranslations[appLanguage].favorites,empty:extraTranslations[appLanguage].emptyFavorites,view:extraTranslations[appLanguage].viewDetails,remove:extraTranslations[appLanguage].removeFavorite}} onRemove={(id)=>setFavorites(current=>current.filter(place=>place._id!==id))} onPlaceClick={(place)=>{const found=places.find(item=>item._id===place._id);if(found){setSelectedPlace(found);setActiveNav("home")}}}/></div>}
     </div>
   );
 
 };
 
 export default PioneerMapPage;
-
-// PioneerMap repaired version - replace the existing PioneerMapPage.tsx with this file.
