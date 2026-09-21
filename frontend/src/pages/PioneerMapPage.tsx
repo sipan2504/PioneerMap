@@ -1525,174 +1525,46 @@ function PioneerMapPage() {
     useRef<L.Marker | null>(null);
 
   /* =======================================================
-  PI LOGIN / OAUTH SIGN-IN
+  PI LOGIN
   ======================================================= */
 
   const [loginBusy, setLoginBusy] = useState(false);
 
-  const PI_CLIENT_ID = "Ctn7jvt8Lr3MpZxZ28BnqL_TLtMxheHx7kyzvnSpfjo";
-  const PI_REDIRECT_URI =
-    "https://pioneer-map-cqz9.vercel.app/signin/callback";
-
-  const getPiState = () => {
-    try {
-      if (window.crypto?.randomUUID) return window.crypto.randomUUID();
-    } catch {
-      // Fall through to the compatibility generator below.
-    }
-
-    return `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random()
-      .toString(36)
-      .slice(2)}`;
-  };
-
-  const finishPiLogin = async (accessToken: string) => {
-    if (!accessToken) {
-      throw new Error(t("piUserError"));
-    }
-
-    const meResponse = await fetch("https://api.minepi.com/v2/me", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const user = await meResponse.json().catch(() => ({}));
-
-    if (!meResponse.ok || !user?.username) {
-      throw new Error(t("piUserError"));
-    }
-
-    const controller = new AbortController();
-    const backendTimer = window.setTimeout(() => controller.abort(), 10000);
-
-    let response: Response;
-    try {
-      response = await fetch(`${backendUrl}/user/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        signal: controller.signal,
-        body: JSON.stringify({
-          authResult: {
-            accessToken,
-            user,
-          },
-        }),
-      });
-    } finally {
-      window.clearTimeout(backendTimer);
-    }
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new Error(data?.message || t("backendError"));
-    }
-
-    setSignedIn(true);
-    setUsername(user.username);
-
-    const welcome =
-      appLanguage === "Turkish"
-        ? "Hoş geldin"
-        : appLanguage === "English"
-        ? "Welcome"
-        : appLanguage === "Arabic"
-        ? "مرحباً"
-        : appLanguage === "Spanish"
-        ? "Bienvenido"
-        : appLanguage === "French"
-        ? "Bienvenue"
-        : appLanguage === "German"
-        ? "Willkommen"
-        : appLanguage === "Portuguese"
-        ? "Bem-vindo"
-        : appLanguage === "Russian"
-        ? "Добро пожаловать"
-        : appLanguage === "Chinese"
-        ? "欢迎"
-        : "स्वागत है";
-
-    setStatus(`✅ ${welcome} @${user.username}`);
-  };
-
-  // Handle the OAuth callback. Pi returns the access token in the URL
-  // fragment, which is only available to browser JavaScript.
+  // Pi Browser authentication uses the Pi SDK.
+  // The SDK must be initialized once before Pi.authenticate().
   useEffect(() => {
-    if (window.location.pathname !== "/signin/callback") return;
-
     let cancelled = false;
+    let attempts = 0;
 
-    const handleCallback = async () => {
-      setLoginBusy(true);
+    const preparePi = () => {
+      if (cancelled) return;
 
-      try {
-        const params = new URLSearchParams(window.location.hash.slice(1));
-        const returnedState = params.get("state");
-        const expectedState =
-          sessionStorage.getItem("pi_oauth_state") ||
-          localStorage.getItem("pi_oauth_state");
-        const error = params.get("error");
-
-        sessionStorage.removeItem("pi_oauth_state");
-        localStorage.removeItem("pi_oauth_state");
-
-        if (!expectedState || returnedState !== expectedState) {
-          throw new Error("Pi Sign-In state doğrulaması başarısız oldu.");
+      const pi = (window as any).Pi;
+      if (pi) {
+        try {
+          Promise.resolve(
+            pi.init({ version: "2.0", sandbox: false })
+          ).catch((error: unknown) =>
+            console.warn("Pi SDK init:", error)
+          );
+        } catch (error) {
+          console.warn("Pi SDK init:", error);
         }
+        return;
+      }
 
-        if (error) {
-          const errorDescription = params.get("error_description");
-          throw new Error(errorDescription || error);
-        }
-
-        const accessToken = params.get("access_token");
-
-        if (!accessToken) {
-          throw new Error(t("piUserError"));
-        }
-
-        if (!cancelled) {
-          await finishPiLogin(accessToken);
-        }
-
-        // Never leave the bearer token in browser history.
-        window.history.replaceState(
-          null,
-          "",
-          "/"
-        );
-
-        if (!cancelled) {
-          window.location.replace("/");
-        }
-      } catch (error) {
-        console.error("Pi OAuth callback error:", error);
-
-        if (!cancelled) {
-          const message =
-            error instanceof Error ? error.message : t("loginFailed");
-          setSignedIn(false);
-          setUsername("");
-          setStatus(`❌ ${message}`);
-        }
-
-        window.history.replaceState(null, "", "/");
-      } finally {
-        if (!cancelled) setLoginBusy(false);
+      attempts += 1;
+      if (attempts < 150) {
+        window.setTimeout(preparePi, 100);
       }
     };
 
-    handleCallback();
+    preparePi();
 
     return () => {
       cancelled = true;
     };
-  }, [appLanguage]);
+  }, []);
 
   const loginWithPi = async () => {
     if (loginBusy) return;
@@ -1700,33 +1572,126 @@ function PioneerMapPage() {
     setLoginBusy(true);
 
     try {
-      const state = getPiState();
+      const waitForPi = () =>
+        new Promise<any>((resolve, reject) => {
+          let attempts = 0;
 
-      // Keep the state in both storages so the value survives the full
-      // navigation through Pi's OAuth authorization page.
-      sessionStorage.setItem("pi_oauth_state", state);
-      localStorage.setItem("pi_oauth_state", state);
+          const check = () => {
+            const pi = (window as any).Pi;
 
-      const authorizeUrl = new URL(
-        "https://accounts.pinet.com/oauth/authorize"
+            if (pi) {
+              resolve(pi);
+              return;
+            }
+
+            attempts += 1;
+            if (attempts >= 150) {
+              reject(new Error(t("piSdkError")));
+              return;
+            }
+
+            window.setTimeout(check, 100);
+          };
+
+          check();
+        });
+
+      const pi = await Promise.race([
+        waitForPi(),
+        new Promise((_, reject) =>
+          window.setTimeout(
+            () => reject(new Error(t("piSdkError"))),
+            15000
+          )
+        ),
+      ]);
+
+      const auth = await pi.authenticate(
+        ["username"],
+        (payment: any) => {
+          console.warn(
+            "Incomplete Pi payment found during authentication:",
+            payment?.identifier
+          );
+        }
       );
 
-      authorizeUrl.searchParams.set("response_type", "token");
-      authorizeUrl.searchParams.set("client_id", PI_CLIENT_ID);
-      authorizeUrl.searchParams.set("redirect_uri", PI_REDIRECT_URI);
-      authorizeUrl.searchParams.set("scope", "username");
-      authorizeUrl.searchParams.set("state", state);
+      if (!auth?.user?.username || !auth?.accessToken) {
+        throw new Error(t("piUserError"));
+      }
 
-      // Use the standard Pi OAuth implicit flow directly. This avoids
-      // depending on a Pi SDK helper to construct the authorization URL.
-      window.location.assign(authorizeUrl.href);
+      const controller = new AbortController();
+      const backendTimer = window.setTimeout(
+        () => controller.abort(),
+        10000
+      );
+
+      let response: Response;
+      try {
+        response = await fetch(`${backendUrl}/user/signin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          signal: controller.signal,
+          body: JSON.stringify({
+            authResult: auth,
+          }),
+        });
+      } finally {
+        window.clearTimeout(backendTimer);
+      }
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.message || t("backendError"));
+      }
+
+      setSignedIn(true);
+      setUsername(auth.user.username);
+
+      const welcome =
+        appLanguage === "Turkish"
+          ? "Hoş geldin"
+          : appLanguage === "English"
+          ? "Welcome"
+          : appLanguage === "Arabic"
+          ? "مرحباً"
+          : appLanguage === "Spanish"
+          ? "Bienvenido"
+          : appLanguage === "French"
+          ? "Bienvenue"
+          : appLanguage === "German"
+          ? "Willkommen"
+          : appLanguage === "Portuguese"
+          ? "Bem-vindo"
+          : appLanguage === "Russian"
+          ? "Добро пожаловать"
+          : appLanguage === "Chinese"
+          ? "欢迎"
+          : "स्वागत है";
+
+      setStatus(`✅ ${welcome} @${auth.user.username}`);
     } catch (error) {
       console.error("Pi login error:", error);
-      sessionStorage.removeItem("pi_oauth_state");
-      localStorage.removeItem("pi_oauth_state");
+
+      setSignedIn(false);
+      setUsername("");
 
       const message = error instanceof Error ? error.message : "";
-      setStatus(message ? `❌ ${message}` : t("loginFailed"));
+      const timeoutError =
+        error instanceof DOMException && error.name === "AbortError";
+
+      setStatus(
+        timeoutError
+          ? `❌ ${t("backendError")}`
+          : message
+          ? `❌ ${message}`
+          : `❌ ${t("loginFailed")}`
+      );
+    } finally {
       setLoginBusy(false);
     }
   };
