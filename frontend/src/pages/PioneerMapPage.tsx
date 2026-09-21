@@ -1633,10 +1633,13 @@ function PioneerMapPage() {
       try {
         const params = new URLSearchParams(window.location.hash.slice(1));
         const returnedState = params.get("state");
-        const expectedState = sessionStorage.getItem("pi_oauth_state");
+        const expectedState =
+          sessionStorage.getItem("pi_oauth_state") ||
+          localStorage.getItem("pi_oauth_state");
         const error = params.get("error");
 
         sessionStorage.removeItem("pi_oauth_state");
+        localStorage.removeItem("pi_oauth_state");
 
         if (!expectedState || returnedState !== expectedState) {
           throw new Error("Pi Sign-In state doğrulaması başarısız oldu.");
@@ -1698,41 +1701,29 @@ function PioneerMapPage() {
 
     try {
       const state = getPiState();
+
+      // Keep the state in both storages so the value survives the full
+      // navigation through Pi's OAuth authorization page.
       sessionStorage.setItem("pi_oauth_state", state);
+      localStorage.setItem("pi_oauth_state", state);
 
-      const pi = (window as any).Pi;
-
-      if (pi?.signIn) {
-        try {
-          pi.init?.({ version: "2.0", sandbox: false });
-        } catch (error) {
-          console.warn("Pi SDK init:", error);
-        }
-
-        pi.signIn({
-          clientId: PI_CLIENT_ID,
-          redirectUri: PI_REDIRECT_URI,
-          scopes: ["username"],
-          state,
-        });
-        return;
-      }
-
-      // Standards-based fallback. This uses the same implicit OAuth flow
-      // documented by Pi and does not require a client secret.
       const authorizeUrl = new URL(
         "https://accounts.pinet.com/oauth/authorize"
       );
+
       authorizeUrl.searchParams.set("response_type", "token");
       authorizeUrl.searchParams.set("client_id", PI_CLIENT_ID);
       authorizeUrl.searchParams.set("redirect_uri", PI_REDIRECT_URI);
       authorizeUrl.searchParams.set("scope", "username");
       authorizeUrl.searchParams.set("state", state);
 
-      window.location.assign(authorizeUrl.toString());
+      // Use the standard Pi OAuth implicit flow directly. This avoids
+      // depending on a Pi SDK helper to construct the authorization URL.
+      window.location.assign(authorizeUrl.href);
     } catch (error) {
       console.error("Pi login error:", error);
       sessionStorage.removeItem("pi_oauth_state");
+      localStorage.removeItem("pi_oauth_state");
 
       const message = error instanceof Error ? error.message : "";
       setStatus(message ? `❌ ${message}` : t("loginFailed"));
