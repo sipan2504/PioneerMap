@@ -1525,13 +1525,15 @@ function PioneerMapPage() {
     useRef<L.Marker | null>(null);
 
   /* =======================================================
-  PI LOGIN
+  PI SIGN-IN
   ======================================================= */
+
+  const PI_CLIENT_ID = "Ctn7jvt8Lr3MpZxZ28BnqL_TLtMxheHx7kyzvnSpfjo";
+  const PI_REDIRECT_URI =
+    "https://pioneer-map-cqz9.vercel.app/signin/callback";
 
   const [loginBusy, setLoginBusy] = useState(false);
 
-  // Prepare Pi once when the page loads. The login button itself only
-  // waits for the SDK to exist; it never calls Pi.init repeatedly.
   useEffect(() => {
     let cancelled = false;
     let attempts = 0;
@@ -1562,6 +1564,154 @@ function PioneerMapPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (window.location.pathname !== "/signin/callback") return;
+    if (!window.location.hash) return;
+
+    let cancelled = false;
+
+    const handlePiCallback = async () => {
+      setLoginBusy(true);
+
+      try {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = params.get("access_token");
+        const returnedState = params.get("state");
+        const expectedState = sessionStorage.getItem("pi_oauth_state");
+        const error = params.get("error");
+
+        sessionStorage.removeItem("pi_oauth_state");
+
+        if (error) {
+          throw new Error(`Pi Sign-In: ${error}`);
+        }
+
+        if (!accessToken) {
+          throw new Error(t("piUserError"));
+        }
+
+        if (!expectedState || returnedState !== expectedState) {
+          throw new Error("Pi Sign-In state doğrulaması başarısız.");
+        }
+
+        const meResponse = await fetch("https://api.minepi.com/v2/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const me = await meResponse.json().catch(() => ({}));
+
+        if (!meResponse.ok || !me?.username) {
+          throw new Error(t("piUserError"));
+        }
+
+        const controller = new AbortController();
+        const backendTimer = window.setTimeout(
+          () => controller.abort(),
+          10000
+        );
+
+        let response: Response;
+        try {
+          response = await fetch(`${backendUrl}/user/signin`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            signal: controller.signal,
+            body: JSON.stringify({
+              authResult: {
+                accessToken,
+                user: {
+                  uid: me.uid,
+                  username: me.username,
+                },
+              },
+            }),
+          });
+        } finally {
+          window.clearTimeout(backendTimer);
+        }
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data?.message || t("backendError"));
+        }
+
+        if (cancelled) return;
+
+        setSignedIn(true);
+        setUsername(me.username);
+
+        const welcome =
+          appLanguage === "Turkish"
+            ? "Hoş geldin"
+            : appLanguage === "English"
+            ? "Welcome"
+            : appLanguage === "Arabic"
+            ? "مرحباً"
+            : appLanguage === "Spanish"
+            ? "Bienvenido"
+            : appLanguage === "French"
+            ? "Bienvenue"
+            : appLanguage === "German"
+            ? "Willkommen"
+            : appLanguage === "Portuguese"
+            ? "Bem-vindo"
+            : appLanguage === "Russian"
+            ? "Добро пожаловать"
+            : appLanguage === "Chinese"
+            ? "欢迎"
+            : "स्वागत है";
+
+        setStatus(`✅ ${welcome} @${me.username}`);
+
+        window.history.replaceState(
+          null,
+          "",
+          window.location.pathname
+        );
+      } catch (error) {
+        console.error("Pi Sign-In callback error:", error);
+
+        if (cancelled) return;
+
+        setSignedIn(false);
+        setUsername("");
+
+        const message = error instanceof Error ? error.message : "";
+        const timeoutError =
+          error instanceof DOMException && error.name === "AbortError";
+
+        setStatus(
+          timeoutError
+            ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
+            : message
+            ? `❌ ${message}`
+            : t("loginFailed")
+        );
+
+        window.history.replaceState(
+          null,
+          "",
+          window.location.pathname
+        );
+      } finally {
+        if (!cancelled) setLoginBusy(false);
+      }
+    };
+
+    void handlePiCallback();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [appLanguage, backendUrl, t]);
 
   const loginWithPi = async () => {
     if (loginBusy) return;
@@ -1603,98 +1753,46 @@ function PioneerMapPage() {
         ),
       ]);
 
-      const auth = await pi.authenticate(
-        ["username"],
-        (payment: any) => {
-          console.warn(
-            "Incomplete Pi payment found during authentication:",
-            payment?.identifier
-          );
-        }
-      );
-
-      if (!auth?.user?.username || !auth?.accessToken) {
-        throw new Error(t("piUserError"));
-      }
-
-      const controller = new AbortController();
-      const backendTimer = window.setTimeout(
-        () => controller.abort(),
-        10000
-      );
-
-      let response: Response;
       try {
-        response = await fetch(`${backendUrl}/user/signin`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          signal: controller.signal,
-          body: JSON.stringify({
-            authResult: auth,
-          }),
-        });
-      } finally {
-        window.clearTimeout(backendTimer);
+        await Promise.resolve(
+          pi.init({ version: "2.0", sandbox: false })
+        );
+      } catch (error) {
+        console.warn("Pi SDK init before sign-in:", error);
       }
 
-      const data = await response.json().catch(() => ({}));
+      const state =
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-      if (!response.ok) {
-        throw new Error(data?.message || t("backendError"));
+      sessionStorage.setItem("pi_oauth_state", state);
+
+      if (typeof pi.signIn !== "function") {
+        throw new Error("Pi Sign-In SDK kullanılamıyor.");
       }
 
-      setSignedIn(true);
-      setUsername(auth.user.username);
-
-      const welcome =
-        appLanguage === "Turkish"
-          ? "Hoş geldin"
-          : appLanguage === "English"
-          ? "Welcome"
-          : appLanguage === "Arabic"
-          ? "مرحباً"
-          : appLanguage === "Spanish"
-          ? "Bienvenido"
-          : appLanguage === "French"
-          ? "Bienvenue"
-          : appLanguage === "German"
-          ? "Willkommen"
-          : appLanguage === "Portuguese"
-          ? "Bem-vindo"
-          : appLanguage === "Russian"
-          ? "Добро пожаловать"
-          : appLanguage === "Chinese"
-          ? "欢迎"
-          : "स्वागत है";
-
-      setStatus(`✅ ${welcome} @${auth.user.username}`);
+      pi.signIn({
+        clientId: PI_CLIENT_ID,
+        redirectUri: PI_REDIRECT_URI,
+        scopes: ["username"],
+        state,
+      });
     } catch (error) {
       console.error("Pi login error:", error);
 
-      setSignedIn(false);
-      setUsername("");
+      sessionStorage.removeItem("pi_oauth_state");
+      setLoginBusy(false);
 
       const message = error instanceof Error ? error.message : "";
-      const timeoutError =
-        error instanceof DOMException && error.name === "AbortError";
-      const consentError = /consent|scope|network error/i.test(message);
-
       setStatus(
-        timeoutError
-          ? "❌ Sunucu yanıt vermedi. Lütfen tekrar dene."
-          : consentError
-          ? "❌ Pi izinleri kontrol edilemedi. Pi Browser'ı yeniden açıp tekrar dene."
-          : message === "Pi SDK timeout"
+        message === "Pi SDK timeout"
           ? t("piSdkError")
           : message
           ? `❌ ${message}`
           : t("loginFailed")
       );
-    } finally {
-      setLoginBusy(false);
     }
   };
 
